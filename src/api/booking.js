@@ -1,11 +1,6 @@
 import { 
   post 
 } from './helper/http';
-import { getStorage, setStorage } from './helper/storage';
-import { getAccessToken } from './helper/userHelper';
-import environtment from './environtment';
-
-const baseURL = environtment.url + '/api/'
 
 export class BookingApi {
   
@@ -73,93 +68,41 @@ export class BookingApi {
     } catch(err) {
       return err.data
     }
-    // let API_URL = baseURL + 'bookings/compute-rates';
-    // let bookingConfirmation = await getStorage('bookingConfirmation')
-
-    // const bookingData = {
-    //   booking_number: bookingConfirmation.booking_number
-    // }
-
-    // console.log(bookingData)
-
-
-    // const response = await fetch(API_URL ,{
-    //     method: 'POST',
-    //     headers: {
-    //             'Accept': 'application/json',
-    //             'Authorization': `Bearer ${getAccessToken()}`,
-    //             'Content-Type': 'application/json',
-    //         },
-    //     body: JSON.stringify(bookingData)
-    //   });
-
-    // const result = await response.json()
-
-    // return result
   }
 
-  static async confirmBooking() {
-    let API_URL = baseURL + 'bookings/update-status/confirmed';
-    let updateBooking = await getStorage('bookingRes')
-    const user = await getStorage('user');
-    const formData = new FormData()
-
-    formData.append('booking_number', updateBooking.booking_number)
-
-
-    const response = await fetch(API_URL ,{
-        method: 'POST',
-        headers: {
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${getAccessToken()}`,
-                'Content-Type': 'multipart/form-data',
-            },
-        body: formData
-      });
-
-    const result = await response.json()
-
-    return result
-  }
-
-  static async cancelBooking(bookNumber) {
-    let API_URL = baseURL + 'bookings/update-status/cancelled';
-    const user = await getStorage('user');
+  static async confirmBooking(bookNumber) {
     const formData = new FormData()
 
     formData.append('booking_number', bookNumber)
 
+    try {
+      const response = await post('/api/bookings/update-status/confirmed', formData, { "Content-Type": "multipart/form-data" })
+      return response.data
+    } catch(err) {
+      return err.data
+    }
+  }
 
-    const response = await fetch(API_URL ,{
-        method: 'POST',
-        headers: {
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${getAccessToken()}`,
-                'Content-Type': 'multipart/form-data',
-            },
-        body: formData
-      });
+  static async cancelBooking(bookNumber) {
+    const formData = new FormData()
 
-    const result = await response.json()
+    formData.append('booking_number', bookNumber)
 
-    return result
+    try {
+      const response = await post('/api/bookings/update-status/cancelled', formData, { "Content-Type": "multipart/form-data" })
+      return response.data
+    } catch(err) {
+      console.log(err)
+      return err
+    }
   }
 
   static async quickQuotate(data) {
-    let API_URL = baseURL + 'bookings/quick-quotation'
-
-    const response = await fetch(API_URL ,{
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data)
-    });
-
-  const result = await response.json()
-
-  return result
-    
+    try {
+      const response = await post('/api/bookings/quick-quotation', data)
+      return response.data
+    } catch(err) {
+      return err.data
+    }
   }
 }

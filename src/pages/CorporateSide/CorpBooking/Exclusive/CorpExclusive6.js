@@ -7,7 +7,6 @@ import {
   Text, 
   ActivityIndicator, 
   TouchableOpacity, 
-  Alert, 
   Dimensions,
   Modal
 } from 'react-native';
@@ -15,10 +14,10 @@ import MapView, { Marker } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import { PROVIDER_GOOGLE } from 'react-native-maps';
 import { BookingApi } from '../../../../api/booking';
-import { getStorage, setStorage } from '../../../../api/helper/storage';
 import { returnIcon } from '../../../../utils/imageHelper';
 import { moneyFormat } from '../../../../utils/stringHelper';
 import { connect } from 'react-redux';
+import { navigate } from '../../../../utils/navigationHelper';
 
 import { UMColors } from '../../../../utils/ColorHelper';
 
@@ -67,33 +66,30 @@ export class CorpExclusive5 extends Component {
     }
     const response = await BookingApi.computeRates(data)
     console.log(response)
-    // if(response.success) {
-    //   await setStorage('bookingRes', response.data)
-    //   this.setState({ bookingRes: response.data, isLoading: false })
-    // }
-    // else {
-    //   this.setState({ isLoading: false })
-    //   console.log(response.message)
-    // }
+    if(response.success) {
+      this.setState({ bookingRes: response.data, isLoading: false })
+    }
+    else {
+      this.setState({ isLoading: false })
+      console.log(response.message)
+    }
   }
 
   async confimBooking() {
-    const response = await BookingApi.confirmBooking(data)
-    // if(respond.success){
-    //   await setStorage('bookingRes', respond.data)
-    //   this.props.navigation.navigate('CorpExclusive7')
-    // } else {
-    //   Alert.alert('Warning', `${respond.message}`)
-    // }
+    const response = await BookingApi.confirmBooking(this.state.bookingData.booking_number)
+    if(response.success){
+      navigate('CorpExclusive7', { booking: response.data })
+    } else {
+      Alert.alert('Warning', `${response.message}`)
+    }
   }
 
   async cancelBooking() {
-    let respond = await BookingApi.cancelBooking(this.state.bookingData.booking_number)
-    console.log(respond)
-    if(respond.success){
-      this.props.navigation.navigate('CorpExclusiveCancelScreen')
+    const response = await BookingApi.cancelBooking(this.state.bookingData.booking_number)
+    if(response.success){
+      navigate('CorpExclusiveCancelScreen')
     } else {
-      console.log(respond)
+      console.log(response)
     }
   }
 
@@ -115,7 +111,6 @@ export class CorpExclusive5 extends Component {
                 style={styles.mdlBtn}
                 onPress={() => {
                   this.cancelBooking()
-                  this.props.navigation.navigate('CorpExclusiveCancelScreen')
                 }}
               >
                 <Text style={styles.mdlBtnTxt}>Yes</Text>

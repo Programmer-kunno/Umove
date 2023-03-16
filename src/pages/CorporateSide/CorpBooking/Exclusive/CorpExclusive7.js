@@ -4,13 +4,10 @@ import {
   StyleSheet, 
   Image,
   TouchableOpacity,
-  Modal
 } from 'react-native'
-import React, { Component, useRef, useCallback } from 'react'
+import React, { Component } from 'react'
 
 import { UMColors } from '../../../../utils/ColorHelper'
-
-import { setStorage, getStorage } from '../../../../api/helper/storage'
 import RBSheet from 'react-native-raw-bottom-sheet'
 
 export default class CorpExclusive7 extends Component {
@@ -18,7 +15,7 @@ export default class CorpExclusive7 extends Component {
     super(props);
 
     this.state = {
-      booking: null,
+      booking: this.props.route.params.booking,
       appointment: null,
       userProfile: null,
       userVehicle: null,
@@ -30,10 +27,8 @@ export default class CorpExclusive7 extends Component {
   }
 
   async componentDidMount () { 
-    const bookRes = await getStorage('bookingRes')
-    const bookNumber = { booking_number: bookRes.booking_number}
+    const bookRes = this.state.booking
     this.setState({ 
-      booking: bookRes, 
       appointment: bookRes.booking_routes[0].booking_appointments[0],
       userProfile: bookRes.booking_routes[0].booking_appointments[0].driver.user.user_profile,
       userVehicle: bookRes.booking_routes[0].booking_appointments[0].vehicle,
@@ -173,7 +168,7 @@ export default class CorpExclusive7 extends Component {
               <Text style={{ fontSize: 25, color: 'rgb(223,131,68)', fontWeight: '400' }}>On its way</Text>
               <View style={styles.bookigRefContainer}>
                 <Text style={styles.bookingRefTxt}>Booking Ref</Text>
-                <Text style={styles.bookingRefTxt}>{this.state.booking.booking_number}</Text>
+                <Text style={[styles.bookingRefTxt, { textAlign: 'right' }]}>{this.state.booking.booking_number}</Text>
               </View>
             </View>
             <View style={styles.bottomBtnContainer}>
