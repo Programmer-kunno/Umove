@@ -29,16 +29,15 @@ export default class CorpExclusiveDriverLocation extends Component {
     try {
       finishTask('GET_LOCATION')
       startTask('GET_LOCATION', async() => {
-        console.log(this.state.destination)
-        const respond = await DriverApi.driverLocation(this.state.bookingNumber)
-        console.log(respond)
-        if(respond.success && respond.data.latitude && respond.data.longitude){
+        const response = await DriverApi.driverLocation(this.state.bookingNumber)
+        console.log(response)
+        if(response.success && response.data.latitude && response.data.longitude){
           this.setState({ origin: {
-            latitude: parseFloat(respond.data.latitude),
-            longitude: parseFloat(respond.data.longitude)
+            latitude: parseFloat(response.data.latitude),
+            longitude: parseFloat(response.data.longitude)
           }})
         } else {
-          console.log(respond)
+          console.log(response)
         }
       }, 30000)
     } catch(e) {
