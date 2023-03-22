@@ -16,13 +16,16 @@ import ImagePicker from 'react-native-image-crop-picker';
 import { FetchApi }  from '../../../api/fetch'
 import { emailRegex, mobileNumberRegex } from '../../../utils/stringHelper';
 import { UMColors } from '../../../utils/ColorHelper';
+import { dispatch } from '../../../utils/redux';
+import { showError } from '../../../redux/actions/ErrorModal';
+import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal';
 
-export default class CorpSignUp3 extends Component {  
+export default class SignUpScreen3 extends Component {  
   constructor(props) {
     super(props);
     
     this.state = { 
-      register: this.props.route.params.register,
+      register: this.props.route?.params?.register,
       error: false,
       errMessage: "",
       companyTypeList: [],
@@ -33,13 +36,7 @@ export default class CorpSignUp3 extends Component {
   }
 
   async componentDidMount() {
-    this.init();
     this.loadComapnyType();
-  }
-
-  async init() {
-    this.setState({ register: this.props.route.params.register })
-    console.log(this.state.register)
   }
 
   async signUp() {
@@ -50,7 +47,7 @@ export default class CorpSignUp3 extends Component {
     else if(!mobileNumberRegex(register.companyMobileNumber)) {
       this.setState({ error: true, errMessage: "Please enter a valid contact number" });
     } else {
-      this.props.navigation.navigate('CorpSignUp4', {
+      this.props.navigation.navigate('SignUpScreen4', {
         register: this.state.register
       })
     }
@@ -58,12 +55,15 @@ export default class CorpSignUp3 extends Component {
 
   async loadComapnyType() {
     let response = await FetchApi.companyTypes()
-    console.log(response.data)
-    if(response.success) {
-      let companyTypeList = response.data
-      this.setState({companyTypeList})
+    if(response == undefined){
+      dispatch(showError(true))
     } else {
-      console.log(response.message)
+      if(response?.data?.success) {
+        let companyTypeList = response?.data?.data
+        this.setState({companyTypeList})
+      } else {
+        console.log(response.message)
+      }
     }
   }
 
@@ -103,7 +103,8 @@ export default class CorpSignUp3 extends Component {
     let register = this.state.register;
     return(
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={styles.mainContainer}>   
+      <View style={styles.mainContainer}>
+        <ErrorWithCloseButtonModal/>
         {/* Logo */}
         <View style={styles.logoContainer}>
           <Image

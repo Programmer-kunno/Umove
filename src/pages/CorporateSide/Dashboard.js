@@ -11,7 +11,7 @@ import Profile from './CorpComponents/Profile';
 
 const Tab = createBottomTabNavigator();
 
-export default CorpDashboard = () => {
+export default Dashboard = () => {
     return (
       <Tab.Navigator
         initialRoute="Home" 

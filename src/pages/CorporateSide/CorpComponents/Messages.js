@@ -1,9 +1,12 @@
 import React, { Component }  from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ImageBackground, Image } from 'react-native';
-import { EventRegister } from 'react-native-event-listeners'
-import { CustomerApi } from '../../../api/customer'; 
-import { getStorage, setStorage } from '../../../api/helper/storage';
-
+import { 
+  StyleSheet, 
+  View, 
+  Text, 
+  TouchableOpacity, 
+  ImageBackground, 
+  Image 
+} from 'react-native';
 import TopDashboardNavbar from '../../Components/TopDashboardNavbar';
 
 const bgImage = '../../../assets/bg-image.jpg';
@@ -23,15 +26,7 @@ export default class Messages extends Component {
   }
   
   async init() {
-    let user = await getStorage('user');
-    this.setState({user})
-  }
 
-  async logOut() {
-    let user = await getStorage('user');
-    await CustomerApi.logout(user.refresh);
-    this.props.navigation.navigate('Login');
-    EventRegister.emit('logout', true);
   }
 
   render() {
@@ -42,8 +37,7 @@ export default class Messages extends Component {
 
             {/* Header */}
             <TopDashboardNavbar
-              LogOut={() => this.logOut()}
-              Title={'Corporate'}
+              CustomerService={() => {}}
             />
 
             <View style={styles.content}>

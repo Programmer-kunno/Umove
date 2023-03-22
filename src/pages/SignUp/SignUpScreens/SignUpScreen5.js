@@ -12,26 +12,17 @@ import DocumentPicker from 'react-native-document-picker'
 import getPath from '@flyerhq/react-native-android-uri-path';
 
 
-export default class CorpSignUp5 extends Component {  
+export default class SignUpScreen5 extends Component {  
   constructor(props) {
     super(props);
     
     this.state = { 
-      register: this.props.route.params.register,
+      register: this.props.route?.params?.register,
     };
   }
 
-  async componentDidMount() {
-    this.init();
-  }
-
-  async init() {
-    this.setState({ register: this.props.route.params.register })
-    console.log(this.state.register)
-  }
-
   async signUp() {
-      this.props.navigation.navigate('CorpSignUp6', {
+      this.props.navigation.navigate('SignUpScreen6', {
         register: this.state.register
       })
   }

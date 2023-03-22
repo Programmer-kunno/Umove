@@ -63,7 +63,7 @@ export default class CorpExclusiveCancelScreen extends Component {
             <TouchableOpacity
               style={styles.backBtn}
               onPress={() => {
-                this.props.navigation.navigate('CorpDashboard')
+                this.props.navigation.navigate('Dashboard')
               }}
             >
               <Text style={styles.backBtnTxt}>Back to Home</Text>

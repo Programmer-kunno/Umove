@@ -18,7 +18,6 @@ export default class App extends Component{
       <View style={{flex: 1}}>
         <Provider store={store}>
           <RootNavigation/>
-        
         </Provider>
       </View>
     )

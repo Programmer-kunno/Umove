@@ -20,3 +20,7 @@ export const resetNavigation = (name) => {
     })
   );
 }
+
+export const goBack = () => {
+  navigationRef.goBack();
+}

@@ -4,6 +4,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler'
 
 import { UMIcons } from '../../utils/imageHelper'
 import { finishTask } from '../../utils/taskManagerHelper'
+import { navigate } from '../../utils/navigationHelper'
 
 export default class NavbarComponent extends Component {
   constructor(props){

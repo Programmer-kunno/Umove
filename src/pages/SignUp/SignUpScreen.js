@@ -6,17 +6,48 @@ import {
   TouchableOpacity
 } from 'react-native'
 import React, { Component } from 'react'
-
 import { UMColors } from '../../utils/ColorHelper'
 import { UMIcons } from '../../utils/imageHelper'
-
 import ErrorOkModal from '../Components/ErrorOkModal'
+import { navigate } from '../../utils/navigationHelper'
+
 
 export default class SignUpScreen extends Component {
   constructor(props){
     super(props);
 
     this.state = {
+      register: {
+        customerType: '',
+        firstName: '',
+        middleName: '',
+        lastName: '',
+        username: '',
+        email: '',
+        mobileNumber: "",
+        streetAddress: '',
+        region: '',
+        province: '',
+        city: '',
+        barangay: '',
+        zipcode: '',
+        companyName: '',
+        companyType: '',
+        companyEmail: '',
+        companyMobileNumber: '',
+        companyAddress: '',
+        officeAddress: '',
+        officeRegion: '',
+        officeProvince: '',
+        officeCity: '',
+        officeBarangay: '',
+        officeZipcode: '',
+        password: '',
+        confirmPassword: '', 
+        bir: null,
+        dti: null,
+        validId: null
+      },
       commingSoonVisible: false,
     }
 
@@ -46,7 +77,7 @@ export default class SignUpScreen extends Component {
               <TouchableOpacity
                 style={styles.choiceBtn}
                 onPress={() => {
-                  this.props.navigation.navigate('CorpSignUp1')
+                  navigate('SignUpScreen1', { register: {...this.state.register, customerType: 'corporate'} })
                 }}
               >
                 <Image
@@ -62,8 +93,8 @@ export default class SignUpScreen extends Component {
                 style={styles.choiceBtn}
                 
                 onPress={() => {
-                  // this.props.navigation.navigate('IndivSignUp1')
-                  this.setState({ commingSoonVisible: true })
+                  navigate('SignUpScreen1', { register: {...this.state.register, customerType: 'individual'} })
+                  // this.setState({ commingSoonVisible: true })
                 }}
               >
                 <Image

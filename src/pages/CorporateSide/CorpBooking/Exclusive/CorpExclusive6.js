@@ -18,8 +18,14 @@ import { returnIcon } from '../../../../utils/imageHelper';
 import { moneyFormat } from '../../../../utils/stringHelper';
 import { connect } from 'react-redux';
 import { navigate } from '../../../../utils/navigationHelper';
-
+import { refreshTokenHelper } from '../../../../api/helper/userHelper';
 import { UMColors } from '../../../../utils/ColorHelper';
+import { dispatch } from '../../../../utils/redux';
+import { showError } from '../../../../redux/actions/ErrorModal';
+import ErrorWithCloseButtonModal from '../../../Components/ErrorWithCloseButtonModal';
+import { setLoading } from '../../../../redux/actions/Loader';
+import { Loader } from '../../../Components/Loader';
+import ErrorOkModal from '../../../Components/ErrorOkModal';
 
 export class CorpExclusive5 extends Component {  
   constructor(props) {
@@ -33,6 +39,8 @@ export class CorpExclusive5 extends Component {
       destination: null,
       bookingRes: null,
       confirmationModal: false,
+      errMessage: '',
+      errorOkModalVisible: false
     };
 
     this.mapView = null
@@ -43,12 +51,12 @@ export class CorpExclusive5 extends Component {
     if(bookingData != ''){
       this.setState({ 
         origin: {
-          latitude: bookingData.booking_routes[0].origin_latitude,
-          longitude: bookingData.booking_routes[0].origin_longitude
+          latitude: bookingData?.booking_routes[0]?.origin_latitude,
+          longitude: bookingData?.booking_routes[0]?.origin_longitude
         },
         destination: {
-          latitude: bookingData.booking_routes[0].destination_latitude,
-          longitude: bookingData.booking_routes[0].destination_longitude
+          latitude: bookingData?.booking_routes[0]?.destination_latitude,
+          longitude: bookingData?.booking_routes[0]?.destination_longitude
         }
       })
       this.init();
@@ -61,36 +69,60 @@ export class CorpExclusive5 extends Component {
   }
   
   async computeRates() {
-    const data = {
-      booking_number: this.state.bookingData.booking_number
-    }
-    const response = await BookingApi.computeRates(data)
-    console.log(response)
-    if(response.success) {
-      this.setState({ bookingRes: response.data, isLoading: false })
-    }
-    else {
-      this.setState({ isLoading: false })
-      console.log(response.message)
-    }
+    refreshTokenHelper(async() => {
+      const data = {
+        booking_number: this.state.bookingData?.booking_number
+      }
+      const response = await BookingApi.computeRates(data)
+      if(response == undefined){
+        dispatch(showError(true))
+        this.setState({isLoading: false, errMessage: 'Cant Connect to the server'})
+      } else {
+        if(response?.data?.success) {
+          this.setState({ bookingRes: response?.data?.data, isLoading: false })
+        }
+        else {
+          this.setState({ isLoading: false, errMessage: response?.data?.message })
+        }
+      }
+    })
   }
 
   async confimBooking() {
-    const response = await BookingApi.confirmBooking(this.state.bookingData.booking_number)
-    if(response.success){
-      navigate('CorpExclusive7', { booking: response.data })
-    } else {
-      Alert.alert('Warning', `${response.message}`)
-    }
+    dispatch(setLoading(true))
+    refreshTokenHelper(async() => {
+      const response = await BookingApi.confirmBooking(this.state.bookingData?.booking_number)
+      if(response == undefined){
+        dispatch(showError(true))
+        dispatch(setLoading(false))
+      } else {
+        if(response?.data?.success){
+          navigate('CorpExclusive7', { booking: response?.data?.data })
+          dispatch(setLoading(false))
+        } else {
+          this.setState({ errMessage: response?.data?.message, errorOkModalVisible: true })
+        }
+      }
+    })
   }
 
   async cancelBooking() {
-    const response = await BookingApi.cancelBooking(this.state.bookingData.booking_number)
-    if(response.success){
-      navigate('CorpExclusiveCancelScreen')
-    } else {
-      console.log(response)
-    }
+    this.setState({ confirmationModal: false })
+    dispatch(setLoading(true))
+    refreshTokenHelper(async() => {
+      const response = await BookingApi.cancelBooking(this.state.bookingData?.booking_number)
+      if(response == undefined){
+        dispatch(showError(true))
+        dispatch(setLoading(false))
+      } else {
+        if(response?.data?.success){
+          navigate('CorpExclusiveCancelScreen')
+          dispatch(setLoading(false))
+        } else {
+          this.setState({ errMessage: response?.data?.message, errorOkModalVisible: true })
+        }
+      }
+    })
   }
 
   cancelConfirmModal() {
@@ -137,8 +169,8 @@ export class CorpExclusive5 extends Component {
           {this.cancelConfirmModal()}
           <View style={styles.bookRefContainer}>
             <View style ={{flexDirection: 'row'}}>
-              <Text style={{fontSize: 10, color: 'black', width: '45%'}}>Booking Ref:</Text>
-              <Text style={{fontSize: 10, color: 'black', width: '45%'}}>{this.state.bookingData.booking_number}</Text>
+              <Text style={{fontSize: 12, color: 'black', width: '45%'}}>Booking Ref:</Text>
+              <Text style={{fontSize: 12, color: 'black', width: '45%', textAlign: 'right'}}>{this.state.bookingData?.booking_number}</Text>
             </View>
           </View>
             {
@@ -148,7 +180,7 @@ export class CorpExclusive5 extends Component {
               { this.state.isLoading ?
                 <Text style={styles.infoTxt}>Please wait while we{"\n"}find you a courier</Text>
                 :
-                <Text style={styles.infoTxt}>No courier{"\n"}is available at the moment</Text>
+                <Text style={styles.infoTxt}>{this.state.errMessage}</Text>
               }
             </View>
             {/* Assign/Cancel Button */}
@@ -166,10 +198,9 @@ export class CorpExclusive5 extends Component {
                   this.setState({ isLoading: true })
                   setTimeout(() => {
                     this.computeRates()
-                    this.setState({isLoading: false});
-                  }, 5000);
+                  }, 2000);
                 }}>
-                  <Text style={styles.buttonText}> Wait </Text>
+                  <Text style={styles.buttonText}> Try Again </Text>
                 </TouchableOpacity>
               </View>
             }
@@ -220,6 +251,14 @@ export class CorpExclusive5 extends Component {
   render() {
     return(
       <View style={styles.container}>
+        <ErrorWithCloseButtonModal/>
+        <ErrorOkModal
+          Visible={this.state.errorOkModalVisible}
+          ErrMsg={this.state.errMessage}
+          OkButton={() => {
+            this.setState({ errorOkModalVisible: false })
+          }}
+        />
         <StatusBar translucent backgroundColor={'transparent'} barStyle={'dark-content'} />
         {
           this.state.origin !== null &&
@@ -282,6 +321,7 @@ export class CorpExclusive5 extends Component {
             </MapView> 
         }
         { this.toRender() }
+        <Loader/>
       </View>
     )
   }
