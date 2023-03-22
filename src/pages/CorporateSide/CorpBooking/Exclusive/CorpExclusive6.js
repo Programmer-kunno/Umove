@@ -66,6 +66,7 @@ export class CorpExclusive5 extends Component {
 
   async init() {
     this.computeRates()
+    dispatch(setLoading(false))
   }
   
   async computeRates() {
@@ -83,6 +84,7 @@ export class CorpExclusive5 extends Component {
         }
         else {
           this.setState({ isLoading: false, errMessage: response?.data?.message })
+          dispatch(setLoading(false))
         }
       }
     })
@@ -101,6 +103,7 @@ export class CorpExclusive5 extends Component {
           dispatch(setLoading(false))
         } else {
           this.setState({ errMessage: response?.data?.message, errorOkModalVisible: true })
+          dispatch(setLoading(false))
         }
       }
     })
@@ -111,6 +114,7 @@ export class CorpExclusive5 extends Component {
     dispatch(setLoading(true))
     refreshTokenHelper(async() => {
       const response = await BookingApi.cancelBooking(this.state.bookingData?.booking_number)
+      console.log(response.data)
       if(response == undefined){
         dispatch(showError(true))
         dispatch(setLoading(false))
@@ -120,6 +124,7 @@ export class CorpExclusive5 extends Component {
           dispatch(setLoading(false))
         } else {
           this.setState({ errMessage: response?.data?.message, errorOkModalVisible: true })
+          dispatch(setLoading(false))
         }
       }
     })

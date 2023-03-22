@@ -1,9 +1,9 @@
-import { post } from "./helper/http"
+import { get } from "./helper/http"
 
 export class DriverApi {
   static async driverLocation(booknumber) {
     try {
-      const response = await post('/api/bookings/driver-location', { booking_number: booknumber })
+      const response = await get(`/api/bookings/driver-location/${booknumber}`, {}, false)
       return response
     } catch(err) {
       return err
