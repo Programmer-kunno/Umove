@@ -13,15 +13,12 @@ import Start2 from '../Start/Start2';
 import Login from '../Login/Login';
 import ForgotPassword from '../Login/ForgotPassword';
 import SignUpScreen from '../SignUp/SignUpScreen';
-import IndivSignUp1 from '../SignUp/Individual/IndivSignUp1';
-import IndivSignUp2 from '../SignUp/Individual/IndivSignUp2';
-import IndivSignUp3 from '../SignUp/Individual/IndivSignUp3';
-import CorpSignUp1 from '../SignUp/Corporate/CorpSignUp1';
-import CorpSignUp2 from '../SignUp/Corporate/CorpSignUp2';
-import CorpSignUp3 from '../SignUp/Corporate/CorpSignUp3';
-import CorpSignUp4 from '../SignUp/Corporate/CorpSignUp4';
-import CorpSignUp5 from '../SignUp/Corporate/CorpSignUp5';
-import CorpSignUp6 from '../SignUp/Corporate/CorpSignUp6';
+import SignUpScreen1 from '../SignUp/SignUpScreens/SignUpScreen1';
+import SignUpScreen2 from '../SignUp/SignUpScreens/SignUpScreen2';
+import SignUpScreen3 from '../SignUp/SignUpScreens/SignUpScreen3';
+import SignUpScreen4 from '../SignUp/SignUpScreens/SignUpScreen4';
+import SignUpScreen5 from '../SignUp/SignUpScreens/SignUpScreen5';
+import SignUpScreen6 from '../SignUp/SignUpScreens/SignUpScreen6';
 import QuickQuotationItemDesc from '../QuickQuotation/QuickQuotationItemDesc';
 import QuickQuotationPickUp from '../QuickQuotation/QuickQuotationPickUp';
 import QuickQuotationDelivery from '../QuickQuotation/QuickQuotationDelivery';
@@ -36,8 +33,7 @@ import CorpExclusive6 from '../CorporateSide/CorpBooking/Exclusive/CorpExclusive
 import CorpExclusive7 from '../CorporateSide/CorpBooking/Exclusive/CorpExclusive7';
 import CorpExclusiveCancelScreen from '../CorporateSide/CorpBooking/Exclusive/CorpExclusiveCancelScreen';
 import CorpExclusiveDriverLocation from '../CorporateSide/CorpBooking/Exclusive/CorpExclusiveDriverLocation';
-import CorpDashboard from '../CorporateSide/CorpDashboard';
-import IndivDashboard from '../IndividualSide/IndivDashboard'
+import Dashboard from '../CorporateSide/Dashboard';
 
 export default RootNavigation = () => {
   const Stack = createStackNavigator();
@@ -58,7 +54,7 @@ export default RootNavigation = () => {
         drawerContent={(props) => 
           <CustomDrawer {...props}/>
         } 
-        initialRouteName={'CorpDashboard'}
+        initialRouteName={'Dashboard'}
         screenOptions={{ 
           headerShown: false, 
           drawerType: 'front', 
@@ -68,7 +64,7 @@ export default RootNavigation = () => {
           swipeEdgeWidth: 0
         }}
       >
-        <Drawer.Screen name={'CorpDashboard'} component={CorpDashboard}/>
+        <Drawer.Screen name={'Dashboard'} component={Dashboard}/>
       </Drawer.Navigator>
     )
   }
@@ -83,15 +79,12 @@ export default RootNavigation = () => {
       <Stack.Screen name="Login" component={Login} options={{ cardStyleInterpolator: forFade, gestureEnabled: false }} />
       <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ cardStyleInterpolator: forFade, gestureEnabled: false }} />
       <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-      <Stack.Screen name="IndivSignUp1" component={IndivSignUp1} options={{ cardStyleInterpolator: forFade }} />
-      <Stack.Screen name="IndivSignUp2" component={IndivSignUp2} />
-      <Stack.Screen name="IndivSignUp3" component={IndivSignUp3} />
-      <Stack.Screen name="CorpSignUp1" component={CorpSignUp1} options={{ cardStyleInterpolator: forFade }} />
-      <Stack.Screen name="CorpSignUp2" component={CorpSignUp2} />
-      <Stack.Screen name="CorpSignUp3" component={CorpSignUp3} />
-      <Stack.Screen name="CorpSignUp4" component={CorpSignUp4} />
-      <Stack.Screen name="CorpSignUp5" component={CorpSignUp5} />
-      <Stack.Screen name="CorpSignUp6" component={CorpSignUp6} />
+      <Stack.Screen name="SignUpScreen1" component={SignUpScreen1} options={{ cardStyleInterpolator: forFade }} />
+      <Stack.Screen name="SignUpScreen2" component={SignUpScreen2} />
+      <Stack.Screen name="SignUpScreen3" component={SignUpScreen3} />
+      <Stack.Screen name="SignUpScreen4" component={SignUpScreen4} />
+      <Stack.Screen name="SignUpScreen5" component={SignUpScreen5} />
+      <Stack.Screen name="SignUpScreen6" component={SignUpScreen6} />
       <Stack.Screen name="QuickQuotationItemDesc" component={QuickQuotationItemDesc} options={{ cardStyleInterpolator: forFade, gestureEnabled: false }} />
       <Stack.Screen name="QuickQuotationPickUp" component={QuickQuotationPickUp} />
       <Stack.Screen name="QuickQuotationDelivery" component={QuickQuotationDelivery} />
@@ -106,7 +99,6 @@ export default RootNavigation = () => {
       <Stack.Screen name="CorpExclusive7" component={CorpExclusive7} options={{ gestureEnabled: false }} />
       <Stack.Screen name="CorpExclusiveDriverLocation" component={CorpExclusiveDriverLocation} options={{ gestureEnabled: false }} />
       <Stack.Screen name="CorpExclusiveCancelScreen" component={CorpExclusiveCancelScreen} options={{ gestureEnabled: false }} />
-      <Stack.Screen name="IndivDashboard" component={IndivDashboard} options={{ gestureEnabled: false }} />
       <Stack.Screen name="DrawerNavigation" component={DrawerNavigation} options={{ gestureEnabled: false }} />
       
       {/* There are Pages in the Archive and Hidden Folder */}

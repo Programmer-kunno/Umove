@@ -6,16 +6,16 @@ import {
   TouchableOpacity,
 } from 'react-native'
 import React, { Component } from 'react'
-
 import { UMColors } from '../../../../utils/ColorHelper'
 import RBSheet from 'react-native-raw-bottom-sheet'
+import { navigate } from '../../../../utils/navigationHelper';
 
 export default class CorpExclusive7 extends Component {
   constructor(props){
     super(props);
 
     this.state = {
-      booking: this.props.route.params.booking,
+      booking: this.props.route?.params?.booking,
       appointment: null,
       userProfile: null,
       userVehicle: null,
@@ -29,9 +29,9 @@ export default class CorpExclusive7 extends Component {
   async componentDidMount () { 
     const bookRes = this.state.booking
     this.setState({ 
-      appointment: bookRes.booking_routes[0].booking_appointments[0],
-      userProfile: bookRes.booking_routes[0].booking_appointments[0].driver.user.user_profile,
-      userVehicle: bookRes.booking_routes[0].booking_appointments[0].vehicle,
+      appointment: bookRes?.booking_routes[0]?.booking_appointments[0],
+      userProfile: bookRes?.booking_routes[0]?.booking_appointments[0]?.driver?.user?.user_profile,
+      userVehicle: bookRes?.booking_routes[0]?.booking_appointments[0]?.vehicle,
     })
     console.log(this.state.booking)
   }
@@ -92,22 +92,22 @@ export default class CorpExclusive7 extends Component {
             <View style={styles.courierDetailsContainer}>
               <View style={styles.courierDetails}>
                 <View style={styles.driverDetails}>
-                  <Text style={{ fontSize: 15, fontWeight: 'bold'}}>{this.state.userProfile.first_name + ' ' + this.state.userProfile.last_name}</Text>
-                  <Text style={{ fontSize: 12, marginBottom: '10%' }}>{this.state.userProfile.mobile_number}</Text>
+                  <Text style={{ fontSize: 15, fontWeight: 'bold'}}>{this.state.userProfile?.first_name + ' ' + this.state.userProfile?.last_name}</Text>
+                  <Text style={{ fontSize: 12, marginBottom: '10%' }}>{this.state.userProfile?.mobile_number}</Text>
                   <Image
                     style={{ width: '80%', height: '60%', borderRadius: 15 }}
-                    source={{ uri: this.state.userProfile.profile_image }}
+                    source={{ uri: this.state.userProfile?.profile_image }}
                     resizeMode={'contain'}
                   />
                 </View>
                 <View style={styles.rideDetails}>
                   <Image 
                     style={{ width: '80%', height: '60%', borderRadius: 15 }}
-                    source={{ uri: this.state.userVehicle.vehicle_image[0].image }}
+                    source={{ uri: this.state.userVehicle?.vehicle_image[0]?.image }}
                     resizeMode={'contain'}
                   />
-                  <Text style={{fontSize: 17, marginTop: '10%'}}>{this.state.userVehicle.plate_number}</Text>
-                  <Text style={{fontSize: 12}}>{this.state.userVehicle.vehicle_name}</Text>
+                  <Text style={{fontSize: 17, marginTop: '10%'}}>{this.state.userVehicle?.plate_number}</Text>
+                  <Text style={{fontSize: 12}}>{this.state.userVehicle?.vehicle_name}</Text>
                 </View>
               </View>
               <View style={styles.vacStatusContainer}>
@@ -143,15 +143,15 @@ export default class CorpExclusive7 extends Component {
               <TouchableOpacity
                 style={styles.contactBtn}
                 onPress={() => {
-                  this.props.navigation.navigate('CorpExclusiveDriverLocation', {
-                    bookingNumber: this.state.booking.booking_number,
+                  navigate('CorpExclusiveDriverLocation', {
+                    bookingNumber: this.state.booking?.booking_number,
                     destination: {
-                      latitude: this.state.booking.booking_routes[0].destination_latitude,
-                      longitude: this.state.booking.booking_routes[0].destination_longitude
+                      latitude: this.state.booking?.booking_routes[0]?.destination_latitude,
+                      longitude: this.state.booking?.booking_routes[0]?.destination_longitude
                     },
                     origin: {
-                      latitude: this.state.booking.booking_routes[0].origin_latitude,
-                      longitude: this.state.booking.booking_routes[0].origin_longitude
+                      latitude: this.state.booking?.booking_routes[0]?.origin_latitude,
+                      longitude: this.state.booking?.booking_routes[0]?.origin_longitude
                     },
                     driverLocation: this.state.driverLocation
                   })
@@ -168,7 +168,7 @@ export default class CorpExclusive7 extends Component {
               <Text style={{ fontSize: 25, color: 'rgb(223,131,68)', fontWeight: '400' }}>On its way</Text>
               <View style={styles.bookigRefContainer}>
                 <Text style={styles.bookingRefTxt}>Booking Ref</Text>
-                <Text style={[styles.bookingRefTxt, { textAlign: 'right' }]}>{this.state.booking.booking_number}</Text>
+                <Text style={[styles.bookingRefTxt, { textAlign: 'right' }]}>{this.state.booking?.booking_number}</Text>
               </View>
             </View>
             <View style={styles.bottomBtnContainer}>
@@ -184,7 +184,7 @@ export default class CorpExclusive7 extends Component {
               <TouchableOpacity
                 style={styles.bottomBtn}
                 onPress={() => {
-                  this.props.navigation.navigate('CorpDashboard')
+                  navigate('DrawerNavigation')
                 }}
               >
                 <Text style={styles.btmBtnTxt}>Okay</Text>

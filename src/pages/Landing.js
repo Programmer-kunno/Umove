@@ -1,10 +1,8 @@
 import React, { Component }  from 'react';
 import { StyleSheet, View, ImageBackground, Image } from 'react-native';
-import { EventRegister } from 'react-native-event-listeners'
-
-import { CustomerApi } from '../api/customer'; 
 import { connect } from 'react-redux';
-import { resetNavigation } from '../utils/navigationHelper';
+import { navigate, resetNavigation } from '../utils/navigationHelper';
+import { refreshTokenHelper } from '../api/helper/userHelper';
 
 const bgImage = '../assets/bg-image.jpg';
 
@@ -22,43 +20,16 @@ class Landing extends Component {
   }
 
   async componentDidMount() {
-      setTimeout(() => {
-        const user = this.props.userData
-        console.log(user)
-        if(user.access) {
-          try{
-            CustomerApi.refreshAccess(() => {
-              if(user.customer_type == "corporate"){
-                resetNavigation('DrawerNavigation')
-              } else {
-                resetNavigation('IndivDashboard')
-              }
-            })
-          } catch(err) {
-            console.log(err)
-          }
-        } else {
-          this.init();
-        }
-      }, 2000)
-  }
-
-  componentWillUnmount() {
-    EventRegister.removeEventListener(this.listener)
-  }
-  
-  async init() {
-    return this.props.navigation.navigate('Start1')
-  }
-  
-  async loggedOut() {
-    if (!this.listener) {
-      this.listener = EventRegister.addEventListener('logout', (data) => {
-        this.setState({username: ''})
-        this.setState({password: ''})
-        this.setState({remember: false})
-      });
-    }
+    setTimeout(() => {
+      const user = this.props.userData
+      if(user.access) {   
+        refreshTokenHelper(() => {
+          resetNavigation('DrawerNavigation')
+        })
+      } else {
+        resetNavigation('Start1')
+      }
+    }, 2000)
   }
 
   render() {
@@ -66,7 +37,6 @@ class Landing extends Component {
       <View style={styles.container}>
         <View style={styles.innerContainer}>
           <View style={styles.content}>
-
             {/* Logo */}
             <View style={styles.alignItemCenter}>
               <Image
@@ -75,7 +45,6 @@ class Landing extends Component {
                 resizeMode={'contain'}
               />
             </View>
-
           </View>
         </View>
       </View>

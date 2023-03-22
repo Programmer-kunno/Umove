@@ -1,25 +1,34 @@
 import React, { Component }  from 'react';
-import { StyleSheet, StatusBar, View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, ScrollView, Keyboard, Image, Alert } from 'react-native';
+import { 
+  StyleSheet, 
+  StatusBar, 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  ScrollView, 
+  Keyboard
+} from 'react-native';
 import ModalSelector from 'react-native-modal-selector-searchable'
-
 import { FetchApi } from '../../../../api/fetch';
 import { BookingApi } from '../../../../api/booking';
-import { getStorage, setStorage } from '../../../../api/helper/storage';
 import ErrorOkModal from '../../../Components/ErrorOkModal';
 import GrayNavbar from '../../../Components/GrayNavbar';
-import { CustomerApi } from '../../../../api/customer';
 import { dispatch } from '../../../../utils/redux';
 import { saveBookingDetails } from '../../../../redux/actions/Booking';
 import { navigate } from '../../../../utils/navigationHelper';
 import { Loader } from '../../../Components/Loader';
 import { setLoading } from '../../../../redux/actions/Loader';
+import { refreshTokenHelper } from '../../../../api/helper/userHelper';
+import { showError } from '../../../../redux/actions/ErrorModal';
+import ErrorWithCloseButtonModal from '../../../Components/ErrorWithCloseButtonModal';
 
 export default class CorpExclusive3 extends Component {  
   constructor(props) {
     super(props);
     
     this.state = { 
-      booking: this.props.route.params.booking,
+      booking: this.props.route?.params?.booking,
       date: new Date(),
       newDate: '',
       time: new Date(),
@@ -43,58 +52,78 @@ export default class CorpExclusive3 extends Component {
 
   async booking() {
     dispatch(setLoading(true))
-    const booking = this.state.booking;
-    const response = await BookingApi.corporateExclusive(booking)
-    if(response.success) {
-      dispatch(saveBookingDetails(response.data))
-      navigate('CorpExclusive4', { booking: this.state.booking })
-      dispatch(setLoading(false))
-    } else if (response.message === 'Given token not valid for any token type' || response.message === 'Authentication credentials were not provided.') {
-      await CustomerApi.refreshAccess(this.booking())
-    } else {
-      this.setState({ bookErr: response.message, errModalVisible: true })
-      dispatch(setLoading(false))
-    }
+    refreshTokenHelper(async() => {
+      const booking = this.state.booking;
+      const response = await BookingApi.corporateExclusive(booking)
+      if(response == undefined){
+        dispatch(setLoading(false))
+        dispatch(showError(true))
+      } else {
+        if(response?.data?.success) {
+          dispatch(saveBookingDetails(response?.data?.data))
+          navigate('CorpExclusive4', { booking: this.state.booking })
+          dispatch(setLoading(false))
+        } else {
+          this.setState({ bookErr: response?.data?.message, errModalVisible: true })
+          dispatch(setLoading(false))
+        }
+      }
+    })
   }
 
   async loadRegion() {
-    console.log(this.state.booking)
     let response = await FetchApi.regions()
-    if(response.success) {
-      let regionList = response.data
-      this.setState({regionList})
+    if(response == undefined){
+      dispatch(showError(true))
     } else {
-      console.log(response.message)
+      if(response?.data?.success) {
+        let regionList = response?.data?.data
+        this.setState({regionList})
+      } else {
+        console.log(response?.message)
+      }
     }
   }
 
   async loadProvince(regionCode) {
     let response = await FetchApi.provinces(regionCode)
-    if(response.success) {
-      let provinceList = response.data
-      this.setState({provinceList})
+    if(response == undefined){
+      dispatch(showError(true))
     } else {
-      console.log(response.message)
+      if(response?.data?.success) {
+        let provinceList = response?.data?.data
+        this.setState({provinceList})
+      } else {
+        console.log(response?.message)
+      }
     }
   }
 
   async loadCity(provinceCode) {
     let response = await FetchApi.cities(provinceCode)
-    if(response.success) {
-      let cityList = response.data
-      this.setState({cityList})
+    if(response == undefined){
+      dispatch(showError(true))
     } else {
-      console.log(response.message)
+      if(response?.data?.success) {
+        let cityList = response?.data?.data
+        this.setState({cityList})
+      } else {
+        console.log(response?.message)
+      }
     }
   }
 
   async loadBarangay(cityCode) {
     let response = await FetchApi.barangays(cityCode)
-    if(response.success) {
-      let barangayList = response.data
-      this.setState({barangayList})
+    if(response == undefined){
+      dispatch(showError(true))
     } else {
-      console.log(response.message)
+      if(response?.data?.success) {
+        let barangayList = response?.data?.data
+        this.setState({barangayList})
+      } else {
+        console.log(response?.message)
+      }
     }
   }
 
@@ -127,16 +156,12 @@ export default class CorpExclusive3 extends Component {
 
     return(
       <View style={styles.container}>
+        <ErrorWithCloseButtonModal/>
         <ErrorOkModal
           Visible={this.state.errModalVisible}
           ErrMsg={this.state.bookErr}
           OkButton={() => {
-            if(this.state.bookErr == 'Session expired please log in again.'){
-              this.props.navigation.navigate('Login')
-              this.setState({ errModalVisible: false })
-            } else {
-              this.setState({ errModalVisible: false })
-            }
+            this.setState({ errModalVisible: false })
           }}
         />
         <StatusBar translucent backgroundColor={'transparent'} barStyle={'light-content'} />

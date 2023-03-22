@@ -8,51 +8,65 @@ import { UMColors } from '../../../../utils/ColorHelper';
 import { startTask, finishTask } from '../../../../utils/taskManagerHelper';
 
 import { DriverApi } from '../../../../api/driver';
-import { getStorage, setStorage } from '../../../../api/helper/storage';
 import MapView, { Marker } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
+import { refreshTokenHelper } from '../../../../api/helper/userHelper';
+import { dispatch } from '../../../../utils/redux';
+import { showError } from '../../../../redux/actions/ErrorModal';
+import { goBack } from '../../../../utils/navigationHelper';
+import ErrorOkModal from '../../../Components/ErrorOkModal';
 
 export default class CorpExclusiveDriverLocation extends Component {  
   constructor(props) {
     super(props);
 
     this.state = {
-      bookingNumber: this.props.route.params.bookingNumber,
-      destination: this.props.route.params.destination,
-      origin: this.props.route.params.origin,
+      bookingNumber: this.props.route?.params?.bookingNumber,
+      destination: this.props.route?.params?.destination,
+      origin: this.props.route?.params?.origin,
+      errModalVisible: false,
+      errMessage: '',
     }
     
     this.mapView = null
   }
 
   componentDidMount() {
-    try {
+    refreshTokenHelper(async() => {
       finishTask('GET_LOCATION')
       startTask('GET_LOCATION', async() => {
         const response = await DriverApi.driverLocation(this.state.bookingNumber)
-        console.log(response)
-        if(response.success && response.data.latitude && response.data.longitude){
-          this.setState({ origin: {
-            latitude: parseFloat(response.data.latitude),
-            longitude: parseFloat(response.data.longitude)
-          }})
+        if(response == undefined){
+          dispatch(showError(true))
         } else {
-          console.log(response)
+          if(response?.data?.success && response?.data?.data?.latitude && response?.data?.data?.longitude){
+            this.setState({ origin: {
+              latitude: parseFloat(response?.data?.data?.latitude),
+              longitude: parseFloat(response?.data?.data?.longitude)
+            }})
+          } else {
+            this.setState({ errMessage: response?.data?.message, errModalVisible: true })
+          }
         }
       }, 30000)
-    } catch(e) {
-      console.log(e);
-    }
+    })
   }
 
  
   render() {
     return(
       <View style={styles.mainContainer}>
+        <ErrorOkModal
+          Visible={this.state.errModalVisible}
+          ErrMsg={this.state.errMessage}
+          OkButton={() => {
+            this.setState({ errModalVisible: false })
+          }}
+        />
         <NavbarComponent
           goBack={() => {
             finishTask('GET_LOCATION')
-            this.props.navigation.navigate('CorpExclusive7')
+            goBack()
           }}
           // backButton={this.props.navigation.pop()}
         />

@@ -9,8 +9,12 @@ import React, { Component } from 'react'
 import { useNavigation } from '@react-navigation/native';
 import { UMColors } from '../../utils/ColorHelper';
 import { UMIcons } from '../../utils/imageHelper';
+import { useSelector } from 'react-redux';
 
 export default TopDashboardNavbar = (props) => {  
+
+  const user = useSelector((state) => state.userOperations.userData)
+  console.log(user)
 
   const navigation = useNavigation()
 
@@ -37,7 +41,7 @@ export default TopDashboardNavbar = (props) => {
               source={UMIcons.mainLogo}
               resizeMode={'contain'}
             />
-            <Text style={styles.headerTitle}>{props.Title}</Text>
+            <Text style={styles.headerTitle}>{user.customer_type == "individual" ? "Individual" : "Corporate"}</Text>
           </View>
         </View>
         <View style={styles.headerRight}>

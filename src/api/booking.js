@@ -7,9 +7,9 @@ export class BookingApi {
   static async quickQuotation(booking) {
     try {
       const response = await post('/api/bookings/quick-quotation', booking)
-      return response.data
+      return response
     } catch(err) {
-      return err.data
+      return err
     }
   }
 
@@ -55,18 +55,18 @@ export class BookingApi {
 
     try {
       const response = await post('/api/bookings/book-delivery', bookingDetails)
-      return response.data
+      return response
     } catch(err) {
-      return err.data
+      return err
     }
   }
 
   static async computeRates(data) {
     try {
       const response = await post('/api/bookings/compute-rates', data)
-      return response.data
+      return response
     } catch(err) {
-      return err.data
+      return err
     }
   }
 
@@ -77,9 +77,9 @@ export class BookingApi {
 
     try {
       const response = await post('/api/bookings/update-status/confirmed', formData, { "Content-Type": "multipart/form-data" })
-      return response.data
+      return response
     } catch(err) {
-      return err.data
+      return err
     }
   }
 
@@ -90,9 +90,8 @@ export class BookingApi {
 
     try {
       const response = await post('/api/bookings/update-status/cancelled', formData, { "Content-Type": "multipart/form-data" })
-      return response.data
+      return response
     } catch(err) {
-      console.log(err)
       return err
     }
   }
@@ -100,9 +99,9 @@ export class BookingApi {
   static async quickQuotate(data) {
     try {
       const response = await post('/api/bookings/quick-quotation', data)
-      return response.data
+      return response
     } catch(err) {
-      return err.data
+      return err
     }
   }
 }

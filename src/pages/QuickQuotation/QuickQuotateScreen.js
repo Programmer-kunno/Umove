@@ -6,6 +6,8 @@ import { UMIcons } from '../../utils/imageHelper';
 import ErrorOkModal from '../Components/ErrorOkModal';
 import { BookingApi } from '../../api/booking';
 import { navigate } from '../../utils/navigationHelper';
+import { dispatch } from '../../utils/redux';
+import { showError } from '../../redux/actions/ErrorModal';
 
 export default class QuickQuotateScreen extends Component {
   constructor(props){
@@ -53,10 +55,14 @@ export default class QuickQuotateScreen extends Component {
     }
 
     const response = await BookingApi.quickQuotate(data)
-    if(response.success){
-      navigate('QuickQuotatePriceScreen', { price: response.data.price })
+    if(response == undefined){
+      dispatch(showError(true))
     } else {
-      this.setState({ errorMsg: response.message, errorModalVisible: true })
+      if(response?.data?.success){
+        navigate('QuickQuotatePriceScreen', { price: response?.data?.data?.price })
+      } else {
+        this.setState({ errorMsg: response?.data?.message, errorModalVisible: true })
+      }
     }
   }
 

@@ -4,7 +4,7 @@ import RadioButtonGroup, { RadioButtonItem } from "expo-radio-button";
 import GrayNavbar from '../../../Components/GrayNavbar';
 import { connect } from 'react-redux';
 import { navigate } from '../../../../utils/navigationHelper';
-
+import { goBack } from '../../../../utils/navigationHelper';
 import { UMColors } from '../../../../utils/ColorHelper';
 
 export class CorpExclusive4 extends Component {  
@@ -12,7 +12,7 @@ export class CorpExclusive4 extends Component {
     super(props);
     
     this.state = { 
-      booking: this.props.route.params.booking,
+      booking: this.props.route?.params?.booking,
       computeRates: {},
       distance: ''
     };
@@ -26,7 +26,7 @@ export class CorpExclusive4 extends Component {
   async init() {
     let bookingOverall = this.props.bookingData
     console.log(bookingOverall)
-    this.setState({ distance: bookingOverall.booking_routes[0].distance / 1000 })
+    this.setState({ distance: bookingOverall?.booking_routes[0]?.distance / 1000 })
   }
 
   render() {
@@ -42,7 +42,7 @@ export class CorpExclusive4 extends Component {
         <GrayNavbar
           Title={'Booking Summary'}
           onBack={() => {
-            navigate('CorpExclusive3')
+            goBack()
           }}
         />
 

@@ -1,128 +1,150 @@
-import React, { Component }  from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ImageBackground, Image, Modal, TouchableWithoutFeedback } from 'react-native';
-
+import React, { Component, useState }  from 'react';
+import { 
+  StyleSheet, 
+  View,
+  Text, 
+  TouchableOpacity, 
+  ImageBackground, 
+  Image, 
+  Modal, 
+  TouchableWithoutFeedback ,
+  StatusBar,
+  Alert
+} from 'react-native';
 import { UMColors } from '../../../utils/ColorHelper';
 import { UMIcons } from '../../../utils/imageHelper';
-
-import { getStorage } from '../../../api/helper/storage';
-
 import TopDashboardNavbar from '../../Components/TopDashboardNavbar';
+import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal';
+import ErrorOkModal from '../../Components/ErrorOkModal';
+import { useSelector } from 'react-redux';
+import { navigate } from '../../../utils/navigationHelper';
 
 const bgImage = '../../../assets/bg-image.jpg';
 
-export default class Home extends Component {  
-  constructor() {
-    super();
-    
-    this.state = { 
-      balance: '1,000.00',
-      points: '10.00',
-      user: [],
-      modalVisible: false
-    };
+export default Home = () => {  
+  const user = useSelector(state => state.userOperations.userData)
+  const [wallet, setWallet] = useState({
+    balance: '1,000.00',
+    points: '10.00'
+  })
+  const [modalVisible, setModalVisible] = useState(false)
+  const [error, setError] = useState({
+    value: false,
+    message: ''
+  })
+  const [isVerified, setIsVerified] = useState(true)
+
+  chooseTypeBooking = () => {
+    console.log(user)
+    if(user.customer_type === 'individual') {
+      setError({ value: true, message: 'Individual booking will be available soon' })
+    } else if(isVerified){
+      setModalVisible(true) 
+    } else {
+      setError({ value: true, message: 'Account not Validated, Please validate your account first' })
+    }
   }
 
-  async componentDidMount() {
-    this.init();
-  }
-  
-  async init() {
-    let user = await getStorage('user');
-    this.setState({user})
-  }
+  return(
+    <View style={styles.container}>
+      <ErrorWithCloseButtonModal/>
+      <ErrorOkModal
+        Visible={error.value}
+        ErrMsg={error.message}
+        OkButton={() => {
+          setError({...error, value: false})
+        }}
+      />
+      <StatusBar translucent barStyle={'dark-content'}/>
+      <ImageBackground source={require(bgImage)} resizeMode='cover' style={styles.image}>
+        <View style={styles.innerContainer}>
 
+          {/* Header */}
+          <TopDashboardNavbar
+            CustomerService={() => {}}
+          />
 
-  render() {
-    const { modalVisible } = this.state;
-    return(
-      <View style={styles.container}>
-        <ImageBackground source={require(bgImage)} resizeMode='cover' style={styles.image}>
-          <View style={styles.innerContainer}>
-
-            {/* Header */}
-            <TopDashboardNavbar
-              CustomerService={() => {}}
-              Title={'Corporate'}
-            />
-
-            {/* Modal */}
-            <Modal
-              animationType="slide"
-              transparent={true}
-              visible={modalVisible}
-              onRequestClose={() => this.setState({modalVisible: false}) }
-            >
-              <TouchableWithoutFeedback onPress={() => this.setState({modalVisible: false}) }>
-                <View style={styles.centeredView}>
-                  <View style={styles.modalView}>
-                    <View style={styles.modalRow}>
-                      <TouchableOpacity style={styles.alignItemCenter}
-                        onPress={() => this.setState({modalVisible: false}, () => {
-                          this.props.navigation.navigate('CorpExclusive1')
-                      })}>
-                        <Image source={require('../../../assets/truck/exclusive.png')} style={styles.exclusiveTruck}/>
-                        <View style={[styles.button, styles.modalButton]}>
-                          <Text style={styles.textStyle}>Exclusive</Text>
-                        </View>
-                      </TouchableOpacity>
-                      <TouchableOpacity style={styles.alignItemCenter}
-                        onPress={() => this.setState({modalVisible: false}, () => {
-                          alert('Shared')
-                      })}>
-                        <Image source={require('../../../assets/truck/shared.png')} style={styles.sharedTruck}/>
-                        <View style={[styles.button, styles.modalButton]}>
-                          <Text style={styles.textStyle}>Shared</Text>
-                        </View>
-                      </TouchableOpacity>
-                    </View>
+          {/* Modal */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(false) }
+          >
+            <TouchableWithoutFeedback onPress={() => setModalVisible(false) }>
+              <View style={styles.centeredView}>
+                <View style={styles.modalView}>
+                  <View style={styles.modalRow}>
+                    <TouchableOpacity style={styles.alignItemCenter}
+                      onPress={() => {
+                        setModalVisible(false)
+                        navigate('CorpExclusive1')
+                      }}
+                      >
+                      <Image source={require('../../../assets/truck/exclusive.png')} style={styles.exclusiveTruck}/>
+                      <View style={[styles.button, styles.modalButton]}>
+                        <Text style={styles.textStyle}>Exclusive</Text>
+                      </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.alignItemCenter}
+                      onPress={() => {
+                        setModalVisible(false)
+                        setError({ value: true, message: 'This feature will be available soon, stay tuned' })
+                      }}
+                    >
+                      <Image source={require('../../../assets/truck/shared.png')} style={styles.sharedTruck}/>
+                      <View style={[styles.button, styles.modalButton]}>
+                        <Text style={styles.textStyle}>Shared</Text>
+                      </View>
+                    </TouchableOpacity>
                   </View>
                 </View>
-              </TouchableWithoutFeedback>
-            </Modal>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
 
-            {/* Body */}
-            <View style={styles.bodyContainer}>
-              <View style={styles.walletContainer}>
-                <View style={styles.balanceContainer}>
-                  <View style={styles.balanceTxtContainer}>
-                    <Text style={styles.balanceTxt}>₱</Text>
-                    <Text style={styles.balanceTxt}>{this.state.balance}</Text>
-                  </View>
-                  <Text style={[styles.balanceTxt, { fontSize: 18, margin: 0, paddingLeft: 20 }]}>Balance</Text>
-                  <TouchableOpacity
-                    style={styles.balancePlusBtn}
-                  >
-                    <Image
-                      style={{ width: '90%' }}
-                      source={UMIcons.orangePlusIcon}
-                      resizeMode={'contain'}
-                    />
-                  </TouchableOpacity>
+          {/* Body */}
+          <View style={styles.bodyContainer}>
+            <View style={styles.walletContainer}>
+              <View style={styles.balanceContainer}>
+                <View style={styles.balanceTxtContainer}>
+                  <Text style={styles.balanceTxt}>₱</Text>
+                  <Text style={styles.balanceTxt}>{wallet.balance}</Text>
                 </View>
-                <View style={styles.pontsContainer}>
-                  <Text style={styles.pointsTxt}>{this.state.points}</Text>
-                  <Text style={styles.pointsTxt}>pts</Text>
-                </View>
+                <Text style={[styles.balanceTxt, { fontSize: 18, margin: 0, paddingLeft: 20 }]}>Balance</Text>
+                <TouchableOpacity
+                  style={styles.balancePlusBtn}
+                >
+                  <Image
+                    style={{ width: '90%' }}
+                    source={UMIcons.orangePlusIcon}
+                    resizeMode={'contain'}
+                  />
+                </TouchableOpacity>
               </View>
-              <View style={styles.paragraphContainer}>
-                <Text style={styles.paragraphTitle}>Send{'\n'}anything{'\n'}fast</Text>
-                <Text style= {styles.paragraph}>There is no transfer, {'\n'}leading to the destination, {'\n'}real-time monitoring, first compensation {'\n'}guarantee and peace of mind.</Text>
+              <View style={styles.pontsContainer}>
+                <Text style={styles.pointsTxt}>{wallet.points}</Text>
+                <Text style={styles.pointsTxt}>pts</Text>
               </View>
-              <TouchableOpacity
-                style={styles.bookBtn}
-                onPress={() => {
-                  this.setState({ modalVisible: true })
-                }}
-              >
-                <Text style={styles.bookBtnTxt}>Book</Text>
-              </TouchableOpacity>
             </View>
-            
+            <View style={styles.paragraphContainer}>
+              <Text style={styles.paragraphTitle}>Send{'\n'}anything{'\n'}fast</Text>
+              <Text style= {styles.paragraph}>There is no transfer, {'\n'}leading to the destination, {'\n'}real-time monitoring, first compensation {'\n'}guarantee and peace of mind.</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.bookBtn}
+              onPress={() => {
+                chooseTypeBooking()
+              }}
+            >
+              <Text style={styles.bookBtnTxt}>Book</Text>
+            </TouchableOpacity>
           </View>
-        </ImageBackground>
-      </View>
-    )
-  }
+          
+        </View>
+      </ImageBackground>
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({

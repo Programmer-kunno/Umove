@@ -10,6 +10,9 @@ import { dispatch } from '../../../utils/redux';
 import { userLogout } from '../../../redux/actions/User';
 import { setLoading } from '../../../redux/actions/Loader';
 import { resetNavigation } from '../../../utils/navigationHelper';
+import { refreshTokenHelper } from '../../../api/helper/userHelper';
+import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal';
+import { showError } from '../../../redux/actions/ErrorModal';
 
 const deviceWidth = Dimensions.get('screen').width
 
@@ -26,32 +29,36 @@ export default Profile = () => {
 
 
   useEffect(() => {
-    console.log(user)
     dispatch(setLoading(false))
     setName(user.first_name.charAt(0).toUpperCase() + user.first_name.slice(1) + ' ' + user.last_name.charAt(0).toUpperCase() + user.last_name.slice(1))
   }, [])
 
-  const deleteUser = async() => {
+  const deleteUser = () => {
     dispatch(setLoading(true))
-    const data = {
-      password: password
-    }
-    const response = await CustomerApi.deleteUser(data)
-    console.log(response)
-    if(response.success){
-      dispatch(userLogout())
-      resetNavigation('Start1')
-      dispatch(setLoading(false))
-    } else if(!response.success && response.message === 'Given token not valid for any token type') {
-      await CustomerApi.refreshAccess(deleteUser())
-    } else {
-      setErr({
-        ...err,
-        value: true
-      })
-      dispatch(setLoading(false))
-      setCancelModalVisible(true)
-    }
+    refreshTokenHelper(async() => {
+      const data = {
+        password: password
+      }
+      const response = await CustomerApi.deleteUser(data)
+      console.log(response)
+      if(response == undefined){
+        dispatch(setLoading(false))
+        dispatch(showError(true))
+      } else {
+        if(response.data.success){
+          resetNavigation('Landing')
+          dispatch(userLogout())
+          dispatch(setLoading(false))
+        } else {
+          setErr({
+            ...err,
+            value: true
+          })
+          dispatch(setLoading(false))
+          setCancelModalVisible(true)
+        }
+      }
+    })
   }
 
   const cancelConfirmModal = () => {
@@ -107,6 +114,7 @@ export default Profile = () => {
 
     return(
       <View style={styles.mainContainer}>
+      <ErrorWithCloseButtonModal/>
       {cancelConfirmModal()}
       <StatusBar translucent barStyle={'light-content'}/>
         {/* Header */}

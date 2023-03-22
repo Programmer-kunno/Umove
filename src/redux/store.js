@@ -5,6 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { userOperations } from "./reducers/UserReducer";
 import { loadingReducer } from "./reducers/LoaderReducer";
+import { showErrorReducer } from "./reducers/ErrorModalReducer";
 import { bookingDetails } from "./reducers/BookingReducer";
 import { configureStore } from "@reduxjs/toolkit";
 
@@ -15,6 +16,7 @@ const config = {
 
 const rootReducer = combineReducers({
   loadingReducer: loadingReducer,
+  showErrorReducer: showErrorReducer,
   userOperations: persistReducer(config, userOperations),
   bookingDetails: persistReducer(config, bookingDetails)
 })

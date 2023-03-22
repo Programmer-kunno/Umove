@@ -7,13 +7,16 @@ import { UMColors } from '../../../../utils/ColorHelper';
 import { FetchApi } from '../../../../api/fetch';
 import GrayNavbar from '../../../Components/GrayNavbar';
 import { navigate } from '../../../../utils/navigationHelper';
+import { dispatch } from '../../../../utils/redux';
+import { showError } from '../../../../redux/actions/ErrorModal';
+import ErrorWithCloseButtonModal from '../../../Components/ErrorWithCloseButtonModal';
 
 export default class CorpExclusive2 extends Component {  
   constructor(props) {
     super(props);
     
     this.state = { 
-      booking: this.props.route.params.booking,
+      booking: this.props.route?.params?.booking,
       date: new Date(),
       newDate: '',
       time: new Date(),
@@ -38,41 +41,57 @@ export default class CorpExclusive2 extends Component {
 
   async loadRegion() {
     let response = await FetchApi.regions()
-    if(response.success) {
-      let regionList = response.data
-      this.setState({regionList})
+    if(response == undefined){
+      dispatch(showError(true))
     } else {
-      console.log(response.message)
+      if(response?.data?.success) {
+        let regionList = response?.data?.data
+        this.setState({regionList})
+      } else {
+        console.log(response?.message)
+      }
     }
   }
 
   async loadProvince(regionCode) {
     let response = await FetchApi.provinces(regionCode)
-    if(response.success) {
-      let provinceList = response.data
-      this.setState({provinceList})
+    if(response == undefined){
+      dispatch(showError(true))
     } else {
-      console.log(response.message)
+      if(response?.data?.success) {
+        let provinceList = response?.data?.data
+        this.setState({provinceList})
+      } else {
+        console.log(response?.message)
+      }
     }
   }
 
   async loadCity(provinceCode) {
     let response = await FetchApi.cities(provinceCode)
-    if(response.success) {
-      let cityList = response.data
-      this.setState({cityList})
+    if(response == undefined){
+      dispatch(showError(true))
     } else {
-      console.log(response.message)
+      if(response?.data?.success) {
+        let cityList = response?.data?.data
+        this.setState({cityList})
+      } else {
+        console.log(response?.message)
+      }
     }
   }
 
   async loadBarangay(cityCode) {
     let response = await FetchApi.barangays(cityCode)
-    if(response.success) {
-      let barangayList = response.data
-      this.setState({barangayList})
+    if(response == undefined){
+      dispatch(showError(true))
     } else {
-      console.log(response.message)
+      if(response?.data?.success) {
+        let barangayList = response?.data?.data
+        this.setState({barangayList})
+      } else {
+        console.log(response?.message)
+      }
     }
   }
 
@@ -136,7 +155,7 @@ export default class CorpExclusive2 extends Component {
     return(
       <View style={styles.container}>
         <StatusBar translucent backgroundColor={'transparent'} barStyle={'light-content'} />
-
+        <ErrorWithCloseButtonModal/>
         {/* Date Modal */}
           <Modal
             animationType="slide"

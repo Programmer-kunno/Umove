@@ -14,16 +14,7 @@ export const returnIcon = (type) => {
 export const UMIcons = {
   welcomeBG: require('../assets/bg/welcome-start.png'),
   mainLogo: require('../assets/logo/logo-primary.png'),
-  greenCheck: require('../assets/icons/green-check.png'),
-  burgerMenuIcon: require('../assets/icons/sideMenu.png'),
-  headsetIcon: require('../assets/icons/headset.png'),
   truckIcon: require('../assets/truck/exclusive.png'),
-  locationIcon: require('../assets/icons/location-icon.png'),
-  backIconOrange: require('../assets/icons/arrow-back-orange.png'),
-  backIcon: require('../assets/icons/arrow-back.png'),
-  orangePlusIcon: require('../assets/icons/orange-plus-icon.png'),
-  quickQuotateIcon: require('../assets/icons/quick-quote-btn.png'),
-  tagIcon: require('../assets/icons/tag-icon.png'),
   individualStartIcon: require('../assets/start/individual-icon.png'),
   corporateStartIcon: require('../assets/start/corporate-icon.png'),
   quickQuoteStartIcon: require('../assets/start/quickquote-icon.png'),
@@ -31,10 +22,8 @@ export const UMIcons = {
   truckStartIcon: require('../assets/start/truck.png'),
   shipStartIcon: require('../assets/start/ship.png'),
   motorStartIcon: require('../assets/start/ride-motor.png'),
-  cloudErrorIcon: require('../assets/icons/cloud-error.png'),
   exitIcon: require('../assets/icons/exit.png'),
   userBlankProfile: require('../assets/user/user-blank.png'),
-  whitePencil: require('../assets/icons/pencil.png'),
   profilePicIcon: require('../assets/icons/profile-pic.png'),
   //Profile Drawer
   homeWalletIcon: require('../assets/drawer/UMoveWalletIcon.png'),
@@ -48,4 +37,20 @@ export const UMIcons = {
   googleIcon: require('../assets/socials/google.png'),
   facebookIcon: require('../assets/socials/facebook.png'),
   appleIcon: require('../assets/socials/apple.png'),
+  //Icons
+  sentIcon: require('../assets/icons/sent.png'),
+  tagIcon: require('../assets/icons/tag-icon.png'),
+  backIcon: require('../assets/icons/arrow-back.png'),
+  locationIcon: require('../assets/icons/location-icon.png'),
+  backIconOrange: require('../assets/icons/arrow-back-orange.png'),
+  orangePlusIcon: require('../assets/icons/orange-plus-icon.png'),
+  quickQuotateIcon: require('../assets/icons/quick-quote-btn.png'),
+  headsetIcon: require('../assets/icons/headset.png'),
+  cloudErrorIcon: require('../assets/icons/cloud-error.png'),
+  whitePencil: require('../assets/icons/pencil.png'),
+  greenCheck: require('../assets/icons/green-check.png'),
+  burgerMenuIcon: require('../assets/icons/sideMenu.png'),
+  xIcon: require('../assets/icons/x-icon.png'),
+  // Error Icons
+  warningSign: require('../assets/errors/warning-sign.png')
 }

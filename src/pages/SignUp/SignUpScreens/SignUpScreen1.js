@@ -8,51 +8,23 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
-  ScrollView, 
-  KeyboardAvoidingView 
 } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-
 import { CustomerApi } from '../../../api/customer';
 import { emailRegex, mobileNumberRegex } from '../../../utils/stringHelper';
 import { UMColors } from '../../../utils/ColorHelper';
+import { UMIcons } from '../../../utils/imageHelper';
+import { Loader } from '../../Components/Loader';
+import { setLoading } from '../../../redux/actions/Loader';
+import { dispatch } from '../../../utils/redux';
+import { showError } from '../../../redux/actions/ErrorModal';
+import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal';
 
-export default class CorpSignUp1 extends Component { 
-  constructor() {
-    super();
+export default class SignUpScreen1 extends Component { 
+  constructor(props) {
+    super(props);
     
     this.state = { 
-      register: {
-        customerType: 'corporate',
-        firstName: '',
-        middleName: '',
-        lastName: '',
-        username: '',
-        email: '',
-        mobileNumber: "",
-        streetAddress: '',
-        region: '',
-        province: '',
-        city: '',
-        barangay: '',
-        zipcode: '',
-        companyName: '',
-        companyType: '',
-        companyEmail: '',
-        companyMobileNumber: '',
-        companyAddress: '',
-        officeAddress: '',
-        officeRegion: '',
-        officeProvince: '',
-        officeCity: '',
-        officeBarangay: '',
-        officeZipcode: '',
-        password: '',
-        confirmPassword: '', 
-        bir: null,
-        dti: null,
-        validId: null
-      },
+      register: this.props.route?.params?.register,
       error: false,
       message: ""
     };
@@ -60,24 +32,43 @@ export default class CorpSignUp1 extends Component {
     this.scrollView = null;
   }
 
+  componentDidMount() {
+    dispatch(setLoading(false))
+    console.log(this.state.register)
+  }
+
   async register() {
+    dispatch(setLoading(true))
     let register = this.state.register;
-    if(!mobileNumberRegex(register.mobileNumber)) {
+    if(!emailRegex(register?.email)){
+      this.setState({error: true, message: "Please enter a valid email"})
+      dispatch(setLoading(false))
+    } else if(!mobileNumberRegex(register?.mobileNumber)) {
       this.setState({error: true, message: "Please enter a valid contact number"})
+      dispatch(setLoading(false))
     } else {
       let res = await CustomerApi.corporateSignup(register)
       console.log(res)
-      if(res.message.username) {
-        this.setState({error: true, message: "Username already taken"})
-      } else if(res.message.email) {
-        this.setState({error: true, message: res.message.email[0] == "This field must be unique." ? "Email Already Taken" : "Please enter a valid email"})
-      } else if(res.message.mobile_number) {
-      this.setState({error: true, message: "Contact Number already taken"})
+      if(res == undefined){
+        dispatch(setLoading(false))
+        dispatch(showError(true))
       } else {
-        this.setState({error: false})
-        this.props.navigation.navigate('CorpSignUp2', {
-          register: this.state.register
-        })
+        if(res?.data?.message?.username) {
+          this.setState({error: true, message: "Username already taken"})
+          dispatch(setLoading(false))
+        } else if(res?.data?.message?.email) {
+          this.setState({error: true, message: res?.data?.message?.email[0] == "This field must be unique." ? "Email Already Taken" : res?.data?.message?.email[0] })
+          dispatch(setLoading(false))
+        } else if(res?.data?.message?.mobile_number) {
+          this.setState({error: true, message: "Contact Number already taken"})
+          dispatch(setLoading(false))
+        } else {
+          this.setState({error: false})
+          this.props.navigation.navigate('SignUpScreen2', {
+            register: this.state.register
+          })
+          dispatch(setLoading(false))
+        }
       }
     }
   }
@@ -87,7 +78,7 @@ export default class CorpSignUp1 extends Component {
     return(
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.mainContainer}>
-
+          <ErrorWithCloseButtonModal/>
           {/* Logo */}
           <View style={styles.upperContainer}>
             <Image
@@ -195,21 +186,21 @@ export default class CorpSignUp1 extends Component {
             <View style={styles.row}>
               <TouchableOpacity onPress={() => alert('Sign Up w/ google')}>
                 <Image
-                  source={require('../../../assets/socials/google.png')}
+                  source={UMIcons.googleIcon}
                   style={styles.socials}
                   resizeMode={'contain'}
                 />
               </TouchableOpacity>
               <TouchableOpacity onPress={() => alert('Sign Up w/ facebook')}>
                 <Image
-                  source={require('../../../assets/socials/facebook.png')}
+                  source={UMIcons.facebookIcon}
                   style={styles.socials}
                   resizeMode={'contain'}
                 />
               </TouchableOpacity>
               <TouchableOpacity onPress={() => alert('Sign Up w/ apple')}>  
                 <Image
-                  source={require('../../../assets/socials/apple.png')}
+                  source={UMIcons.appleIcon}
                   style={styles.socials}
                   resizeMode={'contain'}
                 />
@@ -233,6 +224,7 @@ export default class CorpSignUp1 extends Component {
                 </TouchableOpacity>
             </View>
           </View>
+          <Loader/>
         </View>
       </TouchableWithoutFeedback>
     )

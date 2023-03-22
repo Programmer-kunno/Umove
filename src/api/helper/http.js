@@ -2,8 +2,10 @@ import axios from 'axios'
 import environtment from '../environtment';
 import { getAccessToken } from './userHelper';
 
+axios.defaults.timeout = 20000
 const instance = axios.create({
-  baseURL: environtment.url
+  baseURL: environtment.url,
+  timeout: 20000,
 })
 
 export const post = (apiEndpoint, data, headers) => new Promise(async(resolve, reject) => {

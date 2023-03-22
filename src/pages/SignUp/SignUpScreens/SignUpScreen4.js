@@ -11,17 +11,15 @@ import {
 } from 'react-native';
 import ModalSelector from 'react-native-modal-selector-searchable'
 import { FetchApi }  from '../../../api/fetch'
-
 import { UMColors } from '../../../utils/ColorHelper';
+import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal';
 
-const bgImage = '../../../assets/bg-image.jpg';
-
-export default class CorpSignUp2 extends Component {  
+export default class SignUpScreen4 extends Component {  
   constructor(props) {
     super(props);
     
     this.state = { 
-      register: this.props.route.params.register,
+      register: this.props.route?.params?.register,
       regionList: [],
       provinceList: [],
       cityList: [],
@@ -30,58 +28,68 @@ export default class CorpSignUp2 extends Component {
   }
 
   async componentDidMount() {
-    this.init();
     this.loadRegion();
   }
 
-  async init() {
-    this.setState({ register: this.props.route.params.register })
-    console.log(this.state.register)
-  }
-
   async signUp() {
-      this.props.navigation.navigate('CorpSignUp3', {
+      this.props.navigation.navigate('SignUpScreen5', {
         register: this.state.register
       })
     }
 
   async loadRegion() {
     let response = await FetchApi.regions()
-    if(response.success) {
-      let regionList = response.data
-      this.setState({regionList})
+    if(response == undefined){
+      dispatch(showError(true))
     } else {
-      console.log(response.message)
+      if(response?.data?.success) {
+        let regionList = response?.data?.data
+        this.setState({regionList})
+      } else {
+        console.log(response?.message)
+      }
     }
   }
 
   async loadProvince(regionCode) {
     let response = await FetchApi.provinces(regionCode)
-    if(response.success) {
-      let provinceList = response.data
-      this.setState({provinceList})
+    if(response == undefined){
+      dispatch(showError(true))
     } else {
-      console.log(response.message)
+      if(response?.data?.success) {
+        let provinceList = response?.data?.data
+        this.setState({provinceList})
+      } else {
+        console.log(response?.message)
+      }
     }
   }
 
   async loadCity(provinceCode) {
     let response = await FetchApi.cities(provinceCode)
-    if(response.success) {
-      let cityList = response.data
-      this.setState({cityList})
+    if(response == undefined){
+      dispatch(showError(true))
     } else {
-      console.log(response.message)
+      if(response?.data?.success) {
+        let cityList = response?.data?.data
+        this.setState({cityList})
+      } else {
+        console.log(response?.message)
+      }
     }
   }
 
   async loadBarangay(cityCode) {
     let response = await FetchApi.barangays(cityCode)
-    if(response.success) {
-      let barangayList = response.data
-      this.setState({barangayList})
+    if(response == undefined){
+      dispatch(showError(true))
     } else {
-      console.log(response.message)
+      if(response?.data?.success) {
+        let barangayList = response?.data?.data
+        this.setState({barangayList})
+      } else {
+        console.log(response?.message)
+      }
     }
   }
 
@@ -90,6 +98,7 @@ export default class CorpSignUp2 extends Component {
     return(
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.mainContainer}>
+        <ErrorWithCloseButtonModal/>
           {/* Logo */}
           <View style={styles.upperContainer}>
             <Image
@@ -102,14 +111,14 @@ export default class CorpSignUp2 extends Component {
             <View style={[styles.inputContainer]}>
               {/* Header */}
               <Text style={styles.text}>
-                Billing / Legal Address
+                Office Address
               </Text>
               
                 {/* Street Address */}
                 <TextInput
                   style={[styles.fullWidthInput]}
                   onChangeText={(val) => {
-                    register.streetAddress = val;
+                    register.officeAddress = val;
                     this.setState({register})
                   }}
                   placeholder='House No., Lot, Street'
@@ -126,7 +135,7 @@ export default class CorpSignUp2 extends Component {
                 labelExtractor= {region => region.name}
                 initValue="Select Region"
                 onChange={(region) => {
-                  register.region = region.name;
+                  register.officeRegion = region.name;
                   this.setState({register}, async () => {
                     await this.loadProvince(region.code);
                   });
@@ -148,7 +157,7 @@ export default class CorpSignUp2 extends Component {
               <TextInput
                   style={[styles.zipInput]}
                   onChangeText={(val) => {
-                    register.zipcode = val;
+                    register.officeZipcode = val;
                     this.setState({register})
                   }}  
                   placeholder='ZIP Code'
@@ -168,7 +177,7 @@ export default class CorpSignUp2 extends Component {
                   labelExtractor= {province => province.name}
                   initValue="Select Province"
                   onChange={(province) => {
-                    register.province = province.name;
+                    register.officeProvince = province.name;
                     this.setState({register}, async () => {
                       await this.loadCity(province.code);
                     });
@@ -216,7 +225,7 @@ export default class CorpSignUp2 extends Component {
                   labelExtractor= {city => city.name}
                   initValue="Select City"
                   onChange={(city) => {
-                    register.city = city.name;
+                    register.officeCity = city.name;
                     this.setState({register}, async () => {
                       await this.loadBarangay(city.code);
                     });
@@ -262,7 +271,7 @@ export default class CorpSignUp2 extends Component {
                   labelExtractor= {barangay => barangay.name}
                   initValue="Select Barangay"
                   onChange={(barangay) => {
-                    register.barangay = barangay.name;
+                    register.officeBarangay = barangay.name;
                     this.setState({register});
                   }} 
                   searchText={'Search'}
@@ -301,7 +310,7 @@ export default class CorpSignUp2 extends Component {
           <View style={styles.bottomBtnContainer}>
           {/* Next Button */}
             {/* Make button gray when not all inputs are filled out, orange when filled out */}
-            { register.streetAddress == '' || register.region == '' || register.province == '' || register.city == '' || register.barangay == '' || register.zipcode == 0 ?
+            { register.officeAddress == '' || register.officeRegion == '' || register.officeProvince == '' || register.officeRegion == '' || register.officeBarangay == '' || register.officeZipcode == 0 ?
             <TouchableOpacity style={styles.nextButtonGray} disabled={true}>
               <Text style={styles.buttonText}> NEXT </Text>
             </TouchableOpacity>
@@ -456,7 +465,7 @@ const styles = StyleSheet.create({
   },
   nextButtonGray: {
     height: 50,
-    width: '75%',
+    width: '90%',
     borderRadius: 25,
     justifyContent:'center',
     alignItems: 'center',
@@ -465,7 +474,7 @@ const styles = StyleSheet.create({
   },
   nextButtonOrange: {
     height: 50,
-    width: '75%',
+    width: '90%',
     borderRadius: 25,
     justifyContent:'center',
     alignItems: 'center',

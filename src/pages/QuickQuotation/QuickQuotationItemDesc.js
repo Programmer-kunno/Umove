@@ -15,6 +15,9 @@ import { UMColors } from '../../utils/ColorHelper';
 import { FetchApi } from '../../api/fetch';
 import GrayNavbar from '../Components/GrayNavbar';
 import { navigate } from '../../utils/navigationHelper';
+import ErrorWithCloseButtonModal from '../Components/ErrorWithCloseButtonModal';
+import { dispatch } from '../../utils/redux';
+import { showError } from '../../redux/actions/ErrorModal';
 
 var deviceWidth = Dimensions.get('window').width
 
@@ -79,74 +82,90 @@ export default class QuickQuotationItemDesc extends Component {
   async loadType() {
     const typeItems = await FetchApi.typesOfGoods()
     console.log(typeItems)
-    if(typeItems.success) {
-     const items = []
-      typeItems.data.map((data) => {
-        items.push({
-          id: data.id,
-          label: data.type_name,
-          value: data.id
-        })
-      items.sort((a, b) => a.id - b.id)
-      this.setState({ typeItems: items })
-      })
+    if(typeItems == undefined){
+      dispatch(showError(true))
     } else {
-      console.log(typeItems)
+      if(typeItems?.data?.success) {
+       const items = []
+        typeItems?.data?.data?.map((data) => {
+          items.push({
+            id: data.id,
+            label: data.type_name,
+            value: data.id
+          })
+        items.sort((a, b) => a.id - b.id)
+        this.setState({ typeItems: items })
+        })
+      } else {
+        console.log(typeItems)
+      }
     }
   }
 
   async loadCategory(item) {
     const categoryItems = await FetchApi.productCategories(item)
-    if(categoryItems.success) {
-     const items = []
-     categoryItems.data.map((data) => {
-        items.push({
-          id: data.id,
-          label: data.category_name,
-          value: data.id
-        })
-      items.sort((a, b) => a.id - b.id)
-      this.setState({ categoryItems: items })
-      })
+    if(categoryItems == undefined){
+      dispatch(showError(true))
     } else {
-      console.log(categoryItems)
+      if(categoryItems?.data?.success) {
+        const items = []
+        categoryItems?.data?.data.map((data) => {
+           items.push({
+             id: data.id,
+             label: data.category_name,
+             value: data.id
+           })
+         items.sort((a, b) => a.id - b.id)
+         this.setState({ categoryItems: items })
+         })
+      } else {
+        console.log(categoryItems)
+      }
     }
   }
 
   async loadSubCategory(item) {
     console.log(item)
     const subCategoryItems = await FetchApi.productSubcategories(item)
-    if(subCategoryItems.success) {
-     const items = []
-     subCategoryItems.data.map((data) => {
-        items.push({
-          id: data.id,
-          label: data.subcategory_name,
-          value: data.id
-        })
-      items.sort((a, b) => a.id - b.id)
-      this.setState({ subCategoryItems: items })
-      })
+    if(subCategoryItems == undefined){
+      dispatch(showError(true))
     } else {
-      console.log(subCategoryItems)
+      if(subCategoryItems?.data?.success) {
+        const items = []
+        subCategoryItems?.data?.data?.map((data) => {
+           items.push({
+             id: data.id,
+             label: data.subcategory_name,
+             value: data.id
+           })
+         items.sort((a, b) => a.id - b.id)
+         this.setState({ subCategoryItems: items })
+         })
+      } else {
+        console.log(subCategoryItems)
+      }
     }
   }
 
   async loadPackaging(item) {
     const packagingItems = await FetchApi.packagingTypes(item)
-    if(packagingItems.success) {
-      const items = []
-      packagingItems.data.map((data) => {
-        items.push({
-          id: data.id,
-          label: data.uom_name,
-          value: data.id
-        })
-      items.sort((a, b) => a.id - b.id)
-      this.setState({ packagingItems: items })
-      })
+    if(packagingItems == undefined){
+      dispatch(showError(true))
     } else {
-      console.log(packagingItems)
+      if(packagingItems?.data?.success) {
+        const items = []
+        packagingItems?.data?.data?.map((data) => {
+          items.push({
+            id: data.id,
+            label: data.uom_name,
+            value: data.id
+          })
+        items.sort((a, b) => a.id - b.id)
+        this.setState({ packagingItems: items })
+        })
+      } else {
+        console.log(packagingItems)
+      } 
     }
   }
 
@@ -167,6 +186,7 @@ export default class QuickQuotationItemDesc extends Component {
     return(
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.mainContainer}>
+          <ErrorWithCloseButtonModal/>
           <StatusBar translucent backgroundColor={'transparent'} barStyle={'light-content'} />
 
           {/* Header for Quick Quotation */}
