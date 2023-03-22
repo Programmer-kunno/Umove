@@ -1,5 +1,6 @@
 import { 
-  post 
+  post,
+  get
 } from './helper/http';
 
 export class BookingApi {
@@ -63,7 +64,7 @@ export class BookingApi {
 
   static async computeRates(data) {
     try {
-      const response = await post('/api/bookings/compute-rates', data)
+      const response = await get(`/api/bookings/compute-rates/${data.booking_number}`, {}, false)
       return response
     } catch(err) {
       return err
@@ -73,10 +74,10 @@ export class BookingApi {
   static async confirmBooking(bookNumber) {
     const formData = new FormData()
 
-    formData.append('booking_number', bookNumber)
+    formData.append('status', 'confirmed')
 
     try {
-      const response = await post('/api/bookings/update-status/confirmed', formData, { "Content-Type": "multipart/form-data" })
+      const response = await post(`/api/bookings/update-status/${bookNumber}`, formData, { "Content-Type": "multipart/form-data" })
       return response
     } catch(err) {
       return err
@@ -86,10 +87,10 @@ export class BookingApi {
   static async cancelBooking(bookNumber) {
     const formData = new FormData()
 
-    formData.append('booking_number', bookNumber)
+    formData.append('status', 'cancelled')
 
     try {
-      const response = await post('/api/bookings/update-status/cancelled', formData, { "Content-Type": "multipart/form-data" })
+      const response = await post(`/api/bookings/update-status/${bookNumber}`, formData, { "Content-Type": "multipart/form-data" })
       return response
     } catch(err) {
       return err

@@ -3,7 +3,6 @@ import {
   del
  } from './helper/http';
 // import { Request } from './helper/http'
-import { getAccessToken, getRefreshToken } from './helper/userHelper';
 import environtment from './environtment';
 
 
@@ -19,10 +18,9 @@ export class CustomerApi {
     }
   }
 
-static async refreshAccess() {
+static async refreshAccess(data) {
   try {
-    const refresh = getRefreshToken()
-    const response = await post('/api/refresh-token', { refresh: refresh })
+    const response = await post('/api/refresh-token', data)
     return response
   } catch(err) {
     return err
