@@ -240,13 +240,12 @@ export default class CorpExclusive1 extends Component {
               setItems={(callback) => {this.setState(state => ({
                 typeItems: callback(state.typeItems)}))}}
             />
-
              
              <DropDownPicker
               placeholder="Subcategory"
               placeholderStyle={styles.placeholderStyle}
-              style={!this.state.categoryValue == '' ? [styles.typeDropdownStyle, {position: 'relative', zIndex: 58}] : [styles.typeDropdownStyleDisabled, {position: 'relative', zIndex: 58}]}
-              containerStyle={styles.typeDropdownContainerStyle}
+              style={!this.state.categoryValue == '' ? [styles.typeDropdownStyle, {position: 'relative', zIndex: 0}] : [styles.typeDropdownStyleDisabled, {position: 'relative', zIndex: 58}]}
+              containerStyle={[styles.typeDropdownContainerStyle, { zIndex: 58 }]}
               open={this.state.subCategoryOpen} 
               items={this.state.subCategoryItems}
               value={this.state.subCategoryValue}

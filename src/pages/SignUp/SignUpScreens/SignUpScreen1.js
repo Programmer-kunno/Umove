@@ -18,6 +18,7 @@ import { setLoading } from '../../../redux/actions/Loader';
 import { dispatch } from '../../../utils/redux';
 import { showError } from '../../../redux/actions/ErrorModal';
 import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal';
+import KeyboardAvoidingView from '../../Components/KeyboardAvoidingView';
 
 export default class SignUpScreen1 extends Component { 
   constructor(props) {
@@ -76,157 +77,159 @@ export default class SignUpScreen1 extends Component {
   render() {
     let register = this.state.register;
     return(
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <View style={styles.mainContainer}>
-          <ErrorWithCloseButtonModal/>
-          {/* Logo */}
-          <View style={styles.upperContainer}>
-            <Image
-              source={require('../../../assets/logo/logo-primary.png')}
-              style={styles.logo}
-              resizeMode={'contain'}
-            />
-            {this.state.error && <View style={styles.errorContainer}><Text style={styles.errorMessage}>{this.state.message}</Text></View>}
-          </View>
+      <KeyboardAvoidingView>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <View style={styles.mainContainer}>
+            <ErrorWithCloseButtonModal/>
+            {/* Logo */}
+            <View style={styles.upperContainer}>
+              <Image
+                source={require('../../../assets/logo/logo-primary.png')}
+                style={styles.logo}
+                resizeMode={'contain'}
+              />
+              {this.state.error && <View style={styles.errorContainer}><Text style={styles.errorMessage}>{this.state.message}</Text></View>}
+            </View>
 
-          {/* Sign Up input */}
-          <View style={styles.middleContainer}>
-            <Text style={styles.signUpText}>Sign Up</Text>
-            <View style={styles.inputPart}> 
-              <Text style={styles.text}>First Name</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={(val) => {
-                  register.firstName = val;
-                  this.setState({register})
-                }} 
-              />
-            </View>
-            <View style={styles.inputPart}> 
-              <Text style={styles.text}>Middle Name</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={(val) => {
-                  register.middleName = val;
-                  this.setState({register})
-                }}  
-                placeholder='Optional' 
-              />
-            </View>
-            <View style={styles.inputPart}> 
-              <Text style={styles.text}>Last Name</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={(val) => {
-                  register.lastName = val;
-                  this.setState({register})
-                }}                        
-              />
-            </View>
-            <View style={styles.inputPart}> 
-              <Text style={styles.text}>Username</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={(val) => {
-                  register.username = val;
-                  this.setState({register: register, error2: false})
-                }}    
-              />
-            </View>
-            <View style={styles.inputPart}> 
-              <Text style={styles.text}>Email Address</Text>
-              <TextInput
-                importantForAutofill='no'
-                style={styles.input}
-                keyboardType='email-address'
-                onChangeText={(val) => {
-                  register.email = val;
-                  this.setState({register: register, error1: false})
-                }}                        
-              />
-            </View>
-            <View style={styles.inputPart}> 
-              <Text style={styles.text}>Mobile Number</Text>
-              <View style={{ flexDirection: 'row', width: '100%', height: '50%' }}>
+            {/* Sign Up input */}
+            <View style={styles.middleContainer}>
+              <Text style={styles.signUpText}>Sign Up</Text>
+              <View style={styles.inputPart}> 
+                <Text style={styles.text}>First Name</Text>
                 <TextInput
-                  style={styles.mobileNumberCodeInput}
-                  editable={false}
-                  placeholder={'+63'}
-                />
-                <TextInput
-                  style={styles.mobileNumberInput}
-                  keyboardType='number-pad'
+                  style={styles.input}
                   onChangeText={(val) => {
-                    register.mobileNumber = '+' + 63 + val;
-                    this.setState({register: register, error3: false})
-                  }}
-                  maxLength={10}
+                    register.firstName = val;
+                    this.setState({register})
+                  }} 
                 />
               </View>
+              <View style={styles.inputPart}> 
+                <Text style={styles.text}>Middle Name</Text>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={(val) => {
+                    register.middleName = val;
+                    this.setState({register})
+                  }}  
+                  placeholder='Optional' 
+                />
+              </View>
+              <View style={styles.inputPart}> 
+                <Text style={styles.text}>Last Name</Text>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={(val) => {
+                    register.lastName = val;
+                    this.setState({register})
+                  }}                        
+                />
+              </View>
+              <View style={styles.inputPart}> 
+                <Text style={styles.text}>Username</Text>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={(val) => {
+                    register.username = val;
+                    this.setState({register: register, error2: false})
+                  }}    
+                />
+              </View>
+              <View style={styles.inputPart}> 
+                <Text style={styles.text}>Email Address</Text>
+                <TextInput
+                  importantForAutofill='no'
+                  style={styles.input}
+                  keyboardType='email-address'
+                  onChangeText={(val) => {
+                    register.email = val;
+                    this.setState({register: register, error1: false})
+                  }}                        
+                />
+              </View>
+              <View style={styles.inputPart}> 
+                <Text style={styles.text}>Mobile Number</Text>
+                <View style={{ flexDirection: 'row', width: '100%', height: '50%' }}>
+                  <TextInput
+                    style={styles.mobileNumberCodeInput}
+                    editable={false}
+                    placeholder={'+63'}
+                  />
+                  <TextInput
+                    style={styles.mobileNumberInput}
+                    keyboardType='number-pad'
+                    onChangeText={(val) => {
+                      register.mobileNumber = '+' + 63 + val;
+                      this.setState({register: register, error3: false})
+                    }}
+                    maxLength={10}
+                  />
+                </View>
+              </View>
             </View>
-          </View>
 
-          {/* Next Button */}
-          <View style={styles.nextBtnContainer}>
-            {/* Make button gray when not all inputs are filled out, orange when filled out */}
-            { register.firstName == '' || register.lastName == '' || register.username == '' || register.email == '' || register.mobileNumber == ''  ?
-            <TouchableOpacity style={styles.signUpButtonGray} disabled={true}>
-              <Text style={styles.signUpButtonText}>NEXT</Text>
-            </TouchableOpacity>
-            :
-            <TouchableOpacity style={styles.signUpButtonOrange} onPress={() => this.register() }>
-              <Text style={styles.signUpButtonText}>NEXT</Text>
-            </TouchableOpacity>
-            }
-          </View>
-
-          {/* Login with */}
-          <View style={styles.bottomContainer}>
-            <Text style={styles.signUpWithText}> or Sign Up with </Text>
-            <View style={styles.row}>
-              <TouchableOpacity onPress={() => alert('Sign Up w/ google')}>
-                <Image
-                  source={UMIcons.googleIcon}
-                  style={styles.socials}
-                  resizeMode={'contain'}
-                />
+            {/* Next Button */}
+            <View style={styles.nextBtnContainer}>
+              {/* Make button gray when not all inputs are filled out, orange when filled out */}
+              { register.firstName == '' || register.lastName == '' || register.username == '' || register.email == '' || register.mobileNumber == ''  ?
+              <TouchableOpacity style={styles.signUpButtonGray} disabled={true}>
+                <Text style={styles.signUpButtonText}>NEXT</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => alert('Sign Up w/ facebook')}>
-                <Image
-                  source={UMIcons.facebookIcon}
-                  style={styles.socials}
-                  resizeMode={'contain'}
-                />
+              :
+              <TouchableOpacity style={styles.signUpButtonOrange} onPress={() => this.register() }>
+                <Text style={styles.signUpButtonText}>NEXT</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => alert('Sign Up w/ apple')}>  
-                <Image
-                  source={UMIcons.appleIcon}
-                  style={styles.socials}
-                  resizeMode={'contain'}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => alert('Sign Up w/ fingerprint')}>  
-                <Image
-                  source={require('../../../assets/socials/fingerprint.png')}
-                  style={styles.socials}
-                  resizeMode={'contain'}
-                />
-              </TouchableOpacity>
+              }
             </View>
-            <View style={styles.row}>
-                <Text style={styles.loginText}>
-                  Already have an account? {" "}
-                </Text>
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('Login') }>
-                    <Text style={styles.underline}>
-                      Log In
-                    </Text>
+
+            {/* Login with */}
+            <View style={styles.bottomContainer}>
+              <Text style={styles.signUpWithText}> or Sign Up with </Text>
+              <View style={styles.row}>
+                <TouchableOpacity onPress={() => alert('Sign Up w/ google')}>
+                  <Image
+                    source={UMIcons.googleIcon}
+                    style={styles.socials}
+                    resizeMode={'contain'}
+                  />
                 </TouchableOpacity>
+                <TouchableOpacity onPress={() => alert('Sign Up w/ facebook')}>
+                  <Image
+                    source={UMIcons.facebookIcon}
+                    style={styles.socials}
+                    resizeMode={'contain'}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => alert('Sign Up w/ apple')}>  
+                  <Image
+                    source={UMIcons.appleIcon}
+                    style={styles.socials}
+                    resizeMode={'contain'}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => alert('Sign Up w/ fingerprint')}>  
+                  <Image
+                    source={require('../../../assets/socials/fingerprint.png')}
+                    style={styles.socials}
+                    resizeMode={'contain'}
+                  />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.row}>
+                  <Text style={styles.loginText}>
+                    Already have an account? {" "}
+                  </Text>
+                  <TouchableOpacity onPress={() => this.props.navigation.navigate('Login') }>
+                      <Text style={styles.underline}>
+                        Log In
+                      </Text>
+                  </TouchableOpacity>
+              </View>
             </View>
+            <Loader/>
           </View>
-          <Loader/>
-        </View>
-      </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     )
   }
 }
@@ -312,6 +315,7 @@ const styles = StyleSheet.create({
     borderRightColor: UMColors.primaryOrange,
     borderWidth: 1,
     backgroundColor: 'white',
+    paddingLeft: 10
   },
   nextBtnContainer: {
     width: '100%',
