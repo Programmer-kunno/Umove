@@ -24,3 +24,7 @@ export const resetNavigation = (name) => {
 export const goBack = () => {
   navigationRef.goBack();
 }
+
+export const pop = (value) => {
+  navigationRef.pop(value)
+}

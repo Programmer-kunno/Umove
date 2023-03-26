@@ -2,6 +2,7 @@ import { Text, View, StyleSheet, TouchableOpacity, Image } from 'react-native'
 import React, { Component } from 'react'
 import { UMColors } from '../../utils/ColorHelper';
 import { UMIcons } from '../../utils/imageHelper';
+import { goBack } from '../../utils/navigationHelper';
 
 export default class GrayNavbar extends Component {
   constructor(props){
@@ -16,7 +17,7 @@ export default class GrayNavbar extends Component {
           <TouchableOpacity
             style={styles.headerBackBtn}
             onPress={() => {
-              this.props.onBack()
+              goBack()
             }}
           >
             <Image

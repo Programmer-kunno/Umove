@@ -52,5 +52,11 @@ export const UMIcons = {
   burgerMenuIcon: require('../assets/icons/sideMenu.png'),
   xIcon: require('../assets/icons/x-icon.png'),
   // Error Icons
-  warningSign: require('../assets/errors/warning-sign.png')
+  warningSign: require('../assets/errors/warning-sign.png'),
+  // Payment Icons
+  topUpWalletIcon: require('../assets/payment/topUpWallet.png'),
+  paymayaLogo: require('../assets/payment/paymayaLogo.png'),
+  visaLogo: require('../assets/payment/visa.png'),
+  masterCardLogo: require('../assets/payment/mastercard-logo.png'),
+  creditCardLogo: require('../assets/payment/credit-card.png')
 }
