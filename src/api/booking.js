@@ -14,7 +14,16 @@ export class BookingApi {
     }
   }
 
-  static async corporateExclusive(data) {
+  static async payBooking(bookNumber, data) {
+    try {
+      const response = await post(`/api/bookings/pay/${bookNumber}`, data)   
+      return response
+    } catch(err) {
+      return err
+    }
+  }
+
+  static async book(data) {
     const booking = data
     const pickUpDateTime = booking.pickupDate + " " + booking.pickupTime
 

@@ -10,12 +10,12 @@ export const navigate = (name, data) => {
   navigationRef.navigate(name, data)
 }
 
-export const resetNavigation = (name) => {
+export const resetNavigation = (name, data) => {
   navigationRef.dispatch(
     CommonActions.reset({
       index: 0,
       routes: [
-        { name: name }
+        { name: name, params: data }
       ]
     })
   );
@@ -23,4 +23,12 @@ export const resetNavigation = (name) => {
 
 export const goBack = () => {
   navigationRef.goBack();
+}
+
+export const pop = (value) => {
+  navigationRef.pop(value)
+}
+
+export const focusedScreenName = () => {
+  return navigationRef.getCurrentRoute().name
 }

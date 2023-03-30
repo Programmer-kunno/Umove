@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 import { UMColors } from '../../utils/ColorHelper'
 import { UMIcons } from '../../utils/imageHelper'
 
-export default class ErrorOkModal extends Component {
+export default class SuccessOkModal extends Component {
   render() {
     return (
         <Modal
@@ -17,10 +17,10 @@ export default class ErrorOkModal extends Component {
             <View style={styles.mdlContainer}>
               <Image
                 style={{height: '27%'}}
-                source={UMIcons.cloudErrorIcon}
+                source={UMIcons.greenCheck}
                 resizeMode={'contain'}
               />
-              <Text style={styles.errorText}>{this.props.ErrMsg}</Text>
+              <Text style={styles.successText}>{this.props.SuccessMsg}</Text>
               <TouchableOpacity
                 style={{ marginTop: '6%'}}
                 onPress={() => {
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     elevation: 10
   },
-  errorText: {
+  successText: {
     width: '80%',
     marginTop: '6%',
     fontSize: 16,
@@ -65,5 +65,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   }
 })
-
-

@@ -18,3 +18,15 @@ export const mobileNumberRegex = (mobileNumber) => {
   const mobileRegex = /^(09|\+639)\d{9}$/
   return mobileRegex.test(mobileNumber)
 }
+
+export const cardExpiryDateRegex = (expiryDate) => {
+  return expiryDate.replace(/^(\d{2})(\d{2})/, '$1/$2')
+}
+
+export const cardNumberRegex = (cardNumber) => {
+  return cardNumber.replace(/[^\dA-Z]/g, '').replace(/(.{4})/g, '$1 ').trim()
+}
+
+export const capitalizeFirst = (string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1)
+}

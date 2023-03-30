@@ -3,10 +3,6 @@ import {
   del
  } from './helper/http';
 // import { Request } from './helper/http'
-import environtment from './environtment';
-
-
-const baseURL = environtment.url
 
 export class CustomerApi {
   static login = async(data) => {
@@ -43,41 +39,6 @@ static async refreshAccess(data) {
     } catch(err) {
       return err
     }
-  }
-
-  static async individualSignup(data) {
-    let API_URL = baseURL + '/api/customers/register';
-    let register = data
-    let formdata = new FormData();
-
-    formdata.append('customer_type', register.customerType);
-    formdata.append('billing_type', "per_booking");
-    formdata.append('charge_type', "per_vehicle")
-    formdata.append('user[username]', register.username);
-    formdata.append('user[password]', register.password);
-    formdata.append('user[password2]', register.confirmPassword);
-    formdata.append('user[user_profile][first_name]', register.firstName);
-    formdata.append('user[user_profile][middle_name]', register.middleName);
-    formdata.append('user[user_profile][last_name]', register.lastName);
-    formdata.append('user[user_profile][mobile_number]', register.mobileNumber);
-    formdata.append('user[user_profile][email]', register.email);
-    formdata.append('user[user_profile][address]', register.streetAddress);
-    formdata.append('user[user_profile][region]', register.region);
-    formdata.append('user[user_profile][province]', register.province);
-    formdata.append('user[user_profile][city]', register.city);
-    formdata.append('user[user_profile][barangay]', register.barangay);
-    formdata.append('user[user_profile][zip_code]', register.zipcode);
-    // formdata.append('user[user_profile][profile_image]', {uri: img.uri, name: img.name, type: img.type);
-    
-    let res = await fetch(API_URL ,{
-      method: 'POST',
-      headers: {
-              Accept: 'application/json',
-              "Content-Type": "multipart/form-data",
-          },
-      body: formdata
-    });
-    return res.json()
   }
 
   static corporateSignup = async(data) => {

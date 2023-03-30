@@ -24,16 +24,23 @@ import QuickQuotationPickUp from '../QuickQuotation/QuickQuotationPickUp';
 import QuickQuotationDelivery from '../QuickQuotation/QuickQuotationDelivery';
 import QuickQuotateScreen from '../QuickQuotation/QuickQuotateScreen';
 import QuickQuotatePriceScreen from '../QuickQuotation/QuickQuotatePriceScreen';
-import CorpExclusive1 from '../CorporateSide/CorpBooking/Exclusive/CorpExclusive1';
-import CorpExclusive2 from '../CorporateSide/CorpBooking/Exclusive/CorpExclusive2';
-import CorpExclusive3 from '../CorporateSide/CorpBooking/Exclusive/CorpExclusive3';
-import CorpExclusive4 from '../CorporateSide/CorpBooking/Exclusive/CorpExclusive4';
-import CorpExclusive5 from '../CorporateSide/CorpBooking/Exclusive/CorpExclusive5';
-import CorpExclusive6 from '../CorporateSide/CorpBooking/Exclusive/CorpExclusive6';
-import CorpExclusive7 from '../CorporateSide/CorpBooking/Exclusive/CorpExclusive7';
-import CorpExclusiveCancelScreen from '../CorporateSide/CorpBooking/Exclusive/CorpExclusiveCancelScreen';
-import CorpExclusiveDriverLocation from '../CorporateSide/CorpBooking/Exclusive/CorpExclusiveDriverLocation';
-import Dashboard from '../CorporateSide/Dashboard';
+import ExclusiveBooking1 from '../MainScreens/Booking/Exclusive/ExclusiveBooking1';
+import ExclusiveBooking2 from '../MainScreens/Booking/Exclusive/ExclusiveBooking2';
+import ExclusiveBooking3 from '../MainScreens/Booking/Exclusive/ExclusiveBooking3';
+import ExclusiveBooking4 from '../MainScreens/Booking/Exclusive/ExclusiveBooking4';
+import ExclusiveBooking5 from '../MainScreens/Booking/Exclusive/ExclusiveBooking5';
+import ExclusiveBooking6 from '../MainScreens/Booking/Exclusive/ExclusiveBooking6';
+import ExclusiveBooking7 from '../MainScreens/Booking/Exclusive/ExclusiveBooking7';
+import ExclusiveBookingCancelScreen from '../MainScreens/Booking/Exclusive/ExclusiveBookingCancelScreen';
+import ExclusiveBookingDriverLocation from '../MainScreens/Booking/Exclusive/ExclusiveBookingDriverLocation';
+import Dashboard from '../MainScreens/Dashboard';
+import SelectPaymentScreen from '../MainScreens/Payment/SelectPaymentScreen';
+import PaymentMethodScreen from '../MainScreens/Payment/PaymentMethodScreen';
+import AddPaymentMethodScreen from '../MainScreens/Payment/AddPaymentMethodScreen';
+import AddPaymentMethodWebView from '../MainScreens/Payment/AddPaymentMethodWebView';
+import ReceiptScreen from '../MainScreens/Payment/ReceiptScreen';
+import SuccessPaymentScreen from '../MainScreens/Payment/SuccessPaymentScreen';
+import PaymentLoadingScreen from '../MainScreens/Payment/PaymentLoadingScreen';
 
 export default RootNavigation = () => {
   const Stack = createStackNavigator();
@@ -90,17 +97,23 @@ export default RootNavigation = () => {
       <Stack.Screen name="QuickQuotationDelivery" component={QuickQuotationDelivery} />
       <Stack.Screen name="QuickQuotateScreen" component={QuickQuotateScreen} />
       <Stack.Screen name="QuickQuotatePriceScreen" component={QuickQuotatePriceScreen} />
-      <Stack.Screen name="CorpExclusive1" component={CorpExclusive1} />
-      <Stack.Screen name="CorpExclusive2" component={CorpExclusive2} />
-      <Stack.Screen name="CorpExclusive3" component={CorpExclusive3} />
-      <Stack.Screen name="CorpExclusive4" component={CorpExclusive4} />
-      <Stack.Screen name="CorpExclusive5" component={CorpExclusive5} />
-      <Stack.Screen name="CorpExclusive6" component={CorpExclusive6} options={{ gestureEnabled: false }} />
-      <Stack.Screen name="CorpExclusive7" component={CorpExclusive7} options={{ gestureEnabled: false }} />
-      <Stack.Screen name="CorpExclusiveDriverLocation" component={CorpExclusiveDriverLocation} options={{ gestureEnabled: false }} />
-      <Stack.Screen name="CorpExclusiveCancelScreen" component={CorpExclusiveCancelScreen} options={{ gestureEnabled: false }} />
+      <Stack.Screen name="ExclusiveBooking1" component={ExclusiveBooking1} />
+      <Stack.Screen name="ExclusiveBooking2" component={ExclusiveBooking2} />
+      <Stack.Screen name="ExclusiveBooking3" component={ExclusiveBooking3} />
+      <Stack.Screen name="ExclusiveBooking4" component={ExclusiveBooking4} />
+      <Stack.Screen name="ExclusiveBooking5" component={ExclusiveBooking5} />
+      <Stack.Screen name="ExclusiveBooking6" component={ExclusiveBooking6} options={{ gestureEnabled: false }} />
+      <Stack.Screen name="ExclusiveBooking7" component={ExclusiveBooking7} options={{ gestureEnabled: false }} />
+      <Stack.Screen name="ExclusiveBookingDriverLocation" component={ExclusiveBookingDriverLocation} options={{ gestureEnabled: false }} />
+      <Stack.Screen name="ExclusiveBookingCancelScreen" component={ExclusiveBookingCancelScreen} options={{ gestureEnabled: false }} />
       <Stack.Screen name="DrawerNavigation" component={DrawerNavigation} options={{ gestureEnabled: false }} />
-      
+      <Stack.Screen name="SelectPaymentScreen" component={SelectPaymentScreen} />
+      <Stack.Screen name="PaymentMethodScreen" component={PaymentMethodScreen} />
+      <Stack.Screen name="AddPaymentMethodScreen" component={AddPaymentMethodScreen} />
+      <Stack.Screen name="AddPaymentMethodWebView" component={AddPaymentMethodWebView} />
+      <Stack.Screen name="ReceiptScreen" component={ReceiptScreen} />
+      <Stack.Screen name="SuccessPaymentScreen" component={SuccessPaymentScreen} />
+      <Stack.Screen name="PaymentLoadingScreen" component={PaymentLoadingScreen} />
       {/* There are Pages in the Archive and Hidden Folder */}
 
     </Stack.Navigator>

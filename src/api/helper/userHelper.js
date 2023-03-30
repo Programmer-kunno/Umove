@@ -20,12 +20,13 @@ export const refreshTokenHelper = async(callback) => {
   const refresh = getRefreshToken()
   const decodedToken = jwtDecode(access)
   const expiry = decodedToken.exp
-  const isExpired = (expiry * 1000) >= new Date().getTime()
+  const isExpired = (expiry * 1000) <= new Date().getTime()
   if(isExpired){
     const data = {
       refresh: refresh
     }
     const response = await CustomerApi.refreshAccess(data)
+    console.log(response.data)
     if(response?.data?.success){
       dispatch(updateUserAccess(response?.data?.data?.access))
       callback?.()
