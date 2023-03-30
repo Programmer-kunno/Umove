@@ -79,6 +79,9 @@ export default CustomDrawer = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.drawerBtn}
+          onPress={() => {
+            navigate('TransactionScreen')
+          }}
         >
           <Image
             style={styles.drawerIcons}

@@ -48,6 +48,7 @@ export const UMIcons = {
   headsetIcon: require('../assets/icons/headset.png'),
   cloudErrorIcon: require('../assets/icons/cloud-error.png'),
   whitePencil: require('../assets/icons/pencil.png'),
+  track: require('../assets/icons/track.png'),
   greenCheck: require('../assets/icons/green-check.png'),
   burgerMenuIcon: require('../assets/icons/sideMenu.png'),
   xIcon: require('../assets/icons/x-icon.png'),
