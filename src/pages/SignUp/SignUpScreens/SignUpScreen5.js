@@ -6,7 +6,8 @@ import {
   Text, 
   TouchableOpacity, 
   ScrollView, 
-  PermissionsAndroid
+  PermissionsAndroid,
+  Platform
 } from 'react-native';
 import DocumentPicker from 'react-native-document-picker'
 import getPath from '@flyerhq/react-native-android-uri-path';
@@ -34,9 +35,13 @@ export default class SignUpScreen5 extends Component {
         type: [DocumentPicker.types.images, DocumentPicker.types.pdf],
       });
       const origPath = getPath(response[0].uri)
-      const fileOrigPath = `file://${origPath}`
+      const fileOrigPath = Platform.OS === 'ios' ? origPath : `file://${origPath}`
       response[0].uri = fileOrigPath
-      register.bir = response[0]
+      register.bir = {
+        uri: fileOrigPath,
+        name: response[0].name,
+        type: response[0].type
+      }
       this.setState({register})
       console.log(this.state.register)
     } catch (err) {
@@ -58,9 +63,13 @@ export default class SignUpScreen5 extends Component {
         type: [DocumentPicker.types.images, DocumentPicker.types.pdf],
       });
       const origPath = getPath(response[0].uri)
-      const fileOrigPath = `file://${origPath}`
+      const fileOrigPath = Platform.OS === 'ios' ? origPath : `file://${origPath}`
       response[0].uri = fileOrigPath
-      register.dti = response[0]
+      register.dti = {
+        uri: fileOrigPath,
+        name: response[0].name,
+        type: response[0].type
+      }
       this.setState({register})
       console.log(this.state.register)
     } catch (err) {
@@ -83,9 +92,13 @@ export default class SignUpScreen5 extends Component {
         type: [DocumentPicker.types.images],
       });
       const origPath = getPath(response[0].uri)
-      const fileOrigPath = `file://${origPath}`
+      const fileOrigPath = Platform.OS === 'ios' ? origPath : `file://${origPath}`
       response[0].uri = fileOrigPath
-      register.validId = response[0]
+      register.validId = {
+        uri: fileOrigPath,
+        name: response[0].name,
+        type: response[0].type
+      }
       this.setState({register})
     } catch (err) {
       //Handling any exception (If any)

@@ -19,6 +19,7 @@ import { UMColors } from '../../../utils/ColorHelper';
 import { dispatch } from '../../../utils/redux';
 import { showError } from '../../../redux/actions/ErrorModal';
 import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal';
+import DocumentPicker from 'react-native-document-picker'
 
 export default class SignUpScreen3 extends Component {  
   constructor(props) {
@@ -28,8 +29,7 @@ export default class SignUpScreen3 extends Component {
       register: this.props.route?.params?.register,
       error: false,
       errMessage: "",
-      companyTypeList: [],
-      permission: ""
+      companyTypeList: []
     };
     
     this.scrollView = null
@@ -70,29 +70,42 @@ export default class SignUpScreen3 extends Component {
   async selectCompanyLogo() {
     try {
       let register = this.state.register
-      const OsVer = Platform.constants['Release']
-      if(OsVer <= 12){
-        const data = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE); 
-        this.setState({ permission: data })
+      if(Platform.OS === 'android') {
+        const OsVer = Platform.constants['Release']
+        let data;
+        if(OsVer <= 12){
+          data = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE); 
+        } else {
+          data = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES);
+        }
+        
+        if (data === "granted") {
+          ImagePicker.openPicker({
+            width: 400,
+            height: 400,
+            cropping: true
+          }).then(image => {
+            console.log(image);
+            let result = image
+            let filename = result.path.substring(result.path.lastIndexOf('/') + 1, result.path.length);
+            result.name = filename
+            register.companyLogo = result
+            this.setState({register})
+          }).catch(err => {
+            console.log(err)
+          });
+        }
       } else {
-        const data = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES);
-        this.setState({ permission: data })
-      }
-      if (this.state.permission === "granted") {
-        ImagePicker.openPicker({
-          width: 400,
-          height: 400,
-          cropping: true
-        }).then(image => {
-          console.log(image);
-          let result = image
-          let filename = result.path.substring(result.path.lastIndexOf('/') + 1, result.path.length);
-          result.name = filename
-          register.companyLogo = result
-          this.setState({register})
-        }).catch(err => {
-          console.log(err)
+        const response = await DocumentPicker.pick({
+          type: [DocumentPicker.types.images],
         });
+
+        register.companyLogo = {
+          path: response[0].uri,
+          name: response[0].name,
+          type: response[0].type
+        };
+        this.setState({register})
       }
     } catch (err) {
       console.warn(err);

@@ -256,7 +256,9 @@ const styles = StyleSheet.create({
     width: '75%',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    paddingHorizontal: 5,
+    marginVertical: 5
   },
   rememberContainer: {
     flexDirection: 'row',
@@ -358,4 +360,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  checkbox: {
+    height: 20,
+    width: 20,
+    marginRight: 5
+  }
 })
