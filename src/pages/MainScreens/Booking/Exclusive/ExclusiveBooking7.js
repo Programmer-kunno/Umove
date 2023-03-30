@@ -33,7 +33,7 @@ export default class ExclusiveBooking7 extends Component {
       userProfile: bookRes?.booking_routes[0]?.booking_appointments[0]?.driver?.user?.user_profile,
       userVehicle: bookRes?.booking_routes[0]?.booking_appointments[0]?.vehicle,
     })
-    console.log(this.state.booking)
+    console.log(bookRes?.booking_routes[0]?.booking_appointments[0]?.vehicle)
   }
 
   bookDetailsModal() {
@@ -51,7 +51,7 @@ export default class ExclusiveBooking7 extends Component {
           }
         }}
       >
-        <View style={styles.mdlDetailsContainer}>
+        {/* <View style={styles.mdlDetailsContainer}>
             <Text style={styles.mdlTitle}>Booking Information</Text>
             <View style={styles.mdlInfoContainer}>
               <View style={styles.mdlInfo}>
@@ -71,7 +71,7 @@ export default class ExclusiveBooking7 extends Component {
                 <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.width}</Text>
               </View>
             </View>
-          </View>
+          </View> */}
       </RBSheet>
     )
   }

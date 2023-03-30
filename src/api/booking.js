@@ -114,4 +114,31 @@ export class BookingApi {
       return err
     }
   }
+
+  static async getBooking(params) {
+    let parameters = "?";
+  
+    if(params.type) {
+      parameters += `type=${params.type}&`
+    }
+
+    if(params.page) {
+      parameters += `page=${params.page}&`
+    }
+
+    if(params.status) {
+      parameters += `status=${params.status}&`
+    }
+
+    if(params.pickup_date) {
+      parameters += `pickup_date=${params.pickup_date}&`
+    }
+
+    try {
+      const response = await get('/api/bookings/');
+      return response;
+    } catch(err) {
+      return err
+    }
+  }
 }
