@@ -14,7 +14,7 @@ import { UMColors } from '../../../../utils/ColorHelper';
 import GrayNavbar from '../../../Components/GrayNavbar';
 import { dispatch } from '../../../../utils/redux';
 import { clearBookingDetails } from '../../../../redux/actions/Booking';
-import { navigate } from '../../../../utils/navigationHelper';
+import { goBack, navigate } from '../../../../utils/navigationHelper';
 import { showError } from '../../../../redux/actions/ErrorModal';
 
 export default class ExclusiveBooking1 extends Component {  
@@ -23,7 +23,7 @@ export default class ExclusiveBooking1 extends Component {
     
     this.state = { 
       booking: {
-        bookingType: 'Exclusive',
+        bookingType: this.props.route.params.bookingType,
         vehicleType: '2',
         typeOfGoods: '',
         productCategory: '',
@@ -192,9 +192,9 @@ export default class ExclusiveBooking1 extends Component {
 
           {/* Header for Exclusive */}
           <GrayNavbar
-            Title={'Exclusive'}
+            Title={this.state.booking.bookingType}
             onBack={() => {
-              this.props.navigation.navigate('Dashboard')
+              goBack()
             }}
           />
 

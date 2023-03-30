@@ -10,7 +10,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard
 } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import GrayNavbar from '../../Components/GrayNavbar'
 import { UMColors } from '../../../utils/ColorHelper'
 import { UMIcons } from '../../../utils/imageHelper'
@@ -23,13 +23,40 @@ import { dispatch } from '../../../utils/redux'
 import { setLoading } from '../../../redux/actions/Loader'
 import { showError } from '../../../redux/actions/ErrorModal'
 import { goBack, navigate } from '../../../utils/navigationHelper'
+import ErrorOkModal from '../../Components/ErrorOkModal'
+import { useSelector } from 'react-redux'
+import { useIsFocused } from '@react-navigation/native'
+import { isPaymentSuccess } from '../../../redux/actions/PaymentChecker'
+import SuccessOkModal from '../../Components/SuccessOkModal'
 
 export default AddPaymentMethodScreen = () => {
+  const payment = useSelector(state => state.paymentCheckerReducer.payment)
+  const isFocused = useIsFocused()
   const [accountName, setAccountName] = useState('');
   const [cardNumber, setCardNumber] = useState('');
   const [CVC, setCVC] = useState('');
   const [expDate, setExpDate] = useState('');
   const [isDefault, setIsDefault] = useState(false)
+  const [error, setError] = useState({
+    value: false,
+    message: ''
+  })
+  const [success, setSuccess] = useState({
+    value: false,
+    message: ''
+  })
+
+  useEffect(() => {
+    if(isFocused){
+      if(payment === 'failure'){
+        setError({ value: true, message: 'Add Card Failed!' })
+        dispatch(isPaymentSuccess(''))
+      } else if(payment === 'success') {
+        setSuccess({ value: true, message: 'Card Successfully Added!'})
+        dispatch(isPaymentSuccess(''))
+      }
+    }
+  }, [isFocused])
 
   const addCard = () => {
     dispatch(setLoading(true))
@@ -43,23 +70,44 @@ export default AddPaymentMethodScreen = () => {
     }
     refreshTokenHelper(async() => {
       const response = await CardPayment.addPaymentMethod(data);
-      console.log(response.data?.data?.parameters)
       if(response == undefined){
         dispatch(setLoading(false))
         dispatch(showError(true))
       } else {
         if(response?.data?.success) {
           navigate('AddPaymentMethodWebView', { data: response.data })
+          dispatch(setLoading(false))
+        } else {
+          setError({ value: true, message: response?.data?.data?.message || response?.data })
+          dispatch(setLoading(false))
         }
       }
     })
-
   }
+
+  const onSuccessBack = () => {
+    setSuccess({ ...success, value: false })
+    goBack()
+  } 
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView style={styles.mainContainer}>
         <ErrorWithCloseButtonModal/>
+        <ErrorOkModal
+          Visible={error.value}
+          ErrMsg={error.message}
+          OkButton={() => {
+            setError({ ...error, value: false })
+          }}
+        />
+        <SuccessOkModal
+          Visible={success.value}
+          SuccessMsg={success.message}
+          OkButton={() => {
+            onSuccessBack()
+          }}
+        />
         <GrayNavbar
           Title={'Add Card'}
         />

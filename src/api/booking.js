@@ -14,6 +14,15 @@ export class BookingApi {
     }
   }
 
+  static async payBooking(bookNumber, data) {
+    try {
+      const response = await post(`/api/bookings/pay/${bookNumber}`, data)   
+      return response
+    } catch(err) {
+      return err
+    }
+  }
+
   static async book(data) {
     const booking = data
     const pickUpDateTime = booking.pickupDate + " " + booking.pickupTime
@@ -91,15 +100,6 @@ export class BookingApi {
 
     try {
       const response = await post(`/api/bookings/update-status/${bookNumber}`, formData, { "Content-Type": "multipart/form-data" })
-      return response
-    } catch(err) {
-      return err
-    }
-  }
-
-  static async payBooking(data, bookNumber) {
-    try {
-      const response = await post(`/api/bookings/pay/${bookNumber}`, data)
       return response
     } catch(err) {
       return err

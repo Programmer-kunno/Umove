@@ -58,5 +58,6 @@ export const UMIcons = {
   paymayaLogo: require('../assets/payment/paymayaLogo.png'),
   visaLogo: require('../assets/payment/visa.png'),
   masterCardLogo: require('../assets/payment/mastercard-logo.png'),
-  creditCardLogo: require('../assets/payment/credit-card.png')
+  creditCardLogo: require('../assets/payment/credit-card.png'),
+  receiptSheet: require('../assets/payment/receiptSheet.png')
 }

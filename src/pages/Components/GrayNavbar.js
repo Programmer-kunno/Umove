@@ -17,8 +17,13 @@ export default class GrayNavbar extends Component {
           <TouchableOpacity
             style={styles.headerBackBtn}
             onPress={() => {
-              goBack()
-            }}
+                if(this.props.onGoBack) {
+                  this.props.onGoBack()
+                } else {
+                  goBack()
+                }
+              }
+            }
           >
             <Image
               style={{height: '60%'}}

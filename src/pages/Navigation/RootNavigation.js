@@ -38,6 +38,9 @@ import SelectPaymentScreen from '../MainScreens/Payment/SelectPaymentScreen';
 import PaymentMethodScreen from '../MainScreens/Payment/PaymentMethodScreen';
 import AddPaymentMethodScreen from '../MainScreens/Payment/AddPaymentMethodScreen';
 import AddPaymentMethodWebView from '../MainScreens/Payment/AddPaymentMethodWebView';
+import ReceiptScreen from '../MainScreens/Payment/ReceiptScreen';
+import SuccessPaymentScreen from '../MainScreens/Payment/SuccessPaymentScreen';
+import PaymentLoadingScreen from '../MainScreens/Payment/PaymentLoadingScreen';
 
 export default RootNavigation = () => {
   const Stack = createStackNavigator();
@@ -108,6 +111,9 @@ export default RootNavigation = () => {
       <Stack.Screen name="PaymentMethodScreen" component={PaymentMethodScreen} />
       <Stack.Screen name="AddPaymentMethodScreen" component={AddPaymentMethodScreen} />
       <Stack.Screen name="AddPaymentMethodWebView" component={AddPaymentMethodWebView} />
+      <Stack.Screen name="ReceiptScreen" component={ReceiptScreen} />
+      <Stack.Screen name="SuccessPaymentScreen" component={SuccessPaymentScreen} />
+      <Stack.Screen name="PaymentLoadingScreen" component={PaymentLoadingScreen} />
       {/* There are Pages in the Archive and Hidden Folder */}
 
     </Stack.Navigator>

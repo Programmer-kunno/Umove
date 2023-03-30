@@ -29,7 +29,7 @@ export default PaymentMethodScreen = () => {
   const [cardList, setCardList] = useState([])
   const [primary, setPrimary] = useState(0)
   const isFocused = useIsFocused()
-  const [err, setError] = useState({
+  const [error, setError] = useState({
     value: false,
     message: ''
   })
@@ -67,6 +67,7 @@ export default PaymentMethodScreen = () => {
           setCardList(mapReverse)
           dispatch(setLoading(false))
         } else {
+          setError({ value: true, message: response?.data?.data?.message || response?.data })
           dispatch(setLoading(false))
         }
       }
@@ -97,10 +98,10 @@ export default PaymentMethodScreen = () => {
     <SafeAreaView style={styles.mainContainer}>
       <ErrorWithCloseButtonModal/>
       <ErrorOkModal
-        Visible={err.value}
-        ErrMsg={err.message}
+        Visible={error.value}
+        ErrMsg={error.message}
         OkButton={() => {
-          setError({...err, value: false})
+          setError({...error, value: false})
         }}
       />
       <StatusBar barStyle={'light-content'}/>
@@ -117,6 +118,9 @@ export default PaymentMethodScreen = () => {
               <TouchableOpacity
                 key={index}
                 style={styles.methodBtn}
+                onPress={() => {
+
+                }}
               >
                 <View style={styles.cardContainer}>
                   <RadioButton

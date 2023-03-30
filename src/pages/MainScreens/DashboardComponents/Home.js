@@ -18,6 +18,7 @@ import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModa
 import ErrorOkModal from '../../Components/ErrorOkModal';
 import { useSelector } from 'react-redux';
 import { navigate } from '../../../utils/navigationHelper';
+import SelectPaymentScreen from '../Payment/SelectPaymentScreen';
 
 const bgImage = '../../../assets/bg-image.jpg';
 
@@ -75,7 +76,7 @@ export default Home = () => {
                     <TouchableOpacity style={styles.alignItemCenter}
                       onPress={() => {
                         setModalVisible(false)
-                        navigate('ExclusiveBooking1')
+                        navigate('ExclusiveBooking1', { bookingType: 'Exclusive' })
                       }}
                       >
                       <Image source={require('../../../assets/truck/exclusive.png')} style={styles.exclusiveTruck}/>
@@ -86,7 +87,7 @@ export default Home = () => {
                     <TouchableOpacity style={styles.alignItemCenter}
                       onPress={() => {
                         setModalVisible(false)
-                        setError({ value: true, message: 'This feature will be available soon, stay tuned' })
+                        navigate('ExclusiveBooking1', { bookingType: 'Shared' })
                       }}
                     >
                       <Image source={require('../../../assets/truck/shared.png')} style={styles.sharedTruck}/>
@@ -132,6 +133,7 @@ export default Home = () => {
               style={styles.bookBtn}
               onPress={() => {
                 chooseTypeBooking()
+                // navigate('SelectPaymentScreen')
               }}
             >
               <Text style={styles.bookBtnTxt}>Book</Text>

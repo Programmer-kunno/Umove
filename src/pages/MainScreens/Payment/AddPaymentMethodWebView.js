@@ -3,18 +3,29 @@ import React, { useEffect } from 'react'
 import { UMColors } from '../../../utils/ColorHelper'
 import GrayNavbar from '../../Components/GrayNavbar'
 import WebView from 'react-native-webview'
-import { goBack } from '../../../utils/navigationHelper'
+import { focusedScreenName, goBack } from '../../../utils/navigationHelper'
+import { dispatch } from '../../../utils/redux'
+import { isPaymentSuccess } from '../../../redux/actions/PaymentChecker'
+import { StackActions, useNavigation } from '@react-navigation/native'
 
 export default AddPaymentMethodWebView = (props) => {
 
   const data = props.route.params.data
 
+  const navigation = useNavigation()
+
   const onNavigationStateChange = (data) => {
     console.log(data)
-    if(data?.url.includes('success')){
-      goBack()
-    } else if(data?.url.includes('failure')) {
-      goBack()
+    console.log(focusedScreenName())
+    if(focusedScreenName() === 'AddPaymentMethodWebView') {
+      if(data?.url.includes('success')){
+        navigation.dispatch(StackActions.pop(1))
+        dispatch(isPaymentSuccess('success'))
+      }
+      if(data?.url.includes('failure')) {
+        navigation.dispatch(StackActions.pop(1))
+        dispatch(isPaymentSuccess('failure'))
+      }
     }
   }
 

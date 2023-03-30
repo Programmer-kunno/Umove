@@ -8,7 +8,7 @@ import {
 import React, { Component } from 'react'
 import { UMColors } from '../../../../utils/ColorHelper'
 import RBSheet from 'react-native-raw-bottom-sheet'
-import { navigate } from '../../../../utils/navigationHelper';
+import { navigate, resetNavigation } from '../../../../utils/navigationHelper';
 
 export default class ExclusiveBooking7 extends Component {
   constructor(props){
@@ -167,7 +167,7 @@ export default class ExclusiveBooking7 extends Component {
             <View style={styles.bookingDetailsContainer}>
               <Text style={{ fontSize: 25, color: 'rgb(223,131,68)', fontWeight: '400' }}>On its way</Text>
               <View style={styles.bookigRefContainer}>
-                <Text style={styles.bookingRefTxt}>Booking Ref</Text>
+                <Text style={styles.bookingRefTxt}>Booking No.</Text>
                 <Text style={[styles.bookingRefTxt, { textAlign: 'right' }]}>{this.state.booking?.booking_number}</Text>
               </View>
             </View>
@@ -184,7 +184,7 @@ export default class ExclusiveBooking7 extends Component {
               <TouchableOpacity
                 style={styles.bottomBtn}
                 onPress={() => {
-                  navigate('DrawerNavigation')
+                  resetNavigation('DrawerNavigation')
                 }}
               >
                 <Text style={styles.btmBtnTxt}>Okay</Text>

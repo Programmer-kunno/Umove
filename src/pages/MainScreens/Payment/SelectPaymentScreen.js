@@ -5,7 +5,8 @@ import {
   SafeAreaView, 
   TouchableOpacity, 
   Image, 
-  StatusBar 
+  StatusBar,
+  BackHandler
 } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import GrayNavbar from '../../Components/GrayNavbar'
@@ -13,7 +14,7 @@ import { UMColors } from '../../../utils/ColorHelper'
 import { RadioButton } from 'react-native-paper'
 import { UMIcons } from '../../../utils/imageHelper'
 import ErrorOkModal from '../../Components/ErrorOkModal'
-import { navigate } from '../../../utils/navigationHelper'
+import { navigate, resetNavigation } from '../../../utils/navigationHelper'
 import { CardPayment } from '../../../api/paymentCard'
 import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal'
 import { capitalizeFirst } from '../../../utils/stringHelper'
@@ -21,24 +22,40 @@ import { dispatch } from '../../../utils/redux'
 import { setLoading } from '../../../redux/actions/Loader'
 import { refreshTokenHelper } from '../../../api/helper/userHelper'
 import { useIsFocused } from '@react-navigation/native'
+import { Loader } from '../../Components/Loader'
+import ConfirmationModal from '../../Components/ConfirmationModal'
 
-export default SelectPaymentScreen = () => {
+export default SelectPaymentScreen = (props) => {
+  const { bookingNumber, price, booking } = props.route.params
   const [useWallet, setUseWallet] = useState(false)
   const [balance, setBalance] = useState('00.00')
-  const [selectPaymentRadio, setSelectPaymentRadio] = useState()
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(undefined)
   const [paymentMethod, setPaymanetMethod] = useState([])
-  const isFocused = useIsFocused()
+  const [isGoingBack, setIsGoingBack] = useState(false)
   const [error, setError] = useState({
     value: false,
     message: '',
   })
 
+  const isFocused = useIsFocused()
+
   useEffect(() => {
     if(isFocused){
+      BackHandler.addEventListener('hardwareBackPress', backHanderBtn)
+
       getPaymentMethods()
-      setSelectPaymentRadio()
-    } 
+      setSelectedPaymentMethod(undefined)
+    }
+    
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress', backHanderBtn)
+    }
   }, [isFocused])
+
+  const backHanderBtn = () => {
+    setIsGoingBack(true)
+    return true
+  }
 
   const getPaymentMethods = () => {
     dispatch(setLoading(true))
@@ -49,14 +66,61 @@ export default SelectPaymentScreen = () => {
         dispatch(showError(true))
       } else {
         if(response?.data?.success){
-          console.log(response.data.data)
           setPaymanetMethod(response?.data?.data)
           dispatch(setLoading(false))
         } else {
+          setError({ value: true, message: response?.data?.data?.message || response?.data })
           dispatch(setLoading(false))
         }
       }
     })
+  }
+
+  const onPressNext = async() => {
+    if(useWallet){
+      setError({ value: true, message: 'Paying via Wallet is not available at the moment'})
+    } else {
+      navigate("ReceiptScreen", { selectedPaymentMethod: selectedPaymentMethod, bookingNumber: bookingNumber, price: price, booking: booking })
+    }
+  }
+
+  const renderShowCards = () => {
+    const defaultPaymentMethod = paymentMethod.find(data => data.default === true);
+
+    if(!defaultPaymentMethod) {
+      return (
+        <Text style={styles.noPayMethodTxt}>No Primary Payment Method Available</Text>
+      )
+    } else {
+      return (
+        <TouchableOpacity
+          style={styles.selectPaymentBtn}
+          onPress={() => {
+            setSelectedPaymentMethod(defaultPaymentMethod)
+          }}
+        >
+          <View style={styles.radioBtnSection}>
+            <RadioButton
+              value={defaultPaymentMethod?.id}
+              status={selectedPaymentMethod?.id === defaultPaymentMethod?.id ? 'checked' : 'unchecked'}
+              onPress={() => {
+                setSelectedPaymentMethod(defaultPaymentMethod)
+                setUseWallet(false)
+              }}
+              color={UMColors.primaryOrange}
+              uncheckedColor={UMColors.primaryOrange}
+            />
+            <Text style={styles.paymentTitle}>{capitalizeFirst(defaultPaymentMethod.cardType.replace('-', ''))}</Text>
+            <Text style={styles.cardNumber}>{'**** ' + defaultPaymentMethod.last4}</Text>
+          </View>
+          <Image
+            style={styles.paymentLogo}
+            source={defaultPaymentMethod.cardType == 'visa' ? UMIcons.visaLogo : defaultPaymentMethod.cardType == 'master-card' ? UMIcons.masterCardLogo : UMIcons.creditCardLogo}
+            resizeMode={'contain'}
+          />
+        </TouchableOpacity>
+      )
+    }
   }
 
   return (
@@ -67,12 +131,25 @@ export default SelectPaymentScreen = () => {
         Visible={error.value}
         ErrMsg={error.message}
         OkButton={() => {
-
+          setError({ ...error, value: false })
+        }}
+      />
+      <ConfirmationModal
+        visible={isGoingBack}
+        message={'Are you sure you want to cancel payment?'}
+        onYes={() => {
+          resetNavigation('DrawerNavigation')
+        }}
+        onNo={() => {
+          setIsGoingBack(false)
         }}
       />
       {/* Header */}
       <GrayNavbar
         Title={'Select Payment'}
+        onGoBack={() => {
+          setIsGoingBack(true)
+        }}
       />
       <View style={styles.headerGrayExtention}>
         {/* Amount Container */}
@@ -84,7 +161,7 @@ export default SelectPaymentScreen = () => {
                 status={useWallet ? 'checked' : 'unchecked'}
                 onPress={() => {
                   setUseWallet(!useWallet)
-                  setSelectPaymentRadio('')
+                  setSelectedPaymentMethod(undefined)
                 }}
                 color={UMColors.primaryOrange}
                 uncheckedColor={UMColors.primaryOrange}
@@ -111,41 +188,7 @@ export default SelectPaymentScreen = () => {
       </View>
       {/* Payment Method */}
       <View style={styles.selectPaymentContainer}>
-        {
-          paymentMethod ?
-            paymentMethod.map((result, index) => (
-              result.default &&
-                <TouchableOpacity
-                  style={styles.selectPaymentBtn}
-                  key={index}
-                  onPress={() => {
-                    setSelectPaymentRadio(result.id)
-                  }}
-                >
-                  <View style={styles.radioBtnSection}>
-                    <RadioButton
-                      value={result.id}
-                      status={selectPaymentRadio === result.id ? 'checked' : 'unchecked'}
-                      onPress={() => {
-                        setSelectPaymentRadio(result.id)
-                        setUseWallet(false)
-                      }}
-                      color={UMColors.primaryOrange}
-                      uncheckedColor={UMColors.primaryOrange}
-                    />
-                    <Text style={styles.paymentTitle}>{capitalizeFirst(result.cardType.replace('-', ''))}</Text>
-                    <Text style={styles.cardNumber}>{'**** ' + result.last4}</Text>
-                  </View>
-                  <Image
-                    style={styles.paymentLogo}
-                    source={result.cardType == 'visa' ? UMIcons.visaLogo : result.cardType == 'master-card' ? UMIcons.masterCardLogo : UMIcons.creditCardLogo}
-                    resizeMode={'contain'}
-                  />
-                </TouchableOpacity>
-            ))
-          :
-          <Text style={styles.noPayMethodTxt}>No Payment Method Available</Text>
-        }
+        {renderShowCards()}
         <TouchableOpacity
           style={styles.selectPaymentBtn}
           onPress={() => {
@@ -175,18 +218,19 @@ export default SelectPaymentScreen = () => {
       {/* Next Button */}
       <TouchableOpacity
         style={[styles.nextBtn, 
-          useWallet || selectPaymentRadio ?  
+          useWallet || selectedPaymentMethod ?  
           { backgroundColor: UMColors.primaryOrange }
           :
           { backgroundColor: UMColors.primaryGray }
         ]}
-        disabled={!useWallet || selectPaymentRadio === '' ? false : true}
+        disabled={ useWallet || selectedPaymentMethod ? false : true}
         onPress={() => {
-
+          onPressNext()
         }}
       >
         <Text style={styles.nextBtnTxt}>Next</Text>
       </TouchableOpacity>
+      <Loader/>
     </SafeAreaView>
   )
 }

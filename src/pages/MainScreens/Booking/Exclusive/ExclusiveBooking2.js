@@ -289,7 +289,7 @@ export default class ExclusiveBooking2 extends Component {
                 <TouchableOpacity style={styles.dateInput} onPress={() => this.showDatePicker(true)}>
                   { this.state.newDate == '' ?
                     <Text style={{ color:'#808080' }}>
-                      Date
+                      Pick up Date
                     </Text>
                   :
                     <Text style={{ color:'black' }}>

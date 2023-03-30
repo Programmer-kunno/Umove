@@ -101,7 +101,11 @@ export class ExclusiveBooking5 extends Component {
         dispatch(setLoading(false))
       } else {
         if(response?.data?.success){
-          navigate('ExclusiveBooking7', { booking: response?.data?.data })
+          if(this.state.bookingData.customer.billing_type === 'Per Booking') {
+            navigate('SelectPaymentScreen', { bookingNumber: this.state.bookingData?.booking_number, price: this.state.bookingRes.total_price, booking: response?.data?.data })
+          } else {
+            navigate('ExclusiveBooking7', { booking: response?.data?.data })
+          }
           dispatch(setLoading(false))
         } else {
           this.setState({ errMessage: response?.data?.message, errorOkModalVisible: true })
@@ -176,7 +180,7 @@ export class ExclusiveBooking5 extends Component {
           {this.cancelConfirmModal()}
           <View style={styles.bookRefContainer}>
             <View style ={{flexDirection: 'row'}}>
-              <Text style={{fontSize: 12, color: 'black', width: '45%'}}>Booking Ref:</Text>
+              <Text style={{fontSize: 12, color: 'black', width: '45%'}}>Booking No:</Text>
               <Text style={{fontSize: 12, color: 'black', width: '45%', textAlign: 'right'}}>{this.state.bookingData?.booking_number}</Text>
             </View>
           </View>
@@ -243,11 +247,7 @@ export class ExclusiveBooking5 extends Component {
               <TouchableOpacity
                 style={{ backgroundColor: 'rgb(223,131,68)', width: '80%', height: 45, borderRadius: 10, alignItems: 'center', justifyContent: 'center', elevation: 3}}
                 onPress={() => {
-                  if(this.state.bookingData.customer.billing_type === 'Per Booking') {
-                    navigate('SelectPaymentScreen')
-                  } else {
-                    this.confimBooking()
-                  }
+                  this.confimBooking()
                 }}
               >
                 <Text style={{ color: "white", fontWeight: "600" }}>BOOK NOW</Text>
