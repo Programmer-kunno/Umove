@@ -1,19 +1,24 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
-import { FlatList } from 'react-native-gesture-handler';
+import { View, StyleSheet } from 'react-native'
 import { BookingApi } from '../../../api/booking';
-import BookingCard from '../../Components/BookingCard';
+import ListComponent from '../../Components/ListComponent';
 
 const OngoingTransaction = () => {
   const [data, setData] = useState([]);
+  const [listLoading, setListLoading] = useState(true);
   useEffect(() => {
     init();
   }, [])
 
   const init = async () => {
-    const response = await BookingApi.getBooking({ status: "confirmed" });
-    if(response == undefined){
+    setListLoading(true);
+    setData([]);
+
+    const response = await BookingApi.getBooking({ status: "ongoing" });
+    if(response == undefined){  
+      setListLoading(false);
     } else {
+      setListLoading(false);
       if(response?.data?.success) {
         setData(response.data.data);
       } else {
@@ -21,19 +26,13 @@ const OngoingTransaction = () => {
     }
   }
 
-  const renderItem = ({ item, index }) => {
-    return <BookingCard 
-      index={index} 
-      data={item} 
-      length={data.length} 
-      />
-  }
-
   return (
     <View style={styles.container}>
-      <FlatList 
+      <ListComponent 
         data={data}
-        renderItem={renderItem}
+        loading={listLoading}
+        type={"ongoing"}
+        refreshFunction={init}
       />
     </View>
   )
