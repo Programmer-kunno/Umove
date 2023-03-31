@@ -35,7 +35,7 @@ const BookingCard = (props) => {
               </View>
 
               <TouchableOpacity style={styles.trackButton}>
-                <Text style={styles.buttonText}>Booking Again</Text>
+                <Text style={styles.buttonText}>Rebook</Text>
               </TouchableOpacity>
             </View>
         }
