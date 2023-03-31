@@ -135,7 +135,7 @@ export class BookingApi {
     }
 
     try {
-      const response = await get('/api/bookings/');
+      const response = await get('/api/bookings/' + parameters.slice(0, -1));
       return response;
     } catch(err) {
       return err

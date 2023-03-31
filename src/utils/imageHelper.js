@@ -49,6 +49,8 @@ export const UMIcons = {
   cloudErrorIcon: require('../assets/icons/cloud-error.png'),
   whitePencil: require('../assets/icons/pencil.png'),
   track: require('../assets/icons/track.png'),
+  save: require('../assets/icons/save.png'),
+  no_booking: require('../assets/icons/no_booking_icon.png'),
   greenCheck: require('../assets/icons/green-check.png'),
   burgerMenuIcon: require('../assets/icons/sideMenu.png'),
   xIcon: require('../assets/icons/x-icon.png'),
