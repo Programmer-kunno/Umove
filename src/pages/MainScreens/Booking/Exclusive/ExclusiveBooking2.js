@@ -10,6 +10,7 @@ import { navigate } from '../../../../utils/navigationHelper';
 import { dispatch } from '../../../../utils/redux';
 import { showError } from '../../../../redux/actions/ErrorModal';
 import ErrorWithCloseButtonModal from '../../../Components/ErrorWithCloseButtonModal';
+import { make12HoursFormat } from '../../../../utils/stringHelper';
 
 export default class ExclusiveBooking2 extends Component {  
   constructor(props) {
@@ -32,6 +33,7 @@ export default class ExclusiveBooking2 extends Component {
 
   async componentDidMount() {
     this.loadRegion();
+    console.log(this.state.booking.pickupDate)
   }
 
   async booking() {
@@ -223,7 +225,7 @@ export default class ExclusiveBooking2 extends Component {
                     display="default" 
                     mode="time"
                     themeVariant="light"
-                    is24Hour={true}
+                    is24Hour={false}
                     value={this.state.time}
                     onChange={this.onChangeTime}
                   />
@@ -274,6 +276,7 @@ export default class ExclusiveBooking2 extends Component {
               <View style={styles.inputContainer}>
                 {/* Sender Name */}
                 <TextInput
+                  value={booking.pickupName}
                   style={[styles.fullWidthInput, styles.marginTop]}
                   onChangeText={(pickupName) => {
                     booking.pickupName = pickupName;
@@ -289,7 +292,7 @@ export default class ExclusiveBooking2 extends Component {
                 <TouchableOpacity style={styles.dateInput} onPress={() => this.showDatePicker(true)}>
                   { this.state.newDate == '' ?
                     <Text style={{ color:'#808080' }}>
-                      Pick up Date
+                      Pick Up Date
                     </Text>
                   :
                     <Text style={{ color:'black' }}>
@@ -306,7 +309,7 @@ export default class ExclusiveBooking2 extends Component {
                     </Text>
                   :
                     <Text style={{ color:'black' }}>
-                      {this.state.newTime}
+                      {make12HoursFormat(this.state.newTime)}
                       {/* { timeFormat.format(this.state.newTime) } */}
                     </Text>
                   }
@@ -316,6 +319,7 @@ export default class ExclusiveBooking2 extends Component {
               <View style={styles.inputContainer}>
                 {/* Street Address */}
                 <TextInput
+                  value={booking.pickupStreetAddress}
                   style={[styles.fullWidthInput, styles.marginTop]}
                   onChangeText={(streetAddress) => {
                     booking.pickupStreetAddress = streetAddress;
@@ -332,7 +336,7 @@ export default class ExclusiveBooking2 extends Component {
                   data={this.state.regionList}
                   keyExtractor= {region => region.code}
                   labelExtractor= {region => region.name}
-                  initValue="Select Region"
+                  initValue={"Select Region"}
                   onChange={(region) => {
                     booking.pickupRegion = region.name;
                     this.setState({booking}, async () => {
@@ -354,17 +358,18 @@ export default class ExclusiveBooking2 extends Component {
                 />
                 {/* ZIP Code */}
                 <TextInput
-                    style={[styles.zipInput]}
-                    onChangeText={(val) => {
-                      booking.pickupZipcode = val;
-                      this.setState({booking})
-                    }}  
-                    placeholder='ZIP Code'
-                    placeholderTextColor={'#808080'}                        
-                    keyboardType='number-pad'
-                    returnKeyType='done'
-                    maxLength={4}
-                  />
+                  value={booking.pickupZipcode}
+                  style={[styles.zipInput]}
+                  onChangeText={(val) => {
+                    booking.pickupZipcode = val;
+                    this.setState({booking})
+                  }}  
+                  placeholder='ZIP Code'
+                  placeholderTextColor={'#808080'}                        
+                  keyboardType='number-pad'
+                  returnKeyType='done'
+                  maxLength={4}
+                />
               </View>
               {/* Province */}
               <View style={[styles.inputContainer, styles.marginTop, styles.row]}>
@@ -373,7 +378,7 @@ export default class ExclusiveBooking2 extends Component {
                   data={this.state.provinceList}
                   keyExtractor= {province => province.code}
                   labelExtractor= {province => province.name}
-                  initValue="Select Province"
+                  initValue={"Select Province"}
                   onChange={(province) => {
                     booking.pickupProvince = province.name;
                     this.setState({booking}, async () => {
@@ -397,7 +402,7 @@ export default class ExclusiveBooking2 extends Component {
                 <ModalSelector
                   disabled={true}
                   data={this.state.provinceList}
-                  initValue="Select Province"
+                  initValue={"Select Province"}
                   searchText={'Search'}
                   cancelText={'Cancel'}
                   style={styles.disabledFullWidthInput}
@@ -421,7 +426,7 @@ export default class ExclusiveBooking2 extends Component {
                   data={this.state.cityList}
                   keyExtractor= {city => city.code}
                   labelExtractor= {city => city.name}
-                  initValue="Select City"
+                  initValue={"Select City"}
                   onChange={(city) => {
                     booking.pickupCity = city.name;
                     this.setState({booking}, async () => {
@@ -443,7 +448,7 @@ export default class ExclusiveBooking2 extends Component {
                 :
                 <ModalSelector
                   disabled={true}
-                  initValue="Select City"
+                  initValue={"Select City"}
                   searchText={'Search'}
                   cancelText={'Cancel'}
                   style={styles.disabledFullWidthInput}
@@ -467,7 +472,7 @@ export default class ExclusiveBooking2 extends Component {
                   data={this.state.barangayList}
                   keyExtractor= {barangay => barangay.code}
                   labelExtractor= {barangay => barangay.name}
-                  initValue="Select Barangay"
+                  initValue={"Select Barangay"}
                   onChange={(barangay) => {
                     booking.pickupBarangay = barangay.name;
                     this.setState({booking});
@@ -487,7 +492,7 @@ export default class ExclusiveBooking2 extends Component {
                 :
                 <ModalSelector
                   disabled={true}
-                  initValue="Select Barangay"
+                  initValue={"Select Barangay"}
                   searchText={'Search'}
                   cancelText={'Cancel'}
                   style={styles.disabledFullWidthInput}
@@ -507,6 +512,7 @@ export default class ExclusiveBooking2 extends Component {
               {/* Landmarks */}
               <View style={styles.inputContainer}>
                 <TextInput
+                  value={booking.pickupLandmark}
                   style={[styles.fullWidthInput, styles.marginTop]}
                   onChangeText={(landmark) => {
                     booking.pickupLandmark = landmark;
@@ -519,6 +525,7 @@ export default class ExclusiveBooking2 extends Component {
               {/* Special Instruction */}
               <View style={styles.inputContainer}>
                 <TextInput
+                  value={booking.pickupSpecialInstructions}
                   style={[styles.marginTop, styles.specialInstructions]}
                   onChangeText={(specialInstructions) => {
                     booking.pickupSpecialInstructions = specialInstructions;

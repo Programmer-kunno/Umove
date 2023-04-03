@@ -7,6 +7,7 @@ import Calendar from './DashboardComponents/Calendar';
 import Messages from './DashboardComponents/Messages';
 import Notification from './DashboardComponents/Notification';
 import Profile from './DashboardComponents/Profile';
+import { UMColors } from '../../utils/ColorHelper';
 
 
 const Tab = createBottomTabNavigator();
@@ -14,52 +15,49 @@ const Tab = createBottomTabNavigator();
 export default Dashboard = () => {
     return (
       <Tab.Navigator
-        initialRoute="Home" 
+        initialRoute="Home"
         screenOptions={({ route }) => ({
           tabBarIcon: ({ focused }) => {
             let image;
             let width;
             let height;
+            let activeColor;
             if (route.name === 'Home') {
-              image = focused 
-                ? require('../../assets/icons/home-active.png')
-                : require('../../assets/icons/home.png')
-              width = 22;
-              height = 22;              
+              image = require('../../assets/icons/home.png')
+              color = focused
+                ? UMColors.primaryOrange : UMColors.black
+              width = 25;
+              height = 25;              
             } else if(route.name === 'Calendar') {
-              image = focused 
-                ? require('../../assets/icons/calendar-active.png')
-                : require('../../assets/icons/calendar.png')
-              width = 22;
-              height = 22;
+              image = require('../../assets/icons/calendar.png')
+              color = focused
+                ? UMColors.primaryOrange : UMColors.black
+              width = 25;
+              height = 25;
             } else if(route.name === 'Messages') {
-              image = focused 
-                ? require('../../assets/icons/messages-active.png')
-                : require('../../assets/icons/messages.png')
-              width = 22;
-              height = 22;  
-            } else if(route.name === 'Notification') {
-              image = focused 
-                ? require('../../assets/icons/notificationEmpty-active.png')
-                : require('../../assets/icons/notificationEmpty.png')
-              width = 24;
-              height = 24;  
+              image = require('../../assets/icons/messages.png')
+              color = focused
+                ? UMColors.primaryOrange : UMColors.black
+              width = 25;
+              height = 25;  
             } else if(route.name === 'Profile') {
-              image = focused 
-                ? require('../../assets/icons/profile-active.png')
-                : require('../../assets/icons/profile.png')
-              width = 20;
-              height = 22;  
+              image = require('../../assets/icons/profile.png')
+              color = focused
+                ? UMColors.primaryOrange : UMColors.black
+              width = 23;
+              height = 25;  
             }
-            return <Image source={image} style={{width: width, height: height, marginTop:'5%', marginBottom: '3%'}} />;
+            return <Image source={image} style={{width: width, height: height, marginTop:'5%', marginBottom: '3%', tintColor: color}} />;
           },
-          tabBarActiveTintColor: 'rgb(112, 112, 112)',
-          tabBarInactiveTintColor: 'black',
+          tabBarActiveTintColor: UMColors.primaryOrange,
+          tabBarInactiveTintColor: UMColors.black,
           shifting: true,
           headerShown: false,
+          tabBarLabel:() => {return null},
           tabBarStyle: {
-            borderTopColor: '#1B2027',
-            backgroundColor: 'rgb(238, 241, 217)',
+            height: '8%',
+            borderTopColor: UMColors.black,
+            backgroundColor: UMColors.BGOrange,
             shadowColor: '#171717',
             shadowOffset: {height: -3},
             shadowOpacity: 0.3,
@@ -69,7 +67,7 @@ export default Dashboard = () => {
         <Tab.Screen name="Home" component={Home} options={{ gestureEnabled: false }}/>
         <Tab.Screen name="Calendar" component={Calendar} options={{ gestureEnabled: false }}/>
         <Tab.Screen name="Messages" component={Messages} options={{ gestureEnabled: false }}/>
-        <Tab.Screen name="Notification" component={Notification} options={{ gestureEnabled: false }}/>
+        <Tab.Screen name="Notification" component={Notification} options={{ gestureEnabled: false, tabBarButton: () => null }}/>
         <Tab.Screen name="Profile" component={Profile} options={{ gestureEnabled: false }}/>
       </Tab.Navigator>
     );

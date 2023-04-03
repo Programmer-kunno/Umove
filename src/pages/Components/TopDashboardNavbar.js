@@ -3,13 +3,14 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  Image  
+  Image,
 } from 'react-native'
-import React, { Component } from 'react'
+import React from 'react'
 import { useNavigation } from '@react-navigation/native';
 import { UMColors } from '../../utils/ColorHelper';
 import { UMIcons } from '../../utils/imageHelper';
 import { useSelector } from 'react-redux';
+import { navigate } from '../../utils/navigationHelper';
 
 export default TopDashboardNavbar = (props) => {  
 
@@ -48,12 +49,12 @@ export default TopDashboardNavbar = (props) => {
           <TouchableOpacity
             style={styles.headerRightBtn}
             onPress={() => {
-              props.CustomerService()
+              navigate('Notification')
             }}
           >
             <Image
-              style={{width: '45%'}}
-              source={UMIcons.headsetIcon}
+              style={{width: '50%'}}
+              source={UMIcons.notificationIcon}
               resizeMode={'contain'}
             />
           </TouchableOpacity>
@@ -64,7 +65,7 @@ export default TopDashboardNavbar = (props) => {
 
 const styles = StyleSheet.create({
   headerContainer: {
-    height: '11%',
+    height: '12%',
     width: '100%',
     backgroundColor: UMColors.BGOrange,
     justifyContent: 'space-between',
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
     color: UMColors.black,
     fontSize: 11,
     fontWeight: 'bold',
-    top: -5
+    top: -7
   },
   headerRight: {
     flex: 1,

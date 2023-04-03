@@ -19,6 +19,7 @@ const deviceWidth = Dimensions.get('screen').width
 export default Profile = () => {  
   
   const user = useSelector((state) => state.userOperations.userData)
+  // const userDetailsData = useSelector(state => state.userOperations.userDetailsData)
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [err, setErr] = useState({

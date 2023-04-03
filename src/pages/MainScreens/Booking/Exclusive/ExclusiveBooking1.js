@@ -21,10 +21,10 @@ export default class ExclusiveBooking1 extends Component {
   constructor(props) {
     super(props);
     
-    this.state = { 
+    this.state = {
       booking: {
-        bookingType: this.props.route.params.bookingType,
-        vehicleType: '2',
+        bookingType: this.props.route.params?.rebookData?.bookingType ? this.props.route.params?.rebookData?.bookingType : this.props.route.params.bookingType,
+        vehicleType: '2' || this.props.route.params.rebookData.vehicleType,
         typeOfGoods: '',
         productCategory: '',
         productSubcategory: '',
@@ -34,24 +34,24 @@ export default class ExclusiveBooking1 extends Component {
         length: '',
         weight: '',
         height: '',
-        pickupName: '',
-        pickupStreetAddress: '',
+        pickupName: this.props.route.params.rebookData.pickupName || '',
+        pickupStreetAddress: this.props.route.params.rebookData.pickupStreetAddress || '',
         pickupDate: '',
         pickupTime: '',
-        pickupRegion: '',
-        pickupProvince: '',
-        pickupCity: '',
-        pickupBarangay: '',
-        pickupZipcode: '',
+        pickupRegion: this.props.route.params.rebookData.pickupRegion || '',
+        pickupProvince: this.props.route.params.rebookData.pickupProvince || '',
+        pickupCity: this.props.route.params.rebookData.pickupCity || '',
+        pickupBarangay: this.props.route.params.rebookData.pickupBarangay || '',
+        pickupZipcode: this.props.route.params.rebookData.pickupZipcode || '',
         pickupLandmark: '',
         pickupSpecialInstructions: '',
-        dropoffName: '',
-        dropoffStreetAddress: '',
-        dropoffRegion: '',
-        dropoffProvince: '',
-        dropoffCity: '',
-        dropoffBarangay: '',
-        dropoffZipcode: '',
+        dropoffName: this.props.route.params.rebookData.dropoffName || '',
+        dropoffStreetAddress: this.props.route.params.rebookData.dropoffStreetAddress || '',
+        dropoffRegion: this.props.route.params.rebookData.dropoffRegion || '',
+        dropoffProvince: this.props.route.params.rebookData.dropoffProvince || '',
+        dropoffCity: this.props.route.params.rebookData.dropoffCity || '',
+        dropoffBarangay: this.props.route.params.rebookData.dropoffBarangay || '',
+        dropoffZipcode: this.props.route.params.rebookData.dropoffZipcode || '',
         dropoffLandmark: '',
         dropoffSpecialInstructions: '',
         paymentAddress: 'pickup',
@@ -73,6 +73,7 @@ export default class ExclusiveBooking1 extends Component {
   }
 
   async componentDidMount() {
+    console.log(this.props.route.params?.rebookData)
     dispatch(clearBookingDetails())
     this.loadType();
     this.loadPackaging();

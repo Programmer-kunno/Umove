@@ -76,7 +76,7 @@ export default RootNavigation = () => {
       </Drawer.Navigator>
     )
   }
-  
+
   return (
     <NavigationContainer ref={ref => setTopNavigationRef(ref)}>
     <StatusBar barStyle="dark-content" translucent backgroundColor={'transparent'} />

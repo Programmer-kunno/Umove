@@ -57,7 +57,7 @@ export default class Login extends Component {
         dispatch(setLoading(false))
       } else {
         dispatch(saveUserDetailsRedux(response?.data?.data))
-        resetNavigation('DrawerNavigation')
+        resetNavigation('Landing')
         dispatch(setLoading(false))
       }
     }
@@ -272,6 +272,7 @@ const styles = StyleSheet.create({
     justifyContent:'space-between',
   },
   rememberMeTxt: {
+    marginLeft: 10,
     fontSize: 13,
     color: UMColors.black,
   },

@@ -1,13 +1,24 @@
 import React, { useState } from 'react'
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Modal, TouchableWithoutFeedback, Image } from 'react-native'
 import { UMColors } from '../../utils/ColorHelper'
+import { UMIcons } from '../../utils/imageHelper'
 import { navigate } from '../../utils/navigationHelper'
+import ErrorWithCloseButtonModal from '../Components/ErrorWithCloseButtonModal'
+import GrayNavbar from '../Components/GrayNavbar'
+import { Loader } from '../Components/Loader'
 import TransactionTabs from './TransactionTabs'
 
 const Transactions = () => {
   const [modalVisible, setModalVisible] = useState(false);
   return (
     <SafeAreaView style={styles.container}>
+      <GrayNavbar
+        Title={'Transactions'}
+        rightBtnImage={UMIcons.downloadIcon}
+        onRightPress={() => {
+
+        }}
+      />
       <TransactionTabs />
 
       <Modal
@@ -53,6 +64,8 @@ const Transactions = () => {
           <Text style={styles.bookButtonText}>Create New Booking</Text>
         </TouchableOpacity>
       </View>
+      <Loader/>
+      <ErrorWithCloseButtonModal/>
     </SafeAreaView>
   )
 }
@@ -68,7 +81,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "center",
-    marginBottom: "45%"
+    marginBottom: "30%"
   },
   modalRow: {
     flexDirection: 'row',
