@@ -11,7 +11,7 @@ import TransactionTabs from './TransactionTabs'
 const Transactions = () => {
   const [modalVisible, setModalVisible] = useState(false);
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <GrayNavbar
         Title={'Transactions'}
         rightBtnImage={UMIcons.downloadIcon}
@@ -66,7 +66,7 @@ const Transactions = () => {
       </View>
       <Loader/>
       <ErrorWithCloseButtonModal/>
-    </SafeAreaView>
+    </View>
   )
 }
 
