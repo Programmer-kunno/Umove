@@ -16,6 +16,7 @@ const ListComponent = (props) => {
       type={type}
     />
   }
+  
   const ListEmptyComponent = () => {
     const firstTypeLetter = type.slice(0, 1);
     const adjustedType = firstTypeLetter.toUpperCase() + type.slice(1, type.length) 

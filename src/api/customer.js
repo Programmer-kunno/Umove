@@ -26,7 +26,7 @@ export class CustomerApi {
 
   static async getCustomerData() {
     try {
-      const response = await get('/api/customers', {}, false)
+      const response = await get('/api/customers/', {}, false)
       return response
     } catch(err) {
       return err
