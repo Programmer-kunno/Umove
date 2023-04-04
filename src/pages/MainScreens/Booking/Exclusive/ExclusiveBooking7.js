@@ -62,28 +62,28 @@ export default class ExclusiveBooking7 extends Component {
           }}
         >
           <View style={styles.mdlDetailsContainer}>
-              <Text style={styles.mdlTitle}>Booking Information</Text>
-              <View style={styles.mdlInfoContainer}>
-                <View style={styles.mdlInfo}>
-                  <Text style={styles.mdlInfoTxtLeft}>Type of Goods:</Text>
-                  <Text style={styles.mdlInfoTxtLeft}>Packaging Type:</Text>
-                  <Text style={styles.mdlInfoTxtLeft}>Quantity:</Text>
-                  <Text style={styles.mdlInfoTxtLeft}>Weight:</Text>
-                  <Text style={styles.mdlInfoTxtLeft}>Lenght:</Text>
-                  <Text style={styles.mdlInfoTxtLeft}>Width:</Text>
-                  <Text style={styles.mdlInfoTxtLeft}>Heigth:</Text>
-                </View>
-                <View style={[styles.mdlInfo, { alignItems: 'flex-end' }]}>
-                  <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.subcategory}</Text>
-                  <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.uom}</Text>
-                  <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.quantity}</Text>
-                  <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.weight}</Text>
-                  <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.length}</Text>
-                  <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.width}</Text>
-                  <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.height}</Text>
-                </View>
+            <Text style={styles.mdlTitle}>Booking Information</Text>
+            <View style={styles.mdlInfoContainer}>
+              <View style={styles.mdlInfo}>
+                <Text style={styles.mdlInfoTxtLeft}>Type of Goods:</Text>
+                <Text style={styles.mdlInfoTxtLeft}>Packaging Type:</Text>
+                <Text style={styles.mdlInfoTxtLeft}>Quantity:</Text>
+                <Text style={styles.mdlInfoTxtLeft}>Weight:</Text>
+                <Text style={styles.mdlInfoTxtLeft}>Lenght:</Text>
+                <Text style={styles.mdlInfoTxtLeft}>Width:</Text>
+                <Text style={styles.mdlInfoTxtLeft}>Heigth:</Text>
+              </View>
+              <View style={[styles.mdlInfo, { alignItems: 'flex-end' }]}>
+                <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.subcategory.value}</Text>
+                <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.uom.value}</Text>
+                <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.quantity}</Text>
+                <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.weight}</Text>
+                <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.length}</Text>
+                <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.width}</Text>
+                <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.height}</Text>
               </View>
             </View>
+          </View>
         </RBSheet>
       )
     }
