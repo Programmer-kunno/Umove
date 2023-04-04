@@ -45,7 +45,7 @@ export default class ExclusiveBookingDriverLocation extends Component {
               longitude: parseFloat(response?.data?.data?.longitude)
             }})
           } else {
-            this.setState({ errMessage: response?.data?.message, errModalVisible: true })
+
           }
         }
       }, 30000)

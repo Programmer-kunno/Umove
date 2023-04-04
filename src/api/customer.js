@@ -1,6 +1,7 @@
 import { 
   post,
-  del
+  del,
+  get
  } from './helper/http';
 // import { Request } from './helper/http'
 
@@ -14,14 +15,32 @@ export class CustomerApi {
     }
   }
 
-static async refreshAccess(data) {
-  try {
-    const response = await post('/api/refresh-token', data)
-    return response
-  } catch(err) {
-    return err
+  static async refreshAccess(data) {
+    try {
+      const response = await post('/api/refresh-token', data)
+      return response
+    } catch(err) {
+      return err
+    }
   }
-}
+
+  static async getCustomerData() {
+    try {
+      const response = await get('/api/customers', {}, false)
+      return response
+    } catch(err) {
+      return err
+    }
+  }
+
+  static async getNotification() {
+    try {
+      const response = await get('/api/notifications', {}, false)
+      return response
+    } catch(err) {
+      return err
+    }
+  }
 
   static async deleteUser(data) {
     try {

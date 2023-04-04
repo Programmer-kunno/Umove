@@ -4250,11 +4250,6 @@
   "resolved" "https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz"
   "version" "1.0.0"
 
-"fsevents@^2.3.2":
-  "integrity" "sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA=="
-  "resolved" "https://registry.npmjs.org/fsevents/-/fsevents-2.3.2.tgz"
-  "version" "2.3.2"
-
 "function-bind@^1.1.1":
   "integrity" "sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A=="
   "resolved" "https://registry.npmjs.org/function-bind/-/function-bind-1.1.1.tgz"
@@ -6917,8 +6912,7 @@
     "prop-types" "^15.7.2"
 
 "react-native-get-real-path@github:Wraptime/react-native-get-real-path":
-  "integrity" "sha512-0hz7tJHf7vpf4Pn8KKU0lj2sqvMgBuLXX70liPp+WoW6f0e/M/qlXC2Gg0FgLJkLtCYuDazkCFo5AbRLur01Mw=="
-  "resolved" "git+ssh://git@github.com/Wraptime/react-native-get-real-path.git"
+  "resolved" "git+ssh://git@github.com/Wraptime/react-native-get-real-path.git#85f90fbbfcaf5654837a2879cb28ffee8230da11"
   "version" "1.0.1"
 
 "react-native-gradle-plugin@^0.71.15":

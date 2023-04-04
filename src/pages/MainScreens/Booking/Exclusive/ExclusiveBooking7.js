@@ -9,6 +9,10 @@ import React, { Component } from 'react'
 import { UMColors } from '../../../../utils/ColorHelper'
 import RBSheet from 'react-native-raw-bottom-sheet'
 import { navigate, resetNavigation } from '../../../../utils/navigationHelper';
+import { dispatch } from '../../../../utils/redux';
+import { setLoading } from '../../../../redux/actions/Loader';
+import { BookingApi } from '../../../../api/booking';
+import { showError } from '../../../../redux/actions/ErrorModal';
 
 export default class ExclusiveBooking7 extends Component {
   constructor(props){
@@ -26,54 +30,63 @@ export default class ExclusiveBooking7 extends Component {
     this.RBSheet = null
   }
 
-  async componentDidMount () { 
+  async componentDidMount () {
+    this.init()
+  }
+
+  async init() {
     const bookRes = this.state.booking
     this.setState({ 
       appointment: bookRes?.booking_routes[0]?.booking_appointments[0],
       userProfile: bookRes?.booking_routes[0]?.booking_appointments[0]?.driver?.user?.user_profile,
       userVehicle: bookRes?.booking_routes[0]?.booking_appointments[0]?.vehicle,
     })
-    console.log(bookRes?.booking_routes[0]?.booking_appointments[0]?.vehicle)
   }
 
   bookDetailsModal() {
-    return(
-      <RBSheet
-        ref={ref => this.RBSheet = ref}
-        height={300}
-        openDuration={250}
-        customStyles={{
-          container: {
-            justifyContent: "center",
-            alignItems: "center",
-            borderTopLeftRadius: 15,
-            borderTopRightRadius: 15,
-          }
-        }}
-      >
-        {/* <View style={styles.mdlDetailsContainer}>
-            <Text style={styles.mdlTitle}>Booking Information</Text>
-            <View style={styles.mdlInfoContainer}>
-              <View style={styles.mdlInfo}>
-                <Text style={styles.mdlInfoTxtLeft}>Type of Goods:</Text>
-                <Text style={styles.mdlInfoTxtLeft}>Packaging Type:</Text>
-                <Text style={styles.mdlInfoTxtLeft}>Quantity:</Text>
-                <Text style={styles.mdlInfoTxtLeft}>Weight:</Text>
-                <Text style={styles.mdlInfoTxtLeft}>Lenght:</Text>
-                <Text style={styles.mdlInfoTxtLeft}>Width:</Text>
-              </View>
-              <View style={[styles.mdlInfo, { alignItems: 'flex-end' }]}>
-                <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.subcategory}</Text>
-                <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.uom}</Text>
-                <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.quantity}</Text>
-                <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.weight}</Text>
-                <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.length}</Text>
-                <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.width}</Text>
+    if(!this.state.booking?.booking_items) {
+      return null
+    } else {
+      return(
+        <RBSheet
+          ref={ref => this.RBSheet = ref}
+          height={320}
+          openDuration={250}
+          customStyles={{
+            container: {
+              justifyContent: "center",
+              alignItems: "center",
+              borderTopLeftRadius: 15,
+              borderTopRightRadius: 15,
+            }
+          }}
+        >
+          <View style={styles.mdlDetailsContainer}>
+              <Text style={styles.mdlTitle}>Booking Information</Text>
+              <View style={styles.mdlInfoContainer}>
+                <View style={styles.mdlInfo}>
+                  <Text style={styles.mdlInfoTxtLeft}>Type of Goods:</Text>
+                  <Text style={styles.mdlInfoTxtLeft}>Packaging Type:</Text>
+                  <Text style={styles.mdlInfoTxtLeft}>Quantity:</Text>
+                  <Text style={styles.mdlInfoTxtLeft}>Weight:</Text>
+                  <Text style={styles.mdlInfoTxtLeft}>Lenght:</Text>
+                  <Text style={styles.mdlInfoTxtLeft}>Width:</Text>
+                  <Text style={styles.mdlInfoTxtLeft}>Heigth:</Text>
+                </View>
+                <View style={[styles.mdlInfo, { alignItems: 'flex-end' }]}>
+                  <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.subcategory}</Text>
+                  <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.uom}</Text>
+                  <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.quantity}</Text>
+                  <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.weight}</Text>
+                  <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.length}</Text>
+                  <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.width}</Text>
+                  <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.height}</Text>
+                </View>
               </View>
             </View>
-          </View> */}
-      </RBSheet>
-    )
+        </RBSheet>
+      )
+    }
   }
 
   render() {

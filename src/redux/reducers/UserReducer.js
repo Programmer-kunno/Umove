@@ -1,11 +1,13 @@
 import { 
   SAVE_LOGIN_DETAILS, 
+  SAVE_USER_DETAILS,
   USER_LOGOUT,
   UPDATE_USER_ACCESS
 } from "../actions/User";
 
 const initialState = {
-  userData: {}
+  userData: {},
+  userDetailsData: {}
 }
 
 export const userOperations = (state = initialState, action) => {
@@ -14,6 +16,12 @@ export const userOperations = (state = initialState, action) => {
       return {
         ...state,
         userData: action.value,
+      }
+    }
+    case SAVE_USER_DETAILS: {
+      return {
+        ...state,
+        userDetailsData: action.value
       }
     }
     case USER_LOGOUT: {

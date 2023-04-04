@@ -15,12 +15,13 @@ import { userLogout } from '../../redux/actions/User'
 import { resetNavigation } from '../../utils/navigationHelper'
 import LinearGradient from 'react-native-linear-gradient'
 import { navigate } from '../../utils/navigationHelper'
+import { moneyFormat } from '../../utils/stringHelper'
 
 export default CustomDrawer = () => {
   const deviceWidth = Dimensions.get('screen').width
   const deviceHeigth = Dimensions.get('screen').height
   const user = useSelector((state) => state.userOperations.userData)
-
+  const userDetailsData = useSelector(state => state.userOperations.userDetailsData)
   const [walletBalance, setWalletBalance] = useState("1,000.00")
   const [name, setName] = useState('')
   
@@ -75,7 +76,7 @@ export default CustomDrawer = () => {
             source={UMIcons.homeWalletIcon}
             resizeMode={'contain'}
           />
-          <Text style={styles.homeWalletBalance}>₱ {walletBalance}</Text>
+          <Text style={styles.homeWalletBalance}>₱ {moneyFormat(userDetailsData.remaining_credits)}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.drawerBtn}

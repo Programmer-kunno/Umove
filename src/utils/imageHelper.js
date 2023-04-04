@@ -54,6 +54,8 @@ export const UMIcons = {
   greenCheck: require('../assets/icons/green-check.png'),
   burgerMenuIcon: require('../assets/icons/sideMenu.png'),
   xIcon: require('../assets/icons/x-icon.png'),
+  notificationIcon: require('../assets/icons/notificationEmpty.png'),
+  downloadIcon: require('../assets/icons/downloadIcon.png'),
   // Error Icons
   warningSign: require('../assets/errors/warning-sign.png'),
   // Payment Icons

@@ -1,21 +1,68 @@
 import React from 'react'
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
+import { BookingApi } from '../../api/booking';
+import { refreshTokenHelper } from '../../api/helper/userHelper';
+import { showError } from '../../redux/actions/ErrorModal';
+import { setLoading } from '../../redux/actions/Loader';
 import { UMColors } from '../../utils/ColorHelper';
 import { UMIcons } from '../../utils/imageHelper';
 import { navigate } from '../../utils/navigationHelper';
+import { dispatch } from '../../utils/redux';
 import { moneyFormat } from '../../utils/stringHelper';
+import { Loader } from './Loader';
+import ExclusiveBooking1 from '../MainScreens/Booking/Exclusive/ExclusiveBooking1';
 
 const BookingCard = (props) => {
   const { data, index, length, type, keyProp } = props;
-
   const bookingRoutes = data?.booking_routes[0] || {};
+  const rebookData = {
+    bookingType: data?.booking_type,
+    vehicleType: data?.vehicle_type,
+    pickupName: bookingRoutes.shipper,
+    pickupStreetAddress: bookingRoutes.origin_address,
+    pickupRegion: bookingRoutes.origin_region,
+    pickupProvince: bookingRoutes.origin_province,
+    pickupCity: bookingRoutes.origin_city,
+    pickupBarangay: bookingRoutes.origin_barangay,
+    pickupZipcode: bookingRoutes.origin_zip_code,
+    dropoffName: bookingRoutes.receiver,
+    dropoffStreetAddress: bookingRoutes.destination_address,
+    dropoffRegion: bookingRoutes.destination_region,
+    dropoffProvince: bookingRoutes.destination_province,
+    dropoffCity: bookingRoutes.destination_city,
+    dropoffBarangay: bookingRoutes.destination_barangay,
+    dropoffZipcode: bookingRoutes.destination_zip_code,
+  }
+
+  const getBookingItems = () => {
+    dispatch(setLoading(true))
+    refreshTokenHelper(async() => {
+      const response = await BookingApi.getBooking(data)
+      if(response == undefined){
+        dispatch(showError(true))
+        dispatch(setLoading(false))
+      } else {
+        if(response?.data?.success) {
+          console.log(response.data.data)
+          if(type === "ongoing"){
+            navigate('ExclusiveBooking7', { booking: response?.data?.data })
+          } else {
+
+          } 
+          dispatch(setLoading(false))
+        } else {
+
+        }
+      }
+    })
+  }
 
   const returnSecondColumn = () => {
     return (
       <View key={keyProp} style={[styles.secondColumn, type === "ongoing" && { justifyContent: 'center' }]}>
         {
           type === "ongoing" &&
-            <TouchableOpacity onPress={() => navigate('ExclusiveBooking7', { booking: data })} style={styles.trackButton}>
+            <TouchableOpacity onPress={getBookingItems} style={styles.trackButton}>
               <Text style={styles.buttonText}>Track</Text>
               <Image 
                 source={UMIcons.track}
@@ -34,7 +81,7 @@ const BookingCard = (props) => {
                 />
               </View>
 
-              <TouchableOpacity style={styles.trackButton}>
+              <TouchableOpacity style={styles.trackButton} onPress={() => navigate('ExclusiveBooking1', { rebookData: rebookData })}>
                 <Text style={styles.buttonText}>Rebook</Text>
               </TouchableOpacity>
             </View>
@@ -74,7 +121,8 @@ const styles = StyleSheet.create({
     shadowOffset: {
       width: 0,
       height: 4
-    }
+    },
+    elevation: 7
   },
   firstColumn: {
     flex: 1
@@ -109,7 +157,8 @@ const styles = StyleSheet.create({
     shadowOffset: {
       width: 0,
       height: 4
-    }
+    },
+    elevation: 7
   },
   pastButtonContainer: {
     justifyContent: 'space-between', 

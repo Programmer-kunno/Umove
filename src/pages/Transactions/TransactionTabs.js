@@ -30,11 +30,10 @@ const TransactionTabs = () => {
     return <View style={styles.container}>
       {
         value.navigationState.routes.map((item, itemIndex) => (
-          <View style={[styles.buttonContainer, itemIndex === 1 && styles.midButton]}>
-            <TouchableOpacity activeOpacity={1} onPress={() => onPressTab(item)} style={styles.buttonStlye}>
+          <View key={itemIndex} style={[styles.buttonContainer, itemIndex === 1 && styles.midButton]}>
+            <TouchableOpacity activeOpacity={1} onPress={() => onPressTab(item)} style={[styles.buttonStlye, index !== itemIndex && { borderBottomColor: UMColors.white }]}>
               <Text>{item.title}</Text>
             </TouchableOpacity>
-            <View style={[styles.buttonIndicator, index !== itemIndex && { backgroundColor: UMColors.white }]}/>
           </View>
         ))
       }
@@ -69,11 +68,8 @@ const styles = StyleSheet.create({
   buttonStlye: {
     paddingVertical: 15, 
     alignItems: 'center', 
-    backgroundColor: UMColors.white
+    backgroundColor: UMColors.white,
+    borderBottomWidth: 3,
+    borderBottomColor: UMColors.primaryOrange
   },
-  buttonIndicator: {
-    height: 5, 
-    backgroundColor:
-    UMColors.primaryOrange
-  }
 })

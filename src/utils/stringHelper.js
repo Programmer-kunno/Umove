@@ -30,3 +30,33 @@ export const cardNumberRegex = (cardNumber) => {
 export const capitalizeFirst = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
+
+export const reArrangeDate = (date) => {
+  let splittedDate = date.split('-')
+  let arrangedDate = splittedDate[1] + '-' + splittedDate[2] + '-' + splittedDate[0]
+  return arrangedDate 
+}
+
+export const make12HoursFormat = (time) => {
+  let splittedTime = time.split(':')
+  let hours = parseInt(splittedTime[0]);
+  let minutes = splittedTime[1];
+  let seconds = splittedTime[2];
+
+  let meridian
+  let newHour
+  if(hours >= 12){
+    console.log(hours);
+    console.log(hours === 2);
+    newHour = hours === 12 ? hours : hours - 12
+    meridian = 'PM'
+  } else if(hours === 0) {
+    newHour = 12;
+    meridian = 'AM'
+  } else {
+    newHour = hours
+    meridian = 'AM'
+  }
+
+  return `${newHour}` + ':' + minutes + (seconds ? `:${seconds}` : '') + ' ' + meridian
+}

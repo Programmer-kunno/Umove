@@ -134,6 +134,10 @@ export class BookingApi {
       parameters += `pickup_date=${params.pickup_date}&`
     }
 
+    if(params.booking_number) {
+      parameters = params.booking_number + '&'
+    }
+
     try {
       const response = await get('/api/bookings/' + parameters.slice(0, -1));
       return response;

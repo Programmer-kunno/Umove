@@ -19,14 +19,16 @@ import ErrorOkModal from '../../Components/ErrorOkModal';
 import { useSelector } from 'react-redux';
 import { navigate } from '../../../utils/navigationHelper';
 import SelectPaymentScreen from '../Payment/SelectPaymentScreen';
+import { moneyFormat } from '../../../utils/stringHelper';
 
 const bgImage = '../../../assets/bg-image.jpg';
 
 export default Home = () => {  
-  const user = useSelector(state => state.userOperations.userData)
+  const userDetailsData = useSelector(state => state.userOperations.userDetailsData)
+  console.log(userDetailsData.remaining_credits)
   const [wallet, setWallet] = useState({
     balance: '1,000.00',
-    points: '10.00'
+    points: '0.00'
   })
   const [modalVisible, setModalVisible] = useState(false)
   const [error, setError] = useState({
@@ -35,7 +37,7 @@ export default Home = () => {
   })
   const [isVerified, setIsVerified] = useState(true)
 
-  chooseTypeBooking = () => {
+  const chooseTypeBooking = () => {
     if(isVerified){
       setModalVisible(true) 
     } else {
@@ -107,7 +109,7 @@ export default Home = () => {
               <View style={styles.balanceContainer}>
                 <View style={styles.balanceTxtContainer}>
                   <Text style={styles.balanceTxt}>₱</Text>
-                  <Text style={styles.balanceTxt}>{wallet.balance}</Text>
+                  <Text style={styles.balanceTxt}>{moneyFormat(userDetailsData.remaining_credits)}</Text>
                 </View>
                 <Text style={[styles.balanceTxt, { fontSize: 18, margin: 0, paddingLeft: 20 }]}>Balance</Text>
                 <TouchableOpacity

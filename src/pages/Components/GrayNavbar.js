@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, TouchableOpacity, Image } from 'react-native'
+import { Text, View, StyleSheet, TouchableOpacity, Image, StatusBar } from 'react-native'
 import React, { Component } from 'react'
 import { UMColors } from '../../utils/ColorHelper';
 import { UMIcons } from '../../utils/imageHelper';
@@ -13,6 +13,7 @@ export default class GrayNavbar extends Component {
   render() {
     return (
       <View style={styles.headerContainer}>
+        <StatusBar barStyle={'light-content'}/>
         <View style={styles.headerItems}>
           <TouchableOpacity
             style={styles.headerBackBtn}
@@ -32,6 +33,22 @@ export default class GrayNavbar extends Component {
             />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{this.props.Title}</Text>
+
+          <TouchableOpacity
+            style={styles.rightBtn}
+            disabled={this.props.rightBtnImage ? false : true}
+            onPress={() => {
+              this.props.onRightPress()
+            }}
+          > 
+          { this.props.rightBtnImage &&
+            <Image
+              style={{height: '100%'}}
+              source={this.props.rightBtnImage}
+              resizeMode={'contain'}
+            />
+          }
+          </TouchableOpacity>
         </View>
       </View>
     )
@@ -47,18 +64,29 @@ const styles = StyleSheet.create({
   },
   headerItems: {
     height: '60%',
+    width: '100%',
     position: 'absolute',
     bottom: 10,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between'
   },
   headerTitle: {
     color: UMColors.white,
     fontSize: 22,
   },
   headerBackBtn: {
-    height: '60%',
+    height: 30,
+    width: 30,
     marginHorizontal: '5%',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    alignItems: 'center'
+  }, 
+  rightBtn: {
+    height: 30,
+    width: 30,
+    marginHorizontal: '5%',
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 })
