@@ -200,7 +200,6 @@ const styles = StyleSheet.create({
     right: -1
   },
   editPic: {
-    borderWidth: 1,
     width: '50%',
     height: '50%'
   },

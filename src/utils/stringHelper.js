@@ -10,7 +10,9 @@ export const emailRegex = (email) => {
 }
 
 export const moneyFormat = (money) => {
-  const newMoney = money.toFixed(2).toString();
+  let theMoney = money || 0;
+
+  const newMoney = theMoney.toFixed(2).toString();
   return newMoney.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }
 

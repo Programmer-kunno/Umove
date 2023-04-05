@@ -204,7 +204,7 @@ export default class QuickQuotationItemDesc extends Component {
               placeholder="Types of Goods"
               placeholderStyle={styles.placeholderStyle}
               style={[styles.typeDropdownStyle, {position: 'relative', zIndex: 60}]}
-              containerStyle={[styles.typeDropdownContainerStyle, {position: 'relative', zIndex: 100}]}
+              containerStyle={[styles.typeDropdownContainerStyle, {position: 'relative', zIndex: 60}]}
               open={this.state.typeOpen} 
               items={this.state.typeItems}
               value={this.state.typeValue}
@@ -224,7 +224,7 @@ export default class QuickQuotationItemDesc extends Component {
               placeholder="Category"
               placeholderStyle={styles.placeholderStyle}
               style={!this.state.typeValue == '' ? [styles.typeDropdownStyle, {position: 'relative', zIndex: 59}] : [styles.typeDropdownStyleDisabled, {position: 'relative', zIndex: 59}]}
-              containerStyle={[styles.typeDropdownContainerStyle, { zIndex: 59 }]}
+              containerStyle={[styles.typeDropdownContainerStyle, {position: 'relative', zIndex: 59 }]}
               open={this.state.categoryOpen} 
               items={this.state.categoryItems}
               value={this.state.categoryValue}
@@ -240,13 +240,11 @@ export default class QuickQuotationItemDesc extends Component {
               setItems={(callback) => {this.setState(state => ({
                 typeItems: callback(state.typeItems)}))}}
             />
-
-             
              <DropDownPicker
               placeholder="Subcategory"
               placeholderStyle={styles.placeholderStyle}
               style={!this.state.categoryValue == '' ? [styles.typeDropdownStyle, {position: 'relative', zIndex: 58}] : [styles.typeDropdownStyleDisabled, {position: 'relative', zIndex: 58}]}
-              containerStyle={styles.typeDropdownContainerStyle}
+              containerStyle={[styles.typeDropdownContainerStyle, , {position: 'relative', zIndex: 58 }]}
               open={this.state.subCategoryOpen} 
               items={this.state.subCategoryItems}
               value={this.state.subCategoryValue}
