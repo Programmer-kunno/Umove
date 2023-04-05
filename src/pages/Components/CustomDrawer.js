@@ -30,8 +30,8 @@ export default CustomDrawer = () => {
   }, [])
 
   logOut = () => {
-    resetNavigation('Start1')
     dispatch(userLogout())
+    resetNavigation('Landing')
   }
 
 
