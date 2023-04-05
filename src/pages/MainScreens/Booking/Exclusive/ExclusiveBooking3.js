@@ -22,6 +22,7 @@ import { setLoading } from '../../../../redux/actions/Loader';
 import { refreshTokenHelper } from '../../../../api/helper/userHelper';
 import { showError } from '../../../../redux/actions/ErrorModal';
 import ErrorWithCloseButtonModal from '../../../Components/ErrorWithCloseButtonModal';
+import { UMColors } from '../../../../utils/ColorHelper';
 
 export default class ExclusiveBooking3 extends Component {  
   constructor(props) {
@@ -184,7 +185,8 @@ export default class ExclusiveBooking3 extends Component {
               <View style={styles.inputContainer}>
                 {/* Sender Name */}
                 <TextInput
-                  style={[styles.fullWidthInput, styles.marginTop]}
+                  value={booking.dropoffName}
+                  style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
                   onChangeText={(dropoffName) => {
                     booking.dropoffName = dropoffName;
                     this.setState({ booking })
@@ -197,7 +199,8 @@ export default class ExclusiveBooking3 extends Component {
               <View style={styles.inputContainer}>
                 {/* Street Address */}
                 <TextInput
-                  style={[styles.fullWidthInput, styles.marginTop]}
+                  value={booking.dropoffStreetAddress}
+                  style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
                   onChangeText={(streetAddress) => {
                     booking.dropoffStreetAddress = streetAddress;
                     this.setState({ booking })
@@ -213,7 +216,8 @@ export default class ExclusiveBooking3 extends Component {
                   data={this.state.regionList}
                   keyExtractor= {region => region.code}
                   labelExtractor= {region => region.name}
-                  initValue="Select Region"
+                  initValue={booking.isRebook ? booking.dropoffRegion : "Select Region"}
+                  disabled={booking.isRebook ? true : false}
                   onChange={(region) => {
                     booking.dropoffRegion = region.name;
                     this.setState({booking}, async () => {
@@ -225,7 +229,7 @@ export default class ExclusiveBooking3 extends Component {
                   style={styles.regionInput}
                   initValueTextStyle={styles.initValueTextStyle}
                   searchStyle={styles.searchStyle}
-                  selectStyle={styles.selectStyle2}
+                  selectStyle={[styles.selectStyle2, { backgroundColor: booking.isRebook ? UMColors.ligthGray : UMColors.white}]}
                   selectTextStyle={styles.selectTextStyle}
                   sectionTextStyle={styles.sectionTextStyle}
                   cancelStyle={styles.cancelStyle}
@@ -235,7 +239,9 @@ export default class ExclusiveBooking3 extends Component {
                 />
                 {/* ZIP Code */}
                 <TextInput
-                    style={[styles.zipInput]}
+                    value={booking.dropoffZipcode}
+                    style={[styles.zipInput, { backgroundColor: booking.isRebook ? UMColors.ligthGray : UMColors.white}]}
+                    editable={booking.isRebook ? false : true}
                     onChangeText={(val) => {
                       booking.dropoffZipcode = val;
                       this.setState({booking})
@@ -254,7 +260,8 @@ export default class ExclusiveBooking3 extends Component {
                   data={this.state.provinceList}
                   keyExtractor= {province => province.code}
                   labelExtractor= {province => province.name}
-                  initValue="Select Province"
+                  initValue={booking.isRebook ? booking.dropoffProvince : "Select Provice"}
+                  disabled={booking.isRebook ? true : false}
                   onChange={(province) => {
                     booking.dropoffProvince = province.name;
                     this.setState({booking}, async () => {
@@ -266,7 +273,7 @@ export default class ExclusiveBooking3 extends Component {
                   style={styles.fullWidthInput}
                   initValueTextStyle={styles.initValueTextStyle}
                   searchStyle={styles.searchStyle}
-                  selectStyle={styles.selectStyle1}
+                  selectStyle={[styles.selectStyle1, { backgroundColor: booking.isRebook ? UMColors.ligthGray : UMColors.white}]}
                   selectTextStyle={styles.selectTextStyle}
                   sectionTextStyle={styles.sectionTextStyle}
                   cancelStyle={styles.cancelStyle}
@@ -302,7 +309,8 @@ export default class ExclusiveBooking3 extends Component {
                   data={this.state.cityList}
                   keyExtractor= {city => city.code}
                   labelExtractor= {city => city.name}
-                  initValue="Select City"
+                  initValue={booking.isRebook ? booking.dropoffCity : "Select City"}
+                  disabled={booking.isRebook ? true : false}
                   onChange={(city) => {
                     booking.dropoffCity = city.name;
                     this.setState({booking}, async () => {
@@ -314,7 +322,7 @@ export default class ExclusiveBooking3 extends Component {
                   style={styles.fullWidthInput}
                   initValueTextStyle={styles.initValueTextStyle}
                   searchStyle={styles.searchStyle}
-                  selectStyle={styles.selectStyle1}
+                  selectStyle={[styles.selectStyle1, { backgroundColor: booking.isRebook ? UMColors.ligthGray : UMColors.white}]}
                   selectTextStyle={styles.selectTextStyle}
                   sectionTextStyle={styles.sectionTextStyle}
                   cancelStyle={styles.cancelStyle}
@@ -348,7 +356,8 @@ export default class ExclusiveBooking3 extends Component {
                   data={this.state.barangayList}
                   keyExtractor= {barangay => barangay.code}
                   labelExtractor= {barangay => barangay.name}
-                  initValue="Select Barangay"
+                  initValue={booking.isRebook ? booking.dropoffBarangay : "Select Barangay"}
+                  disabled={booking.isRebook ? true : false}
                   onChange={(barangay) => {
                     booking.dropoffBarangay = barangay.name;
                     this.setState({booking});
@@ -358,7 +367,7 @@ export default class ExclusiveBooking3 extends Component {
                   style={styles.fullWidthInput}
                   initValueTextStyle={styles.initValueTextStyle}
                   searchStyle={styles.searchStyle}
-                  selectStyle={styles.selectStyle1}
+                  selectStyle={[styles.selectStyle1, { backgroundColor: booking.isRebook ? UMColors.ligthGray : UMColors.white}]}
                   selectTextStyle={styles.selectTextStyle}
                   sectionTextStyle={styles.sectionTextStyle}
                   cancelStyle={styles.cancelStyle}
@@ -388,7 +397,7 @@ export default class ExclusiveBooking3 extends Component {
               {/* Landmarks */}
               <View style={styles.inputContainer}>
                 <TextInput
-                  style={[styles.fullWidthInput, styles.marginTop]}
+                  style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
                   onChangeText={(landmark) => {
                     booking.dropoffLandmark = landmark;
                     this.setState({booking})
@@ -486,7 +495,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     borderWidth: 1,
     borderColor: 'rgb(223,131,68)',
-    paddingLeft: '5%'
+    justifyContent: 'center',
   },
   regionInput: {
     width: '62%',
@@ -524,11 +533,12 @@ const styles = StyleSheet.create({
   selectStyle1: {
     backgroundColor: 'white',
     width: '100%',
-    height: 38,
+    height: '100%',
     borderRadius: 25,
-    borderWidth:0,
+    borderWidth: 0,
     justifyContent: 'center',
     alignItems: 'flex-start',
+    paddingLeft: '5%',
   },
   selectStyle2: {
     backgroundColor: 'white',
@@ -539,7 +549,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgb(223,131,68)',
     justifyContent: 'center',
     alignItems: 'flex-start',
-    paddingLeft: '10%'
+    paddingLeft: '7%'
   },
   selectTextStyle: {
     fontSize: 14,

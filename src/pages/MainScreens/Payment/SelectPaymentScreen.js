@@ -17,15 +17,17 @@ import ErrorOkModal from '../../Components/ErrorOkModal'
 import { navigate, resetNavigation } from '../../../utils/navigationHelper'
 import { CardPayment } from '../../../api/paymentCard'
 import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal'
-import { capitalizeFirst } from '../../../utils/stringHelper'
+import { capitalizeFirst, moneyFormat } from '../../../utils/stringHelper'
 import { dispatch } from '../../../utils/redux'
 import { setLoading } from '../../../redux/actions/Loader'
 import { refreshTokenHelper } from '../../../api/helper/userHelper'
 import { useIsFocused } from '@react-navigation/native'
 import { Loader } from '../../Components/Loader'
 import ConfirmationModal from '../../Components/ConfirmationModal'
+import { useSelector } from 'react-redux'
 
 export default SelectPaymentScreen = (props) => {
+  const userDetailsData = useSelector(state => state.userOperations.userDetailsData)
   const { bookingNumber, price, booking } = props.route.params
   const [useWallet, setUseWallet] = useState(false)
   const [balance, setBalance] = useState('00.00')
@@ -181,7 +183,7 @@ export default SelectPaymentScreen = (props) => {
           </View>
           <View style={styles.priceContainer}>
             <Text style={styles.priceText}>₱</Text>
-            <Text style={styles.priceText}>{balance}</Text>
+            <Text style={styles.priceText}>{moneyFormat(userDetailsData.remaining_credits)}</Text>
           </View>
           <Text style={styles.availableBalanceTxt}>Available Balance</Text>
         </View>

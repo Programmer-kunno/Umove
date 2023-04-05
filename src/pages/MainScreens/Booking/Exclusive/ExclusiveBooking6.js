@@ -76,7 +76,7 @@ export class ExclusiveBooking5 extends Component {
         booking_number: this.state.bookingData?.booking_number
       }
       const response = await BookingApi.computeRates(data)
-      console.log(response)
+      console.log(response.data.data.vehicle_type)
       if(response == undefined){
         dispatch(showError(true))
         this.setState({isLoading: false, errMessage: 'Cant Connect to the server'})
@@ -228,7 +228,7 @@ export class ExclusiveBooking5 extends Component {
                 source={returnIcon(this.state.bookingRes.vehicle_type)}
                 resizeMode={"contain"}
               />
-              <Text style={{ fontSize: 10 }}>U-MOVE {this.state.bookingRes.vehicle_type}</Text>
+              <Text style={{ fontSize: 10 }}>U-MOVE {this.state.bookingRes.vehicle_type.value}</Text>
             </View>
             <View style={{ textAlign: 'center', justifyContent: 'center', }}>
               <Text style={{ fontSize: 28 }}>₱ {moneyFormat(this.state.bookingRes.total_price)}</Text>
@@ -263,13 +263,13 @@ export class ExclusiveBooking5 extends Component {
     return(
       <View style={styles.container}>
         <ErrorWithCloseButtonModal/>
-        <ErrorOkModal
+        {/* <ErrorOkModal
           Visible={this.state.errorOkModalVisible}
           ErrMsg={this.state.errMessage}
           OkButton={() => {
             this.setState({ errorOkModalVisible: false })
           }}
-        />
+        /> */}
         <StatusBar translucent backgroundColor={'transparent'} barStyle={'dark-content'} />
         {
           this.state.origin !== null &&
