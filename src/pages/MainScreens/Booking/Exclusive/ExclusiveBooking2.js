@@ -32,7 +32,6 @@ export default class ExclusiveBooking2 extends Component {
   }
 
   async componentDidMount() {
-    this.loadRegion();
     console.log(this.state.booking.pickupDate)
   }
 
@@ -277,7 +276,7 @@ export default class ExclusiveBooking2 extends Component {
                 {/* Sender Name */}
                 <TextInput
                   value={booking.pickupName}
-                  style={[styles.fullWidthInput, styles.marginTop]}
+                  style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
                   onChangeText={(pickupName) => {
                     booking.pickupName = pickupName;
                     this.setState({ booking })
@@ -320,7 +319,7 @@ export default class ExclusiveBooking2 extends Component {
                 {/* Street Address */}
                 <TextInput
                   value={booking.pickupStreetAddress}
-                  style={[styles.fullWidthInput, styles.marginTop]}
+                  style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
                   onChangeText={(streetAddress) => {
                     booking.pickupStreetAddress = streetAddress;
                     this.setState({ booking })
@@ -334,9 +333,13 @@ export default class ExclusiveBooking2 extends Component {
                 {/* Region */}
                 <ModalSelector
                   data={this.state.regionList}
+                  onModalOpen={() => {
+                    this.loadRegion();
+                  }}
                   keyExtractor= {region => region.code}
                   labelExtractor= {region => region.name}
-                  initValue={"Select Region"}
+                  initValue={booking.isRebook ? booking.pickupRegion : "Select Region"}
+                  disabled={booking.isRebook ? true : false}
                   onChange={(region) => {
                     booking.pickupRegion = region.name;
                     this.setState({booking}, async () => {
@@ -348,7 +351,7 @@ export default class ExclusiveBooking2 extends Component {
                   style={styles.regionInput}
                   initValueTextStyle={styles.initValueTextStyle}
                   searchStyle={styles.searchStyle}
-                  selectStyle={styles.selectStyle2}
+                  selectStyle={[styles.selectStyle2, { backgroundColor: booking.isRebook ? UMColors.ligthGray : UMColors.white}]}
                   selectTextStyle={styles.selectTextStyle}
                   sectionTextStyle={styles.sectionTextStyle}
                   cancelStyle={styles.cancelStyle}
@@ -359,7 +362,8 @@ export default class ExclusiveBooking2 extends Component {
                 {/* ZIP Code */}
                 <TextInput
                   value={booking.pickupZipcode}
-                  style={[styles.zipInput]}
+                  style={[styles.zipInput, { backgroundColor: booking.isRebook ? UMColors.ligthGray : UMColors.white}]}
+                  editable={booking.isRebook ? false : true}
                   onChangeText={(val) => {
                     booking.pickupZipcode = val;
                     this.setState({booking})
@@ -378,7 +382,8 @@ export default class ExclusiveBooking2 extends Component {
                   data={this.state.provinceList}
                   keyExtractor= {province => province.code}
                   labelExtractor= {province => province.name}
-                  initValue={"Select Province"}
+                  initValue={booking.isRebook ? booking.pickupProvince : "Select Province"}
+                  disabled={booking.isRebook ? true : false}
                   onChange={(province) => {
                     booking.pickupProvince = province.name;
                     this.setState({booking}, async () => {
@@ -390,7 +395,7 @@ export default class ExclusiveBooking2 extends Component {
                   style={styles.fullWidthInput}
                   initValueTextStyle={styles.initValueTextStyle}
                   searchStyle={styles.searchStyle}
-                  selectStyle={styles.selectStyle1}
+                  selectStyle={[styles.selectStyle1, { backgroundColor: booking.isRebook ? UMColors.ligthGray : UMColors.white}]}
                   selectTextStyle={styles.selectTextStyle}
                   sectionTextStyle={styles.sectionTextStyle}
                   cancelStyle={styles.cancelStyle}
@@ -426,7 +431,8 @@ export default class ExclusiveBooking2 extends Component {
                   data={this.state.cityList}
                   keyExtractor= {city => city.code}
                   labelExtractor= {city => city.name}
-                  initValue={"Select City"}
+                  initValue={booking.isRebook ? booking.pickupCity : "Select City"}
+                  disabled={booking.isRebook ? true : false}
                   onChange={(city) => {
                     booking.pickupCity = city.name;
                     this.setState({booking}, async () => {
@@ -438,7 +444,7 @@ export default class ExclusiveBooking2 extends Component {
                   style={styles.fullWidthInput}
                   initValueTextStyle={styles.initValueTextStyle}
                   searchStyle={styles.searchStyle}
-                  selectStyle={styles.selectStyle1}
+                  selectStyle={[styles.selectStyle1, { backgroundColor: booking.isRebook ? UMColors.ligthGray : UMColors.white}]}
                   selectTextStyle={styles.selectTextStyle}
                   sectionTextStyle={styles.sectionTextStyle}
                   cancelStyle={styles.cancelStyle}
@@ -472,7 +478,8 @@ export default class ExclusiveBooking2 extends Component {
                   data={this.state.barangayList}
                   keyExtractor= {barangay => barangay.code}
                   labelExtractor= {barangay => barangay.name}
-                  initValue={"Select Barangay"}
+                  initValue={booking.isRebook ? booking.pickupBarangay : "Select Barangay"}
+                  disabled={booking.isRebook ? true : false}
                   onChange={(barangay) => {
                     booking.pickupBarangay = barangay.name;
                     this.setState({booking});
@@ -482,7 +489,7 @@ export default class ExclusiveBooking2 extends Component {
                   style={styles.fullWidthInput}
                   initValueTextStyle={styles.initValueTextStyle}
                   searchStyle={styles.searchStyle}
-                  selectStyle={styles.selectStyle1}
+                  selectStyle={[styles.selectStyle1, { backgroundColor: booking.isRebook ? UMColors.ligthGray : UMColors.white}]}
                   selectTextStyle={styles.selectTextStyle}
                   sectionTextStyle={styles.sectionTextStyle}
                   cancelStyle={styles.cancelStyle}
@@ -513,7 +520,7 @@ export default class ExclusiveBooking2 extends Component {
               <View style={styles.inputContainer}>
                 <TextInput
                   value={booking.pickupLandmark}
-                  style={[styles.fullWidthInput, styles.marginTop]}
+                  style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
                   onChangeText={(landmark) => {
                     booking.pickupLandmark = landmark;
                     this.setState({booking})
@@ -636,7 +643,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     borderWidth: 1,
     borderColor: 'rgb(223,131,68)',
-    paddingLeft: '5%'
+    justifyContent: 'center',
   },
   regionInput: {
     width: '62%',
@@ -674,11 +681,12 @@ const styles = StyleSheet.create({
   selectStyle1: {
     backgroundColor: 'white',
     width: '100%',
-    height: 38,
+    height: '100%',
     borderRadius: 25,
-    borderWidth:0,
+    borderWidth: 0,
     justifyContent: 'center',
     alignItems: 'flex-start',
+    paddingLeft: '5%',
   },
   selectStyle2: {
     backgroundColor: 'white',
@@ -689,7 +697,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgb(223,131,68)',
     justifyContent: 'center',
     alignItems: 'flex-start',
-    paddingLeft: '10%'
+    paddingLeft: '7%'
   },
   selectTextStyle: {
     fontSize: 14,

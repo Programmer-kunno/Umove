@@ -1,10 +1,10 @@
 export const returnIcon = (type) => {
-  switch(type.toLowerCase()) {
-    case "motorcycle":
+  switch(type) {
+    case "Motorcycle":
       return require('../assets/vehicles/motor_nobg.png');
-    case "truck":
+    case "Truck":
       return require('../assets/vehicles/exclusive_nobg.png');
-    case "ship":
+    case "Ship":
       return require('../assets/vehicles/ship_nobg.png');
     default:
       return require('../assets/vehicles/motor_nobg.png');

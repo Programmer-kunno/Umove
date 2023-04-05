@@ -17,7 +17,7 @@ const BookingCard = (props) => {
   const bookingRoutes = data?.booking_routes[0] || {};
   const rebookData = {
     bookingType: data?.booking_type,
-    vehicleType: data?.vehicle_type,
+    vehicleType: data?.vehicle_type.id,
     pickupName: bookingRoutes.shipper,
     pickupStreetAddress: bookingRoutes.origin_address,
     pickupRegion: bookingRoutes.origin_region,
@@ -81,7 +81,9 @@ const BookingCard = (props) => {
                 />
               </View>
 
-              <TouchableOpacity style={styles.trackButton} onPress={() => navigate('ExclusiveBooking1', { rebookData: rebookData })}>
+              <TouchableOpacity style={styles.trackButton} onPress={() => {
+                console.log(data)
+                navigate('ExclusiveBooking1', { rebookData: rebookData, isRebook: true })}}>
                 <Text style={styles.buttonText}>Rebook</Text>
               </TouchableOpacity>
             </View>
