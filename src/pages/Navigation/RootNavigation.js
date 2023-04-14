@@ -24,15 +24,15 @@ import QuickQuotationPickUp from '../QuickQuotation/QuickQuotationPickUp';
 import QuickQuotationDelivery from '../QuickQuotation/QuickQuotationDelivery';
 import QuickQuotateScreen from '../QuickQuotation/QuickQuotateScreen';
 import QuickQuotatePriceScreen from '../QuickQuotation/QuickQuotatePriceScreen';
-import ExclusiveBooking1 from '../MainScreens/Booking/Exclusive/ExclusiveBooking1';
-import ExclusiveBooking2 from '../MainScreens/Booking/Exclusive/ExclusiveBooking2';
-import ExclusiveBooking3 from '../MainScreens/Booking/Exclusive/ExclusiveBooking3';
-import ExclusiveBooking4 from '../MainScreens/Booking/Exclusive/ExclusiveBooking4';
-import ExclusiveBooking5 from '../MainScreens/Booking/Exclusive/ExclusiveBooking5';
-import ExclusiveBooking6 from '../MainScreens/Booking/Exclusive/ExclusiveBooking6';
-import ExclusiveBooking7 from '../MainScreens/Booking/Exclusive/ExclusiveBooking7';
-import ExclusiveBookingCancelScreen from '../MainScreens/Booking/Exclusive/ExclusiveBookingCancelScreen';
-import ExclusiveBookingDriverLocation from '../MainScreens/Booking/Exclusive/ExclusiveBookingDriverLocation';
+import BookingItemScreen from '../MainScreens/Booking/BookingItemScreen';
+import BookingPickUpScreen from '../MainScreens/Booking/BookingPickUpScreen';
+import BookingDropOffScreen from '../MainScreens/Booking/BookingDropOffScreen';
+import BookingDescriptionScreen from '../MainScreens/Booking/BookingDescriptionScreen';
+import BookingProcessingScreen from '../MainScreens/Booking/BookingProcessingScreen';
+import BookingFindingDriverScreen from '../MainScreens/Booking/BookingFindingDriverScreen';
+import BookingAndDriverDescription from '../MainScreens/Booking/BookingAndDriverDescription';
+import BookingCancelScreen from '../MainScreens/Booking/BookingCancelScreen';
+import BookingDriverLocation from '../MainScreens/Booking/BookingDriverLocation';
 import Dashboard from '../MainScreens/Dashboard';
 import SelectPaymentScreen from '../MainScreens/Payment/SelectPaymentScreen';
 import PaymentMethodScreen from '../MainScreens/Payment/PaymentMethodScreen';
@@ -42,6 +42,9 @@ import ReceiptScreen from '../MainScreens/Payment/ReceiptScreen';
 import SuccessPaymentScreen from '../MainScreens/Payment/SuccessPaymentScreen';
 import PaymentLoadingScreen from '../MainScreens/Payment/PaymentLoadingScreen';
 import TransactionScreen from '../Transactions/TransactionScreen';
+import TermsAndCondition from '../MainScreens/ProfileDrawerScreens/TermsAndCondition';
+import DataPrivacy from '../MainScreens/ProfileDrawerScreens/DataPrivacy';
+import Help from '../MainScreens/ProfileDrawerScreens/Help';
 
 export default RootNavigation = () => {
   const Stack = createStackNavigator();
@@ -98,15 +101,15 @@ export default RootNavigation = () => {
       <Stack.Screen name="QuickQuotationDelivery" component={QuickQuotationDelivery} />
       <Stack.Screen name="QuickQuotateScreen" component={QuickQuotateScreen} />
       <Stack.Screen name="QuickQuotatePriceScreen" component={QuickQuotatePriceScreen} />
-      <Stack.Screen name="ExclusiveBooking1" component={ExclusiveBooking1} />
-      <Stack.Screen name="ExclusiveBooking2" component={ExclusiveBooking2} />
-      <Stack.Screen name="ExclusiveBooking3" component={ExclusiveBooking3} />
-      <Stack.Screen name="ExclusiveBooking4" component={ExclusiveBooking4} />
-      <Stack.Screen name="ExclusiveBooking5" component={ExclusiveBooking5} />
-      <Stack.Screen name="ExclusiveBooking6" component={ExclusiveBooking6} options={{ gestureEnabled: false }} />
-      <Stack.Screen name="ExclusiveBooking7" component={ExclusiveBooking7} options={{ gestureEnabled: false }} />
-      <Stack.Screen name="ExclusiveBookingDriverLocation" component={ExclusiveBookingDriverLocation} options={{ gestureEnabled: false }} />
-      <Stack.Screen name="ExclusiveBookingCancelScreen" component={ExclusiveBookingCancelScreen} options={{ gestureEnabled: false }} />
+      <Stack.Screen name="BookingItemScreen" component={BookingItemScreen} />
+      <Stack.Screen name="BookingPickUpScreen" component={BookingPickUpScreen} />
+      <Stack.Screen name="BookingDropOffScreen" component={BookingDropOffScreen} />
+      <Stack.Screen name="BookingDescriptionScreen" component={BookingDescriptionScreen} />
+      <Stack.Screen name="BookingProcessingScreen" component={BookingProcessingScreen} />
+      <Stack.Screen name="BookingFindingDriverScreen" component={BookingFindingDriverScreen} options={{ gestureEnabled: false }} />
+      <Stack.Screen name="BookingAndDriverDescription" component={BookingAndDriverDescription} options={{ gestureEnabled: false }} />
+      <Stack.Screen name="BookingDriverLocation" component={BookingDriverLocation} options={{ gestureEnabled: false }} />
+      <Stack.Screen name="BookingCancelScreen" component={BookingCancelScreen} options={{ gestureEnabled: false }} />
       <Stack.Screen name="DrawerNavigation" component={DrawerNavigation} options={{ gestureEnabled: false }} />
       <Stack.Screen name="SelectPaymentScreen" component={SelectPaymentScreen} />
       <Stack.Screen name="PaymentMethodScreen" component={PaymentMethodScreen} />
@@ -116,6 +119,9 @@ export default RootNavigation = () => {
       <Stack.Screen name="SuccessPaymentScreen" component={SuccessPaymentScreen} />
       <Stack.Screen name="PaymentLoadingScreen" component={PaymentLoadingScreen} />
       <Stack.Screen name="TransactionScreen" component={TransactionScreen} />
+      <Stack.Screen name="TermsAndCondition" component={TermsAndCondition} />
+      <Stack.Screen name="DataPrivacy" component={DataPrivacy} />
+      <Stack.Screen name="Help" component={Help} />
       {/* There are Pages in the Archive and Hidden Folder */}
 
     </Stack.Navigator>

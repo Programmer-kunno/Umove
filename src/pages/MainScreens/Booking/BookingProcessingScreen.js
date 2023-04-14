@@ -1,10 +1,11 @@
 import React, { Component }  from 'react';
 import { StyleSheet, StatusBar, View, Image, Text, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
-import { navigate } from '../../../../utils/navigationHelper';
+import { navigate } from '../../../utils/navigationHelper';
 
-import { UMColors } from '../../../../utils/ColorHelper';
+import { UMColors } from '../../../utils/ColorHelper';
+import { UMIcons } from '../../../utils/imageHelper';
 
-export default class ExclusiveBooking5 extends Component {  
+export default class BookingProcessingScreen extends Component {  
   constructor(props) {
     super(props);
     
@@ -30,7 +31,7 @@ export default class ExclusiveBooking5 extends Component {
           <View style={styles.alignItemCenter}>
             <View style={styles.alignItemCenter}>
               <Image
-                source={require('../../../../assets/logo/logo-primary.png')}
+                source={UMIcons.mainLogo}
                 style={styles.logo1}
               />
             </View>
@@ -44,16 +45,16 @@ export default class ExclusiveBooking5 extends Component {
         :
           <View style={styles.alignItemCenter}>
               <Image
-                source={require('../../../../assets/logo/logo-primary.png')}
+                source={UMIcons.mainLogo}
                 style={styles.logo2}
               />
-              <Image source={require('../../../../assets/icons/green-check.png')} style={styles.greenCheck}/>
+              <Image source={UMIcons.greenCheck} style={styles.greenCheck}/>
               <View style={styles.textContainer2}>
                 <Text style={styles.text}>We are pleased to inform you that your booking{'\n'}has been received and confirmed.</Text>
               </View>
               {/* Book Button */}
               <TouchableOpacity style={styles.bookButtonOrange} onPress={() => {
-                navigate('ExclusiveBooking6')
+                navigate('BookingFindingDriverScreen')
               }}>
                 <Text style={styles.buttonText}> Continue </Text>
               </TouchableOpacity>

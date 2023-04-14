@@ -3,16 +3,20 @@ import { StatusBar, StyleSheet, View, Modal, TouchableWithoutFeedback, Text, Tex
 import ModalSelector from 'react-native-modal-selector-searchable';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment/moment';
-import { UMColors } from '../../../../utils/ColorHelper';
-import { FetchApi } from '../../../../api/fetch';
-import GrayNavbar from '../../../Components/GrayNavbar';
-import { navigate } from '../../../../utils/navigationHelper';
-import { dispatch } from '../../../../utils/redux';
-import { showError } from '../../../../redux/actions/ErrorModal';
-import ErrorWithCloseButtonModal from '../../../Components/ErrorWithCloseButtonModal';
-import { make12HoursFormat } from '../../../../utils/stringHelper';
+import { UMColors } from '../../../utils/ColorHelper';
+import { FetchApi } from '../../../api/fetch';
+import GrayNavbar from '../../Components/GrayNavbar';
+import { navigate } from '../../../utils/navigationHelper';
+import { dispatch } from '../../../utils/redux';
+import { showError } from '../../../redux/actions/ErrorModal';
+import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal';
+import { make12HoursFormat } from '../../../utils/stringHelper';
+import { BookingApi } from '../../../api/booking';
+import { setLoading } from '../../../redux/actions/Loader';
+import { Loader } from '../../Components/Loader';
+import ErrorOkModal from '../../Components/ErrorOkModal';
 
-export default class ExclusiveBooking2 extends Component {  
+export default class BookingPickUpScreen extends Component {  
   constructor(props) {
     super(props);
     
@@ -27,17 +31,36 @@ export default class ExclusiveBooking2 extends Component {
       regionList: [],
       provinceList: [],
       cityList: [],
-      barangayList: []
+      barangayList: [],
+      error: false,
+      errorMessage: ''
     };
   }
 
   async componentDidMount() {
     console.log(this.state.booking.pickupDate)
+    dispatch(setLoading(false))
   }
 
   async booking() {
-    console.log(this.state.booking)
-    navigate('ExclusiveBooking3', { booking: this.state.booking })
+    this.checkTimeDate()
+  }
+
+  checkTimeDate = async() => {
+    dispatch(setLoading(true))
+    const response = await BookingApi.book(this.state.booking)
+    if(response == undefined){
+      dispatch(setLoading(false))
+      dispatch(showError(true))
+    } else {
+      if(!response?.data?.message?.pickup_time){
+        navigate('BookingDropOffScreen', { booking: this.state.booking })
+        dispatch(setLoading(false))
+      } else {
+        this.setState({ error: true, errorMessage: 'Pick Up Time passed or too soon' })
+        dispatch(setLoading(false))
+      }
+    }
   }
 
   async loadRegion() {
@@ -157,6 +180,13 @@ export default class ExclusiveBooking2 extends Component {
       <View style={styles.container}>
         <StatusBar translucent backgroundColor={'transparent'} barStyle={'light-content'} />
         <ErrorWithCloseButtonModal/>
+        <ErrorOkModal
+          Visible={this.state.error}
+          ErrMsg={this.state.errorMessage}
+          OkButton={() => {
+            this.setState({ error: false, errorMessage: '' })
+          }}
+        />
         {/* Date Modal */}
           <Modal
             animationType="slide"
@@ -171,7 +201,7 @@ export default class ExclusiveBooking2 extends Component {
                     <DateTimePicker
                       display="default" 
                       mode="date"
-                      minimumDate={new Date().setDate(new Date().getDate() + 1)}
+                      minimumDate={new Date().setDate(new Date().getDate())}
                       themeVariant="light"
                       value={this.state.date}
                       onChange={this.onChangeDate}
@@ -262,7 +292,7 @@ export default class ExclusiveBooking2 extends Component {
             <GrayNavbar
               Title={'Pick Up Address'}
               onBack={() => {
-                this.props.navigation.navigate('ExclusiveBooking1')
+                this.props.navigation.navigate('BookingItemScreen')
               }}
             />
           <View style={{width: '100%', height: '71%', alignItems: 'center'}}>
@@ -570,7 +600,7 @@ export default class ExclusiveBooking2 extends Component {
           </TouchableOpacity>
           }
         </View>
-            
+        <Loader/>
       </View>
     )
   }

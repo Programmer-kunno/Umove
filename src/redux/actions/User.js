@@ -14,6 +14,14 @@ export const saveUser = (data) => {
   }
 } 
 
+export const SAVE_USER_PASS = "SAVE_USER_PASS"
+export const saveUserPass = (data) => {
+  return {
+    type: SAVE_USER_PASS,
+    value: data
+  }
+} 
+
 export const USER_LOGOUT = "USER_LOGOUT"
 export const userLogout = () => {
   return {

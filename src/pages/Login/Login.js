@@ -1,4 +1,4 @@
-import React, { Component }  from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Image, Text, TextInput, Dimensions, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { EventRegister } from 'react-native-event-listeners'
 import CheckBox from '@react-native-community/checkbox';
@@ -6,204 +6,191 @@ import CheckBox from '@react-native-community/checkbox';
 import { CustomerApi } from '../../api/customer'; 
 import { UMColors } from '../../utils/ColorHelper';
 import { dispatch } from '../../utils/redux';
-import { saveUserDetailsRedux } from '../../redux/actions/User';
+import { saveUserDetailsRedux, saveUserPass } from '../../redux/actions/User';
 import { resetNavigation } from '../../utils/navigationHelper';
 import { Loader } from '../Components/Loader';
 import { setLoading } from '../../redux/actions/Loader';
 import ErrorWithCloseButtonModal from '../Components/ErrorWithCloseButtonModal';
 import { showError } from '../../redux/actions/ErrorModal';
 import { UMIcons } from '../../utils/imageHelper';
+import { useSelector } from 'react-redux';
+import { useIsFocused } from '@react-navigation/native';
 
 const deviceWidth = Dimensions.get('screen').width
 
-export default class Login extends Component {  
-  constructor() {
-    super();
+export default Login = () => {
+  const logInData = useSelector(state => state.userOperations.logInData)
+  console.log(logInData)
+  const [username, setUsername] = useState( logInData ? logInData.username : '')
+  const [password, setPassword] = useState( logInData ? logInData.password : '')
+  const [remember, setRemember] = useState(false)
+  const isFocused = useIsFocused()
+  const [error, setError] = useState({
+    value: false,
+    message: ''
+  })
     
-    this.state = { 
-      username: '',
-      password: '', 
-      remember: false,
-      error: false,
-      errMsg: '',
-      modalVisible: false
-    };
-  }
+  useEffect(() => {
+    if(isFocused) {
+      dispatch(setLoading(false))
+    }
+  }, [isFocused])
 
-  async componentDidMount() {
-    dispatch(setLoading(false))
-    this.loggedOut();
-  }
-
-  componentWillUnmount() {
-    EventRegister.removeEventListener(this.listener)
-  }
-
-  async logIn() {
+  const logIn = async() => {
     dispatch(setLoading(true))
-    this.setState({ error: false });
+    setError({ ...error, value: false });
     const data = {
-      username: this.state.username,
-      password: this.state.password
+      username: username,
+      password: password
     }
     const response = await CustomerApi.login(data);
-    console.log(response)
     if(response == undefined){
       dispatch(setLoading(false))
       dispatch(showError(true))
     } else {
       if(!response?.data?.success) {
-        this.setState({ error: true, errMsg: response?.data?.message });
+        setError({ value: true, message: response?.data?.message || response?.data });
         dispatch(setLoading(false))
       } else {
-        dispatch(saveUserDetailsRedux(response?.data?.data))
-        resetNavigation('Landing')
+        dispatch(saveUserDetailsRedux({ ...response?.data?.data, rememberMe: remember }))
+        resetNavigation('Landing', { savedLogInData: data })
         dispatch(setLoading(false))
       }
     }
   }
 
-  async loggedOut() {
-    if (!this.listener) {
-      this.listener = EventRegister.addEventListener('logout', () => {
-        this.setState({username: ''})
-        this.setState({password: ''})
-        this.setState({remember: false})
-      });
-    }
+  const loggedOut = () => {
+
   }
 
-  render() {
-    return(
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <View style={styles.mainContainer}>
-          <ErrorWithCloseButtonModal/>
-              {/* Logo */}
-              <View style={styles.mainLogoContainer}>
-                <Image
-                  source={UMIcons.mainLogo}
-                  style={styles.logo}
-                  resizeMode={'contain'}
+  return(
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.mainContainer}>
+        <ErrorWithCloseButtonModal/>
+            {/* Logo */}
+            <View style={styles.mainLogoContainer}>
+              <Image
+                source={UMIcons.mainLogo}
+                style={styles.logo}
+                resizeMode={'contain'}
+              />
+            </View>
+
+            {/* Username and Password */}
+            <View style={styles.inputContainer}>
+              <View style={styles.inputPart}> 
+                <Text style={styles.text}>
+                  Email or Username
+                </Text>
+                <TextInput
+                  style={styles.input}
+                  value={username}
+                  onChangeText={(val) => {setUsername(val)}}  
                 />
               </View>
-
-              {/* Username and Password */}
-              <View style={styles.inputContainer}>
-                <View style={styles.inputPart}> 
-                  <Text style={styles.text}>
-                    Email or Username
-                  </Text>
-                  <TextInput
-                    style={styles.input}
-                    value={this.state.username}
-                    onChangeText={(val) => {this.setState({username: val})}}  
-                  />
-                </View>
-                <View style={styles.inputPart}> 
-                  <Text style={styles.text}>
-                    Password
-                  </Text>
-                  <TextInput
-                    style={styles.input}
-                    secureTextEntry={true}
-                    value={this.state.password}
-                    onChangeText={(val) => {this.setState({password: val})}}  
-                  />
-                </View>
-                
-                {/* Remember Me and Forgot Password */}
-                <View style={styles.rememberForgotContainer}>
-                  <View style={styles.rememberContainer}>
-                    <CheckBox
-                      checkedColor='green'
-                      value={this.state.remember}
-                      onValueChange={() => {this.setState({remember: !this.state.remember})}}
-                      style={styles.checkbox}
-                    />
-                    <Text style={styles.rememberMeTxt}>Remember Me</Text>
-                  </View>
-                  <TouchableOpacity onPress={() => this.props.navigation.navigate('ForgotPassword')}>
-                    <Text style={styles.forgotPassword}>Forgot Password?</Text>
-                  </TouchableOpacity>
-                </View>
-                {this.state.error && <View style={styles.errorContainer}><Text style={styles.errorMessage}>{this.state.errMsg}</Text></View>}
-
+              <View style={styles.inputPart}> 
+                <Text style={styles.text}>
+                  Password
+                </Text>
+                <TextInput
+                  style={styles.input}
+                  secureTextEntry={true}
+                  value={password}
+                  onChangeText={(val) => {setPassword(val)}}  
+                />
               </View>
-
-              {/* Login Button */}
-              <View style={styles.logInBtnContainer}>
-                {/* Make button gray when not all inputs are filled out, orange when filled out */}
-                { this.state.username == '' || this.state.password == '' ?
-                <TouchableOpacity style={styles.loginButtonGray} disabled={true}>
-                  <Text style={styles.loginButtonText}>LOG IN</Text>
+              
+              {/* Remember Me and Forgot Password */}
+              <View style={styles.rememberForgotContainer}>
+                <View style={styles.rememberContainer}>
+                  <CheckBox
+                    checkedColor='green'
+                    value={remember}
+                    onValueChange={() => {setRemember(!remember)}}
+                    style={styles.checkbox}
+                  />
+                  <Text style={styles.rememberMeTxt}>Remember Me</Text>
+                </View>
+                <TouchableOpacity onPress={() => this.props.navigation.navigate('ForgotPassword')}>
+                  <Text style={styles.forgotPassword}>Forgot Password?</Text>
                 </TouchableOpacity>
-                :
-                <TouchableOpacity style={styles.loginButtonOrange} 
-                  onPress={() => {
-                    Keyboard.dismiss() 
-                    this.logIn() 
-                  }}
-                >
-                  <Text style={styles.loginButtonText}>LOG IN</Text>
-                </TouchableOpacity>
-                }
               </View>
+              {error.value && <View style={styles.errorContainer}><Text style={styles.errorMessage}>{error.message}</Text></View>}
 
-              {/* Login with */}
-              <View style={styles.altLogInContainer}>
-                <Text style={styles.loginWithText}> or Log In with </Text>
+            </View>
+
+            {/* Login Button */}
+            <View style={styles.logInBtnContainer}>
+              {/* Make button gray when not all inputs are filled out, orange when filled out */}
+              { username == '' || password == '' ?
+              <TouchableOpacity style={styles.loginButtonGray} disabled={true}>
+                <Text style={styles.loginButtonText}>LOG IN</Text>
+              </TouchableOpacity>
+              :
+              <TouchableOpacity style={styles.loginButtonOrange} 
+                onPress={() => {
+                  Keyboard.dismiss() 
+                  logIn() 
+                }}
+              >
+                <Text style={styles.loginButtonText}>LOG IN</Text>
+              </TouchableOpacity>
+              }
+            </View>
+
+            {/* Login with */}
+            <View style={styles.altLogInContainer}>
+              <Text style={styles.loginWithText}> or Log In with </Text>
+              <View style={styles.row}>
+                <TouchableOpacity onPress={() => alert('Log In w/ google')}>
+                  <Image
+                    source={UMIcons.googleIcon}
+                    style={styles.socials}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => alert('Log In w/ facebook')}>
+                  <Image
+                    source={UMIcons.facebookIcon}
+                    style={styles.socials}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => alert('Log In w/ apple')}>  
+                  <Image
+                    source={UMIcons.appleIcon}
+                    style={styles.socials}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => alert('Log In w/ fingerprint')}>  
+                  <Image
+                    source={require('../../assets/socials/fingerprint.png')}
+                    style={styles.socials}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Sign Up */}
+            <View style={styles.alignItemCenter}>
+              <View style={styles.signUpContainer}>
                 <View style={styles.row}>
-                  <TouchableOpacity onPress={() => alert('Log In w/ google')}>
-                    <Image
-                      source={UMIcons.googleIcon}
-                      style={styles.socials}
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => alert('Log In w/ facebook')}>
-                    <Image
-                      source={UMIcons.facebookIcon}
-                      style={styles.socials}
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => alert('Log In w/ apple')}>  
-                    <Image
-                      source={UMIcons.appleIcon}
-                      style={styles.socials}
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => alert('Log In w/ fingerprint')}>  
-                    <Image
-                      source={require('../../assets/socials/fingerprint.png')}
-                      style={styles.socials}
-                    />
-                  </TouchableOpacity>
-                </View>
-              </View>
-
-              {/* Sign Up */}
-              <View style={styles.alignItemCenter}>
-                <View style={styles.signUpContainer}>
-                  <View style={styles.row}>
-                    <Text style={styles.signUpText}>
-                      Don't have an account? {" "}
+                  <Text style={styles.signUpText}>
+                    Don't have an account? {" "}
+                  </Text>
+                  <TouchableOpacity onPress={() => {
+                    this.props.navigation.navigate('SignUpScreen')
+                  }}>
+                    <Text style={styles.underline}>
+                      Sign Up
                     </Text>
-                    <TouchableOpacity onPress={() => {
-                      this.props.navigation.navigate('SignUpScreen')
-                    }}>
-                      <Text style={styles.underline}>
-                        Sign Up
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
+                  </TouchableOpacity>
                 </View>
               </View>
-          <Loader/>
-        </View>
-      </TouchableWithoutFeedback>
-    )
-  }
+            </View>
+        <Loader/>
+      </View>
+    </TouchableWithoutFeedback>
+  )
 }
-
 
 const styles = StyleSheet.create({
   mainContainer: {

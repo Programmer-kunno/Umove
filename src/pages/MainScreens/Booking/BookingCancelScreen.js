@@ -10,10 +10,10 @@ import {
 } from 'react-native'
 import React, { Component } from 'react'
 
-import { UMIcons } from '../../../../utils/imageHelper';
-import { BookingApi } from '../../../../api/booking';
+import { UMIcons } from '../../../utils/imageHelper';
+import { BookingApi } from '../../../api/booking';
 
-export default class ExclusiveBookingCancelScreen extends Component {
+export default class BookingCancelScreen extends Component {
   constructor(props) {
     super(props);
     

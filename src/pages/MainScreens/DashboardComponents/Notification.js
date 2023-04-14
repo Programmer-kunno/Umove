@@ -83,7 +83,7 @@ export default Notification = () => {
             dispatch(showError(true))
           } else {
             if(response?.data?.success) {
-              navigate('ExclusiveBooking7', { booking: response?.data?.data })
+              navigate('BookingAndDriverDescription', { booking: response?.data?.data })
               dispatch(setLoading(false))
             } else {
               setListLoading(false);
@@ -154,7 +154,7 @@ export default Notification = () => {
           dispatch(setLoading(false))
         } else {
           if(response?.data?.success){
-            navigate('ExclusiveBookingCancelScreen')
+            navigate('BookingCancelScreen')
             dispatch(setLoading(false))
           } else {
             setError({ value: true, message: response?.data?.message || response.data })

@@ -7,6 +7,7 @@ import { userOperations } from "./reducers/UserReducer";
 import { loadingReducer } from "./reducers/LoaderReducer";
 import { showErrorReducer } from "./reducers/ErrorModalReducer";
 import { bookingDetails } from "./reducers/BookingReducer";
+import { appState } from "./reducers/AppReducer";
 import { paymentCheckerReducer } from "./reducers/PaymentCheckerReducer";
 import { configureStore } from "@reduxjs/toolkit";
 
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
   loadingReducer: loadingReducer,
   paymentCheckerReducer: paymentCheckerReducer,
   showErrorReducer: showErrorReducer,
+  appState: appState,
   userOperations: persistReducer(config, userOperations),
   bookingDetails: persistReducer(config, bookingDetails)
 })

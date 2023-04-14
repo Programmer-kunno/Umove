@@ -1,22 +1,22 @@
 import React, { Component }  from 'react';
 import { StyleSheet, StatusBar, View, Text, TouchableOpacity, Image } from 'react-native';
 
-import NavbarComponent from '../../../Components/NavbarComponent';
+import NavbarComponent from '../../Components/NavbarComponent';
 
-import { UMIcons } from '../../../../utils/imageHelper';
-import { UMColors } from '../../../../utils/ColorHelper';
-import { startTask, finishTask } from '../../../../utils/taskManagerHelper';
+import { UMIcons } from '../../../utils/imageHelper';
+import { UMColors } from '../../../utils/ColorHelper';
+import { startTask, finishTask } from '../../../utils/taskManagerHelper';
 
-import { DriverApi } from '../../../../api/driver';
+import { DriverApi } from '../../../api/driver';
 import MapView, { Marker } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
-import { refreshTokenHelper } from '../../../../api/helper/userHelper';
-import { dispatch } from '../../../../utils/redux';
-import { showError } from '../../../../redux/actions/ErrorModal';
-import { goBack } from '../../../../utils/navigationHelper';
-import ErrorOkModal from '../../../Components/ErrorOkModal';
+import { refreshTokenHelper } from '../../../api/helper/userHelper';
+import { dispatch } from '../../../utils/redux';
+import { showError } from '../../../redux/actions/ErrorModal';
+import { goBack } from '../../../utils/navigationHelper';
+import ErrorOkModal from '../../Components/ErrorOkModal';
 
-export default class ExclusiveBookingDriverLocation extends Component {  
+export default class BookingDriverLocation extends Component {  
   constructor(props) {
     super(props);
 

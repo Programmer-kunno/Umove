@@ -10,21 +10,21 @@ import {
   Keyboard
 } from 'react-native';
 import ModalSelector from 'react-native-modal-selector-searchable'
-import { FetchApi } from '../../../../api/fetch';
-import { BookingApi } from '../../../../api/booking';
-import ErrorOkModal from '../../../Components/ErrorOkModal';
-import GrayNavbar from '../../../Components/GrayNavbar';
-import { dispatch } from '../../../../utils/redux';
-import { saveBookingDetails } from '../../../../redux/actions/Booking';
-import { navigate } from '../../../../utils/navigationHelper';
-import { Loader } from '../../../Components/Loader';
-import { setLoading } from '../../../../redux/actions/Loader';
-import { refreshTokenHelper } from '../../../../api/helper/userHelper';
-import { showError } from '../../../../redux/actions/ErrorModal';
-import ErrorWithCloseButtonModal from '../../../Components/ErrorWithCloseButtonModal';
-import { UMColors } from '../../../../utils/ColorHelper';
+import { FetchApi } from '../../../api/fetch';
+import { BookingApi } from '../../../api/booking';
+import ErrorOkModal from '../../Components/ErrorOkModal';
+import GrayNavbar from '../../Components/GrayNavbar';
+import { dispatch } from '../../../utils/redux';
+import { saveBookingDetails } from '../../../redux/actions/Booking';
+import { navigate } from '../../../utils/navigationHelper';
+import { Loader } from '../../Components/Loader';
+import { setLoading } from '../../../redux/actions/Loader';
+import { refreshTokenHelper } from '../../../api/helper/userHelper';
+import { showError } from '../../../redux/actions/ErrorModal';
+import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal';
+import { UMColors } from '../../../utils/ColorHelper';
 
-export default class ExclusiveBooking3 extends Component {  
+export default class BookingDropOffScreen extends Component {  
   constructor(props) {
     super(props);
     
@@ -62,7 +62,7 @@ export default class ExclusiveBooking3 extends Component {
       } else {
         if(response?.data?.success) {
           dispatch(saveBookingDetails(response?.data?.data))
-          navigate('ExclusiveBooking4', { booking: this.state.booking })
+          navigate('BookingDescriptionScreen', { booking: this.state.booking })
           dispatch(setLoading(false))
         } else {
           this.setState({ bookErr: response?.data?.message, errModalVisible: true })
@@ -171,7 +171,7 @@ export default class ExclusiveBooking3 extends Component {
             <GrayNavbar
               Title={'Destination Address'}
               onBack={() => {
-                this.props.navigation.navigate('ExclusiveBooking2')
+                this.props.navigation.navigate('BookingPickUpScreen')
               }}
             />
 

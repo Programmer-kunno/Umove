@@ -5,8 +5,9 @@ import { navigate, resetNavigation } from '../utils/navigationHelper';
 import { refreshTokenHelper } from '../api/helper/userHelper';
 import { CustomerApi } from '../api/customer';
 import { dispatch } from '../utils/redux';
-import { saveUser } from '../redux/actions/User';
+import { saveUser, userLogout } from '../redux/actions/User';
 import { showError } from '../redux/actions/ErrorModal';
+import { saveAppMounted } from '../redux/actions/AppState';
 import ErrorWithCloseButtonModal from './Components/ErrorWithCloseButtonModal';
 import ErrorOkModal from './Components/ErrorOkModal';
 
@@ -29,24 +30,47 @@ class Landing extends Component {
   async componentDidMount() {
     setTimeout(() => {
       const user = this.props.userData
-      if(user.access) {   
-        refreshTokenHelper(async() => {
-          const response = await CustomerApi.getCustomerData()
-          console.log(response.data)
-          if(response == undefined){
-            dispatch(showError(true))
-          } else {
-            if(response?.data?.success) {
-              dispatch(saveUser(response?.data?.data))
-              resetNavigation('DrawerNavigation')
+      if(!this.props.appMounted) {
+        if(user.access && user.rememberMe) {
+          refreshTokenHelper(async() => {
+            const response = await CustomerApi.getCustomerData()
+            if(response == undefined){
+              dispatch(showError(true))
             } else {
-              this.setState({ error: true, errorMessage: response?.data?.message || response?.data })
+              if(response?.data?.success) {
+                dispatch(saveUser(response?.data?.data))
+                resetNavigation('DrawerNavigation')
+              } else {
+                this.setState({ error: true, errorMessage: response?.data?.message || response?.data })
+              }
             }
-          }
-        })
+          })
+        } else {
+          dispatch(userLogout())
+          resetNavigation('Start1')
+        }
       } else {
-        resetNavigation('Start1')
+        if(!user.access){
+          dispatch(userLogout())
+          resetNavigation('Start1')
+        } else {
+          refreshTokenHelper(async() => {
+            const response = await CustomerApi.getCustomerData()
+            if(response == undefined){
+              dispatch(showError(true))
+            } else {
+              if(response?.data?.success) {
+                dispatch(saveUser(response?.data?.data))
+                resetNavigation('DrawerNavigation')
+              } else {
+                this.setState({ error: true, errorMessage: response?.data?.message || response?.data })
+              }
+            }
+          })
+        }
       }
+
+      dispatch(saveAppMounted(true))
     }, 2000)
   }
 
@@ -81,6 +105,7 @@ class Landing extends Component {
 export default connect(
   state => {
     return {
+      appMounted: state.appState.appMounted,
       userData: state.userOperations.userData
     };
   },

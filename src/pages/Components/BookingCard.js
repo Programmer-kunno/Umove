@@ -10,7 +10,7 @@ import { navigate } from '../../utils/navigationHelper';
 import { dispatch } from '../../utils/redux';
 import { moneyFormat } from '../../utils/stringHelper';
 import { Loader } from './Loader';
-import ExclusiveBooking1 from '../MainScreens/Booking/Exclusive/ExclusiveBooking1';
+import BookingItemScreen from '../MainScreens/Booking/BookingItemScreen';
 
 const BookingCard = (props) => {
   const { data, index, length, type, keyProp } = props;
@@ -45,7 +45,7 @@ const BookingCard = (props) => {
         if(response?.data?.success) {
           console.log(response.data.data)
           if(type === "ongoing"){
-            navigate('ExclusiveBooking7', { booking: response?.data?.data })
+            navigate('BookingAndDriverDescription', { booking: response?.data?.data })
           } else {
 
           } 
@@ -83,7 +83,7 @@ const BookingCard = (props) => {
 
               <TouchableOpacity style={styles.trackButton} onPress={() => {
                 console.log(data)
-                navigate('ExclusiveBooking1', { rebookData: rebookData, isRebook: true })}}>
+                navigate('BookingItemScreen', { rebookData: rebookData, isRebook: true })}}>
                 <Text style={styles.buttonText}>Rebook</Text>
               </TouchableOpacity>
             </View>

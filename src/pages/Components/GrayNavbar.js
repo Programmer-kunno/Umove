@@ -80,7 +80,8 @@ const styles = StyleSheet.create({
     width: 30,
     marginHorizontal: '5%',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: UMColors.darkerGray
   }, 
   rightBtn: {
     height: 30,

@@ -133,15 +133,15 @@ export default Profile = () => {
               resizeMode={'contain'}
             />
             <Text style={styles.profileName}>{name}</Text>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={styles.editProfileBtn}
               onPress={() => {
 
               }}
             >
               <Text style={styles.editProfileBtnTxt}>Edit Profile</Text>
-            </TouchableOpacity>
-            <View style={[styles.contactContainer, { marginTop: 12 }]}>
+            </TouchableOpacity> */}
+            <View style={[styles.contactContainer, { marginTop: 30 }]}>
               <Text style={[styles.contactTxt, { textAlign: 'left' }]}>Email Address:</Text>
               <Text style={styles.contactTxt}>{user.email}</Text>
             </View>

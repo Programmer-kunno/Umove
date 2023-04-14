@@ -9,15 +9,15 @@ import {
   Keyboard 
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { FetchApi } from '../../../../api/fetch';
-import { UMColors } from '../../../../utils/ColorHelper';
-import GrayNavbar from '../../../Components/GrayNavbar';
-import { dispatch } from '../../../../utils/redux';
-import { clearBookingDetails } from '../../../../redux/actions/Booking';
-import { goBack, navigate } from '../../../../utils/navigationHelper';
-import { showError } from '../../../../redux/actions/ErrorModal';
+import { FetchApi } from '../../../api/fetch';
+import { UMColors } from '../../../utils/ColorHelper';
+import GrayNavbar from '../../Components/GrayNavbar';
+import { dispatch } from '../../../utils/redux';
+import { clearBookingDetails } from '../../../redux/actions/Booking';
+import { goBack, navigate } from '../../../utils/navigationHelper';
+import { showError } from '../../../redux/actions/ErrorModal';
 
-export default class ExclusiveBooking1 extends Component {  
+export default class BookingItemScreen extends Component {  
   constructor(props) {
     super(props);
     
@@ -81,7 +81,7 @@ export default class ExclusiveBooking1 extends Component {
   }
 
   async booking() {
-    navigate('ExclusiveBooking2', { booking: this.state.booking })
+    navigate('BookingPickUpScreen', { booking: this.state.booking })
   }
 
   async loadType() {
@@ -302,8 +302,10 @@ export default class ExclusiveBooking1 extends Component {
                       editable={false}
                     />
                     {
-                      this.state.booking.width > 100  &&
+                      this.state.booking.width > 100 ?
                         <Text style={styles.errorTxt}>Max value is 100</Text>
+                      : this.state.booking.width < 0 &&
+                        <Text style={styles.errorTxt}>Value must be above 0</Text>
                     }
                   </View>                    
               </View>
@@ -327,8 +329,10 @@ export default class ExclusiveBooking1 extends Component {
                       editable={false}
                     />
                     {
-                      this.state.booking.length > 100  &&
+                      this.state.booking.length > 100 ?
                         <Text style={styles.errorTxt}>Max value is 100</Text>
+                      : this.state.booking.length < 0 &&
+                        <Text style={styles.errorTxt}>Value must be above 0</Text>
                     }
                   </View>
               </View>
@@ -354,8 +358,10 @@ export default class ExclusiveBooking1 extends Component {
                     editable={false}
                   />
                     {
-                      this.state.booking.weight > 1000  &&
+                      this.state.booking.weight > 1000 ?
                         <Text style={styles.errorTxt}>Max value is 1000</Text>
+                      : this.state.booking.weight < 0 &&
+                        <Text style={styles.errorTxt}>Value must be above 0</Text>
                     }
                 </View>
               </View>
@@ -379,8 +385,10 @@ export default class ExclusiveBooking1 extends Component {
                     editable={false}
                   />
                     {
-                      this.state.booking.height > 100  &&
+                      this.state.booking.height > 100 ?
                         <Text style={styles.errorTxt}>Max value is 100</Text>
+                      : this.state.booking.height < 0 &&
+                        <Text style={styles.errorTxt}>Value must be above 0</Text>
                     }
                 </View>
               </View>
@@ -428,7 +436,18 @@ export default class ExclusiveBooking1 extends Component {
 
           {/* Next Button */}
             {/* Make button gray when not all inputs are filled out, orange when filled out */}
-            { booking.typeOfGoods == '' || booking.productSubcategory == '' || booking.quantity == 0 || booking.width == '' || booking.length == '' || booking.weight == '' || booking.height == '' || booking.width > 100 || booking.length > 100 || booking.weight > 1000 || booking.height > 100 || booking.packagingType == '' ?
+            { booking.typeOfGoods == '' || 
+              booking.productSubcategory == '' || 
+              booking.quantity == 0 || 
+              booking.width == '' || 
+              booking.length == '' || 
+              booking.weight == '' || 
+              booking.height == '' || 
+              booking.width > 100 || booking.width < 0 || 
+              booking.length > 100 || booking.length < 0 || 
+              booking.weight > 1000 || booking.weight < 0 || 
+              booking.height > 100 || booking.height < 0 || 
+              booking.packagingType == '' ?
             <TouchableOpacity style={styles.nextButtonGray} disabled={true}>
               <Text style={styles.buttonText}> NEXT </Text>
             </TouchableOpacity>

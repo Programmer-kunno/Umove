@@ -1,13 +1,14 @@
 import React, { Component }  from 'react';
 import { StyleSheet, StatusBar, View, Text, TouchableOpacity, Image } from 'react-native';
 import RadioButtonGroup, { RadioButtonItem } from "expo-radio-button";
-import GrayNavbar from '../../../Components/GrayNavbar';
+import GrayNavbar from '../../Components/GrayNavbar';
 import { connect } from 'react-redux';
-import { navigate } from '../../../../utils/navigationHelper';
-import { goBack } from '../../../../utils/navigationHelper';
-import { UMColors } from '../../../../utils/ColorHelper';
+import { navigate } from '../../../utils/navigationHelper';
+import { goBack } from '../../../utils/navigationHelper';
+import { UMColors } from '../../../utils/ColorHelper';
+import { UMIcons } from '../../../utils/imageHelper';
 
-export class ExclusiveBooking4 extends Component {  
+export class BookingDescriptionScreen extends Component {  
   constructor(props) {
     super(props);
     
@@ -64,7 +65,7 @@ export class ExclusiveBooking4 extends Component {
             <View style={[styles.row, styles.alignItemCenter, styles.justifyContentSpaceBetween, styles.part1Padding]}>
               <View style={[styles.row, styles.alignItemCenter]}>
                 <Image
-                      source={require('../../../../assets/vehicles/exclusive_nobg.png')}
+                      source={UMIcons.truckNoBgIcon}
                       style={styles.bookingVehicle}
                 />
               </View>
@@ -140,7 +141,7 @@ export class ExclusiveBooking4 extends Component {
         <View style={styles.alignItemCenter}>
           {/* Book Button */}
           <TouchableOpacity style={styles.bookButtonOrange} onPress={() => {
-            navigate('ExclusiveBooking5')
+            navigate('BookingProcessingScreen')
           }}>
             <Text style={styles.buttonText}> BOOK </Text>
           </TouchableOpacity>
@@ -157,7 +158,7 @@ export default connect(
       bookingData: state.bookingDetails.booking
     };
   },
-)(ExclusiveBooking4);
+)(BookingDescriptionScreen);
 
 
 const styles = StyleSheet.create({
