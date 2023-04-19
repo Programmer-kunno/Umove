@@ -48,7 +48,7 @@ export default class SignUpScreen1 extends Component {
       this.setState({error: true, message: "Please enter a valid contact number"})
       dispatch(setLoading(false))
     } else {
-      let res = await CustomerApi.corporateSignup(register)
+      let res = await CustomerApi.signUp(register)
       console.log(res)
       if(res == undefined){
         dispatch(setLoading(false))

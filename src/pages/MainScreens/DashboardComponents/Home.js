@@ -25,7 +25,6 @@ const bgImage = '../../../assets/bg-image.jpg';
 
 export default Home = () => {  
   const userDetailsData = useSelector(state => state.userOperations.userDetailsData)
-  console.log(userDetailsData.remaining_credits)
   const [wallet, setWallet] = useState({
     balance: '1,000.00',
     points: '0.00'
@@ -78,7 +77,7 @@ export default Home = () => {
                     <TouchableOpacity style={styles.alignItemCenter}
                       onPress={() => {
                         setModalVisible(false)
-                        navigate('ExclusiveBooking1', { bookingType: 'Exclusive' })
+                        navigate('BookingItemScreen', { bookingType: 'Exclusive' })
                       }}
                       >
                       <Image source={require('../../../assets/truck/exclusive.png')} style={styles.exclusiveTruck}/>
@@ -89,7 +88,7 @@ export default Home = () => {
                     <TouchableOpacity style={styles.alignItemCenter}
                       onPress={() => {
                         setModalVisible(false)
-                        navigate('ExclusiveBooking1', { bookingType: 'Shared' })
+                        navigate('BookingItemScreen', { bookingType: 'Shared' })
                       }}
                     >
                       <Image source={require('../../../assets/truck/shared.png')} style={styles.sharedTruck}/>

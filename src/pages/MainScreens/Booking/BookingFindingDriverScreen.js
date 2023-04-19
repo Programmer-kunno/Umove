@@ -13,21 +13,21 @@ import {
 import MapView, { Marker } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import { PROVIDER_GOOGLE } from 'react-native-maps';
-import { BookingApi } from '../../../../api/booking';
-import { returnIcon } from '../../../../utils/imageHelper';
-import { moneyFormat } from '../../../../utils/stringHelper';
+import { BookingApi } from '../../../api/booking';
+import { UMIcons, returnIcon } from '../../../utils/imageHelper';
+import { moneyFormat } from '../../../utils/stringHelper';
 import { connect } from 'react-redux';
-import { navigate } from '../../../../utils/navigationHelper';
-import { refreshTokenHelper } from '../../../../api/helper/userHelper';
-import { UMColors } from '../../../../utils/ColorHelper';
-import { dispatch } from '../../../../utils/redux';
-import { showError } from '../../../../redux/actions/ErrorModal';
-import ErrorWithCloseButtonModal from '../../../Components/ErrorWithCloseButtonModal';
-import { setLoading } from '../../../../redux/actions/Loader';
-import { Loader } from '../../../Components/Loader';
-import ErrorOkModal from '../../../Components/ErrorOkModal';
+import { navigate } from '../../../utils/navigationHelper';
+import { refreshTokenHelper } from '../../../api/helper/userHelper';
+import { UMColors } from '../../../utils/ColorHelper';
+import { dispatch } from '../../../utils/redux';
+import { showError } from '../../../redux/actions/ErrorModal';
+import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal';
+import { setLoading } from '../../../redux/actions/Loader';
+import { Loader } from '../../Components/Loader';
+import ErrorOkModal from '../../Components/ErrorOkModal';
 
-export class ExclusiveBooking5 extends Component {  
+export class BookingProcessingScreen extends Component {  
   constructor(props) {
     super(props);
     
@@ -76,7 +76,6 @@ export class ExclusiveBooking5 extends Component {
         booking_number: this.state.bookingData?.booking_number
       }
       const response = await BookingApi.computeRates(data)
-      console.log(response.data.data.vehicle_type)
       if(response == undefined){
         dispatch(showError(true))
         this.setState({isLoading: false, errMessage: 'Cant Connect to the server'})
@@ -104,7 +103,7 @@ export class ExclusiveBooking5 extends Component {
           if(this.state.bookingData.customer.billing_type === 'Per Booking') {
             navigate('SelectPaymentScreen', { bookingNumber: this.state.bookingData?.booking_number, price: this.state.bookingRes.total_price, booking: response?.data?.data })
           } else {
-            navigate('ExclusiveBooking7', { booking: response?.data?.data })
+            navigate('BookingAndDriverDescription', { booking: response?.data?.data })
           }
           dispatch(setLoading(false))
         } else {
@@ -126,7 +125,7 @@ export class ExclusiveBooking5 extends Component {
         dispatch(setLoading(false))
       } else {
         if(response?.data?.success){
-          navigate('ExclusiveBookingCancelScreen')
+          navigate('BookingCancelScreen')
           dispatch(setLoading(false))
         } else {
           this.setState({ errMessage: response?.data?.message, errorOkModalVisible: true })
@@ -225,7 +224,7 @@ export class ExclusiveBooking5 extends Component {
             <View style={{ minWidth: '40%', left: -20, alignItems: 'center', justifyContent: 'center'}}>
               <Image
                 style={{ height: '60%', width: '100%' }}
-                source={returnIcon(this.state.bookingRes.vehicle_type)}
+                source={returnIcon(this.state.bookingRes.vehicle_type.value)}
                 resizeMode={"contain"}
               />
               <Text style={{ fontSize: 10 }}>U-MOVE {this.state.bookingRes.vehicle_type.value}</Text>
@@ -300,7 +299,7 @@ export class ExclusiveBooking5 extends Component {
             >
               <Image
                 style={{ height: 30}}
-                source={require('../../../../assets/truck/exclusive.png')}
+                source={UMIcons.truckIcon}
                 resizeMode={'contain'}
               />
             </Marker>
@@ -312,7 +311,7 @@ export class ExclusiveBooking5 extends Component {
             >
               <Image
                 style={{ height: 30}}
-                source={require('../../../../assets/icons/location-icon.png')}
+                source={UMIcons.locationIcon}
                 resizeMode={'contain'}
               />
             </Marker>
@@ -325,7 +324,7 @@ export class ExclusiveBooking5 extends Component {
                 latitude: parseFloat(this.state.destination.latitude),
                 longitude: parseFloat(this.state.destination.longitude)
               }}
-              apikey={"AIzaSyCjh5lmz5CQu1MKjEKaLa552Cq5fCXTlCo"}
+              apikey={"AIzaSyBTKmk04d6UkPSY2j3l3OUqGPRlZzalN2w"}
               strokeColor={"rgb(223,131,68)"}
               strokeWidth={4}
             /> 
@@ -344,7 +343,7 @@ export default connect(
       bookingData: state.bookingDetails.booking
     };
   },
-)(ExclusiveBooking5);
+)(BookingProcessingScreen);
 
 const styles = StyleSheet.create({
   container: {

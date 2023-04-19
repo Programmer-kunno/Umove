@@ -6,15 +6,16 @@ import {
   TouchableOpacity,
 } from 'react-native'
 import React, { Component } from 'react'
-import { UMColors } from '../../../../utils/ColorHelper'
+import { UMColors } from '../../../utils/ColorHelper'
 import RBSheet from 'react-native-raw-bottom-sheet'
-import { navigate, resetNavigation } from '../../../../utils/navigationHelper';
-import { dispatch } from '../../../../utils/redux';
-import { setLoading } from '../../../../redux/actions/Loader';
-import { BookingApi } from '../../../../api/booking';
-import { showError } from '../../../../redux/actions/ErrorModal';
+import { navigate, resetNavigation } from '../../../utils/navigationHelper';
+import { dispatch } from '../../../utils/redux';
+import { setLoading } from '../../../redux/actions/Loader';
+import { BookingApi } from '../../../api/booking';
+import { showError } from '../../../redux/actions/ErrorModal';
+import { UMIcons } from '../../../utils/imageHelper';
 
-export default class ExclusiveBooking7 extends Component {
+export default class BookingAndDriverDescription extends Component {
   constructor(props){
     super(props);
 
@@ -98,7 +99,7 @@ export default class ExclusiveBooking7 extends Component {
             <View style={styles.mainLogoContainer}>
               <Image
                 style={styles.headerLogo}
-                source={require('../../../../assets/logo/logo-primary.png')}
+                source={UMIcons.mainLogo}
                 resizeMode={'contain'}
               />  
             </View>
@@ -126,7 +127,7 @@ export default class ExclusiveBooking7 extends Component {
               <View style={styles.vacStatusContainer}>
                   <Image
                     style={{ height: '80%', marginRight: 10 }}
-                    source={require('../../../../assets/icons/vaccination.png')}
+                    source={UMIcons.fullVaccinatedIcon}
                     resizeMode={'contain'}
                   />
                   <Text style={{ fontSize: 17, fontWeight: 'bold'}}>Fully Vaccinated</Text>
@@ -139,7 +140,7 @@ export default class ExclusiveBooking7 extends Component {
               >
                 <Image
                   style={{ width: '90%' }}
-                  source={require('../../../../assets/icons/call-icon.png')}
+                  source={UMIcons.callIcon}
                   resizeMode={'contain'}
                 />
               </TouchableOpacity>
@@ -149,14 +150,14 @@ export default class ExclusiveBooking7 extends Component {
               >
                 <Image
                   style={{ width: '90%' }}
-                  source={require('../../../../assets/icons/message-icon.png')}
+                  source={UMIcons.messageIcon}
                   resizeMode={'contain'}
                 />
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.contactBtn}
                 onPress={() => {
-                  navigate('ExclusiveBookingDriverLocation', {
+                  navigate('BookingDriverLocation', {
                     bookingNumber: this.state.booking?.booking_number,
                     destination: {
                       latitude: this.state.booking?.booking_routes[0]?.destination_latitude,
@@ -172,7 +173,7 @@ export default class ExclusiveBooking7 extends Component {
               >
                 <Image
                   style={{ width: '90%' }}
-                  source={require('../../../../assets/icons/location-icon.png')}
+                  source={UMIcons.locationIcon}
                   resizeMode={'contain'}
                 />
               </TouchableOpacity>

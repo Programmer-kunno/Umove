@@ -113,6 +113,9 @@ export default CustomDrawer = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.drawerBtn}
+          onPress={() => {
+            navigate('Help')
+          }}
         >
           <Image
             style={styles.drawerIcons}
@@ -133,6 +136,9 @@ export default CustomDrawer = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.drawerBtn, { marginTop: '2%', justifyContent: 'space-between', borderBottomWidth: 0}]}
+          onPress={() => {
+            navigate('TermsAndCondition')
+          }}
         >
           <Text style={[styles.drawerTxt, { marginLeft: '4%' }]}>Terms and Condition</Text>
           <Image

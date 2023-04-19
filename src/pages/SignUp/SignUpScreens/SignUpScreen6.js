@@ -43,7 +43,7 @@ export default class SignUpScreen6 extends Component {
         dispatch(setLoading(false))
         this.setState({error: true, message: "Password do not match, try again"})
       } else {
-        let response = await CustomerApi.corporateSignup(register)
+        let response = await CustomerApi.signUp(register)
         console.log(response.data)
         if(response == undefined){
           dispatch(setLoading(false))

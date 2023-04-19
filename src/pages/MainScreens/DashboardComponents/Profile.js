@@ -7,9 +7,9 @@ import { CustomerApi } from '../../../api/customer';
 import { TextInput } from 'react-native-gesture-handler';
 import { Loader } from '../../Components/Loader';
 import { dispatch } from '../../../utils/redux';
-import { userLogout } from '../../../redux/actions/User';
+import { saveUserChanges, userLogout } from '../../../redux/actions/User';
 import { setLoading } from '../../../redux/actions/Loader';
-import { resetNavigation } from '../../../utils/navigationHelper';
+import { navigate, resetNavigation } from '../../../utils/navigationHelper';
 import { refreshTokenHelper } from '../../../api/helper/userHelper';
 import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal';
 import { showError } from '../../../redux/actions/ErrorModal';
@@ -19,7 +19,8 @@ const deviceWidth = Dimensions.get('screen').width
 export default Profile = () => {  
   
   const user = useSelector((state) => state.userOperations.userData)
-  // const userDetailsData = useSelector(state => state.userOperations.userDetailsData)
+  const userDetailsData = useSelector((state) => state.userOperations.userDetailsData)
+  console.log(userDetailsData.user)
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [err, setErr] = useState({
@@ -27,7 +28,33 @@ export default Profile = () => {
     message: 'Password is incorrect'
   })
   const [cancelModalVisible, setCancelModalVisible] = useState(false)
-
+  const editUserData = {
+    customerType: userDetailsData.customer_type,
+    firstName: userDetailsData?.user?.user_profile?.first_name,
+    middleName: userDetailsData?.user?.user_profile?.middle_name,
+    lastName: userDetailsData?.user?.user_profile?.last_name,
+    username: userDetailsData?.user?.username,
+    email: userDetailsData?.user?.user_profile?.email,
+    mobileNumber: userDetailsData?.user?.user_profile?.mobile_number,
+    address: userDetailsData?.user?.user_profile?.address,
+    barangay: userDetailsData?.user?.user_profile?.barangay,
+    city: userDetailsData?.user?.user_profile?.city,
+    province: userDetailsData?.user?.user_profile?.province,
+    region: userDetailsData?.user?.user_profile?.region,
+    zipCode: userDetailsData?.user?.user_profile?.zip_code,
+    validID: userDetailsData?.valid_id
+  }
+  const editCompanyData = userDetailsData?.company ? {
+    companyName: userDetailsData?.company?.company_name,
+    companyEmail: userDetailsData?.company?.company_email,
+    companyMobileNumber: userDetailsData?.company?.company_mobile_number,
+    officeAddress: userDetailsData?.company?.office_address,
+    officeBarangay: userDetailsData?.company?.office_barangay,
+    officeCity: userDetailsData?.company?.office_city,
+    officeProvince: userDetailsData?.company?.office_province,
+    officeZipCode: userDetailsData?.company?.office_zip_code,
+    companyLogo: userDetailsData?.company?.company_logo
+  } : null 
 
   useEffect(() => {
     dispatch(setLoading(false))
@@ -136,7 +163,13 @@ export default Profile = () => {
             <TouchableOpacity
               style={styles.editProfileBtn}
               onPress={() => {
-
+                if(user?.customer_type === "corporate") {
+                  navigate('ChooseToEditScreen')
+                  dispatch(saveUserChanges({ userDetails: editUserData, companyDetails: editCompanyData }))
+                } else {
+                  navigate('UserProfileScreen')
+                  dispatch(saveUserChanges({ userDetails: editUserData }))
+                }
               }}
             >
               <Text style={styles.editProfileBtnTxt}>Edit Profile</Text>

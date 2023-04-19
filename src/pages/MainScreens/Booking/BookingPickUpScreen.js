@@ -1,30 +1,22 @@
 import React, { Component }  from 'react';
-import { 
-  StyleSheet, 
-  StatusBar, 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  ScrollView, 
-  Keyboard
-} from 'react-native';
-import ModalSelector from 'react-native-modal-selector-searchable'
-import { FetchApi } from '../../../../api/fetch';
-import { BookingApi } from '../../../../api/booking';
-import ErrorOkModal from '../../../Components/ErrorOkModal';
-import GrayNavbar from '../../../Components/GrayNavbar';
-import { dispatch } from '../../../../utils/redux';
-import { saveBookingDetails } from '../../../../redux/actions/Booking';
-import { navigate } from '../../../../utils/navigationHelper';
-import { Loader } from '../../../Components/Loader';
-import { setLoading } from '../../../../redux/actions/Loader';
-import { refreshTokenHelper } from '../../../../api/helper/userHelper';
-import { showError } from '../../../../redux/actions/ErrorModal';
-import ErrorWithCloseButtonModal from '../../../Components/ErrorWithCloseButtonModal';
-import { UMColors } from '../../../../utils/ColorHelper';
+import { StatusBar, StyleSheet, View, Modal, TouchableWithoutFeedback, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, ScrollView, Keyboard, Image } from 'react-native';
+import ModalSelector from 'react-native-modal-selector-searchable';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import moment from 'moment/moment';
+import { UMColors } from '../../../utils/ColorHelper';
+import { FetchApi } from '../../../api/fetch';
+import GrayNavbar from '../../Components/GrayNavbar';
+import { navigate } from '../../../utils/navigationHelper';
+import { dispatch } from '../../../utils/redux';
+import { showError } from '../../../redux/actions/ErrorModal';
+import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal';
+import { make12HoursFormat } from '../../../utils/stringHelper';
+import { BookingApi } from '../../../api/booking';
+import { setLoading } from '../../../redux/actions/Loader';
+import { Loader } from '../../Components/Loader';
+import ErrorOkModal from '../../Components/ErrorOkModal';
 
-export default class ExclusiveBooking3 extends Component {  
+export default class BookingPickUpScreen extends Component {  
   constructor(props) {
     super(props);
     
@@ -40,36 +32,36 @@ export default class ExclusiveBooking3 extends Component {
       provinceList: [],
       cityList: [],
       barangayList: [],
-      bookErr: '',
-      errModalVisible: false
+      error: false,
+      errorMessage: ''
     };
   }
 
   async componentDidMount() {
+    console.log(this.state.booking.pickupDate)
     dispatch(setLoading(false))
-    this.loadRegion();
   }
 
-
   async booking() {
+    this.checkTimeDate()
+  }
+
+  checkTimeDate = async() => {
     dispatch(setLoading(true))
-    refreshTokenHelper(async() => {
-      const booking = this.state.booking;
-      const response = await BookingApi.book(booking)
-      if(response == undefined){
+    const response = await BookingApi.book(this.state.booking)
+    console.log(response.data)
+    if(response == undefined){
+      dispatch(setLoading(false))
+      dispatch(showError(true))
+    } else {
+      if(!response?.data?.message?.pickup_time){
+        navigate('BookingDropOffScreen', { booking: this.state.booking })
         dispatch(setLoading(false))
-        dispatch(showError(true))
       } else {
-        if(response?.data?.success) {
-          dispatch(saveBookingDetails(response?.data?.data))
-          navigate('ExclusiveBooking4', { booking: this.state.booking })
-          dispatch(setLoading(false))
-        } else {
-          this.setState({ bookErr: response?.data?.message, errModalVisible: true })
-          dispatch(setLoading(false))
-        }
+        this.setState({ error: true, errorMessage: 'Pick Up Time passed or too soon' })
+        dispatch(setLoading(false))
       }
-    })
+    }
   }
 
   async loadRegion() {
@@ -136,73 +128,231 @@ export default class ExclusiveBooking3 extends Component {
     this.setState({ timeModalVisible: visible });
   }
 
-  // onChangeDate = (event, date) => {
-  //   const selectedDate = date.toLocaleDateString('zh-Hans-CN');
+  onChangeDate = (event, date) => {
+    this.setState({dateModalVisible: false})
+    const selectedDate = date.toLocaleDateString('zh-Hans-CN');
+    let unformattedDate = selectedDate
+      let rawDate = unformattedDate.replaceAll('/', '-') 
+      let nDate = new Date(rawDate)
+      this.setState({ newDate: nDate })
 
-  //   let booking = this.state.booking
-  //   booking.dropoffDate = selectedDate
-  //   this.setState({ booking });
-  // };
+      let booking = this.state.booking
+      booking.pickupDate = moment(this.state.newDate).format("YYYY-MM-DD")
+      this.setState({ booking }); 
+  };
 
-  // onChangeTime = (event, time) => {
-  //   const selectedTime = time.toLocaleTimeString('en-GB');
+  onChangeTime = (event, time) => {
+    this.setState({timeModalVisible: false})
+    const selectedTime = time.toLocaleTimeString('en-GB', {hour: '2-digit', minute:'2-digit'});
 
-  //   let booking = this.state.booking
-  //   booking.dropoffTime = selectedTime
-  //   this.setState({ booking });
-  // }
+      let unformattedTime = selectedTime
+      this.setState({ newTime: unformattedTime })
 
+      let booking = this.state.booking
+      booking.pickupTime = selectedTime
+      this.setState({ booking });
+  }
+  
   render() {
     let booking = this.state.booking;
+    const { dateModalVisible } = this.state;
+    const { timeModalVisible } = this.state;
+    
+    //For-IOS
+    // dateFormat = new Intl.DateTimeFormat('en-US', {
+    //   year:  'numeric',
+    //   month: 'long',
+    //   day:   'numeric',
+    // });
+
+    // timeFormat = new Intl.DateTimeFormat('en-GB', {
+    //   hour: '2-digit',
+    //   minute: '2-digit',
+    // });
+    tommorowDate = () => {
+      const today = new Date()
+      let tomorrow =  new Date()
+      tomorrow.setDate(today.getDate() + 1)
+      return tomorrow
+    }
+
 
     return(
       <View style={styles.container}>
+        <StatusBar translucent backgroundColor={'transparent'} barStyle={'light-content'} />
         <ErrorWithCloseButtonModal/>
         <ErrorOkModal
-          Visible={this.state.errModalVisible}
-          ErrMsg={this.state.bookErr}
+          Visible={this.state.error}
+          ErrMsg={this.state.errorMessage}
           OkButton={() => {
-            this.setState({ errModalVisible: false })
+            this.setState({ error: false, errorMessage: '' })
           }}
         />
-        <StatusBar translucent backgroundColor={'transparent'} barStyle={'light-content'} />
+        {/* Date Modal */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={dateModalVisible}
+            onRequestClose={() => this.setState({dateModalVisible: false}) }
+          >
+            <View style={styles.blurContainer}>
+              <TouchableWithoutFeedback onPress={() => this.setState({dateModalVisible: false}) }>
+                <View style={styles.centeredView}>
+                  <View style={styles.modalView}>
+                    <DateTimePicker
+                      display="default" 
+                      mode="date"
+                      minimumDate={new Date().setDate(new Date().getDate())}
+                      themeVariant="light"
+                      value={this.state.date}
+                      onChange={this.onChangeDate}
+                    />
+                    {
+                    //IOS
+                    /* <View style={styles.alignItemCenter}>
+                      <TouchableOpacity
+                        style={styles.modalButton}
+                        onPress={() => this.setState({dateModalVisible: false}, () => {
+                          let booking = this.state.booking
+                          if(booking.pickupDate != '') {
+                            let unformattedDate = booking.pickupDate
+                            let rawDate = unformattedDate.replaceAll('/', '-') 
+                            let date = new Date(unformattedDate)
+
+                            this.setState({ newDate: date })
+                          } else {
+                            let date = new Date()
+                            this.setState({ newDate: date })
+                            
+                            const selectedDate = date.toLocaleDateString('zh-Hans-CN');
+                            let booking = this.state.booking
+                            booking.pickupDate = selectedDate
+                            this.setState({ booking }); 
+                          }
+                        })}
+                      >
+                        <Text style={styles.textStyle}> Done </Text>
+                      </TouchableOpacity>
+                    </View> */}
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </Modal>
+
+        {/* Time Modal */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={timeModalVisible}
+          onRequestClose={() => this.setState({timeModalVisible: false}) }
+        >
+          <View style={styles.blurContainer}> 
+            <TouchableWithoutFeedback onPress={() => this.setState({timeModalVisible: false}) }>
+              <View style={styles.centeredView}>
+                <View style={styles.modalView}>
+                  <DateTimePicker 
+                    display="default" 
+                    mode="time"
+                    themeVariant="light"
+                    is24Hour={false}
+                    value={this.state.time}
+                    onChange={this.onChangeTime}
+                  />
+                  {/* <View style={styles.alignItemCenter}>
+                    <TouchableOpacity
+                      style={styles.modalButton}
+                      onPress={() => this.setState({timeModalVisible: false}, () => {
+                        let booking = this.state.booking
+                        if(booking.pickupTime != '') {
+                          let unformattedTime = booking.pickupTime
+                          let time = new Date( 'March, 28 2001 ' + unformattedTime )
+
+                          this.setState({ newTime: time })
+                        } else {
+                          let time = new Date()
+                          this.setState({ newTime: time })
+                          
+                          const selectedTime = time.toLocaleTimeString('en-GB');
+                          let booking = this.state.booking
+                          booking.pickupTime = selectedTime
+                          this.setState({ booking });
+                        }
+                      })}
+                    >
+                      <Text style={styles.textStyle}> Done </Text>
+                    </TouchableOpacity>
+                  </View> */}
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </Modal>
 
             {/* Header for Delivery Address */}
             <GrayNavbar
-              Title={'Destination Address'}
+              Title={'Pick Up Address'}
               onBack={() => {
-                this.props.navigation.navigate('ExclusiveBooking2')
+                this.props.navigation.navigate('BookingItemScreen')
               }}
             />
-
           <View style={{width: '100%', height: '71%', alignItems: 'center'}}>
             <ScrollView style={{width: '100%'}}>
 
               <View style={styles.labelContainer}>
-                <Text style={styles.labelText}> Drop Off Details </Text>
+                <Text style={styles.labelText}> Pick Up Details </Text>
               </View>
 
               <View style={styles.inputContainer}>
                 {/* Sender Name */}
                 <TextInput
-                  value={booking.dropoffName}
+                  value={booking.pickupName}
                   style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
-                  onChangeText={(dropoffName) => {
-                    booking.dropoffName = dropoffName;
+                  onChangeText={(pickupName) => {
+                    booking.pickupName = pickupName;
                     this.setState({ booking })
                   }}
-                  placeholder="Reciever's Name"
+                  placeholder="Sender's Name"
                   placeholderTextColor={'#808080'}
                 />
+              </View>
+
+              {/* Date and Time */}
+              <View style={[styles.inputContainer, styles.row, styles.marginTop]}>
+                <TouchableOpacity style={styles.dateInput} onPress={() => this.showDatePicker(true)}>
+                  { this.state.newDate == '' ?
+                    <Text style={{ color:'#808080' }}>
+                      Pick Up Date
+                    </Text>
+                  :
+                    <Text style={{ color:'black' }}>
+                      {moment(this.state.newDate).format("YYYY-MM-DD")}
+                      {/* { dateFormat.format(this.state.newDate) } */}
+                    </Text>
+                  }
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.timeInput} onPress={() => this.showTimePicker(true)}>
+                  { this.state.newTime == '' ?
+                    <Text style={{ color:'#808080' }}>
+                      Time
+                      {/* { timeFormat.format(this.state.time) } */}
+                    </Text>
+                  :
+                    <Text style={{ color:'black' }}>
+                      {make12HoursFormat(this.state.newTime)}
+                      {/* { timeFormat.format(this.state.newTime) } */}
+                    </Text>
+                  }
+                </TouchableOpacity>
               </View>
 
               <View style={styles.inputContainer}>
                 {/* Street Address */}
                 <TextInput
-                  value={booking.dropoffStreetAddress}
+                  value={booking.pickupStreetAddress}
                   style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
                   onChangeText={(streetAddress) => {
-                    booking.dropoffStreetAddress = streetAddress;
+                    booking.pickupStreetAddress = streetAddress;
                     this.setState({ booking })
                   }}
                   placeholder='House No., Lot, Street'
@@ -214,12 +364,15 @@ export default class ExclusiveBooking3 extends Component {
                 {/* Region */}
                 <ModalSelector
                   data={this.state.regionList}
+                  onModalOpen={() => {
+                    this.loadRegion();
+                  }}
                   keyExtractor= {region => region.code}
                   labelExtractor= {region => region.name}
-                  initValue={booking.isRebook ? booking.dropoffRegion : "Select Region"}
+                  initValue={booking.isRebook ? booking.pickupRegion : "Select Region"}
                   disabled={booking.isRebook ? true : false}
                   onChange={(region) => {
-                    booking.dropoffRegion = region.name;
+                    booking.pickupRegion = region.name;
                     this.setState({booking}, async () => {
                       await this.loadProvince(region.code);
                     });
@@ -239,31 +392,31 @@ export default class ExclusiveBooking3 extends Component {
                 />
                 {/* ZIP Code */}
                 <TextInput
-                    value={booking.dropoffZipcode}
-                    style={[styles.zipInput, { backgroundColor: booking.isRebook ? UMColors.ligthGray : UMColors.white}]}
-                    editable={booking.isRebook ? false : true}
-                    onChangeText={(val) => {
-                      booking.dropoffZipcode = val;
-                      this.setState({booking})
-                    }}  
-                    placeholder='ZIP Code'
-                    placeholderTextColor={'#808080'}                        
-                    keyboardType='number-pad'
-                    returnKeyType='done'
-                    maxLength={4}
-                  />
+                  value={booking.pickupZipcode}
+                  style={[styles.zipInput, { backgroundColor: booking.isRebook ? UMColors.ligthGray : UMColors.white}]}
+                  editable={booking.isRebook ? false : true}
+                  onChangeText={(val) => {
+                    booking.pickupZipcode = val;
+                    this.setState({booking})
+                  }}  
+                  placeholder='ZIP Code'
+                  placeholderTextColor={'#808080'}                        
+                  keyboardType='number-pad'
+                  returnKeyType='done'
+                  maxLength={4}
+                />
               </View>
               {/* Province */}
               <View style={[styles.inputContainer, styles.marginTop, styles.row]}>
-                { booking.dropoffRegion !== '' ? 
+                { booking.pickupRegion != '' ? 
                 <ModalSelector
                   data={this.state.provinceList}
                   keyExtractor= {province => province.code}
                   labelExtractor= {province => province.name}
-                  initValue={booking.isRebook ? booking.dropoffProvince : "Select Provice"}
+                  initValue={booking.isRebook ? booking.pickupProvince : "Select Province"}
                   disabled={booking.isRebook ? true : false}
                   onChange={(province) => {
-                    booking.dropoffProvince = province.name;
+                    booking.pickupProvince = province.name;
                     this.setState({booking}, async () => {
                       await this.loadCity(province.code);
                     });
@@ -285,7 +438,7 @@ export default class ExclusiveBooking3 extends Component {
                 <ModalSelector
                   disabled={true}
                   data={this.state.provinceList}
-                  initValue="Select Province"
+                  initValue={"Select Province"}
                   searchText={'Search'}
                   cancelText={'Cancel'}
                   style={styles.disabledFullWidthInput}
@@ -302,17 +455,17 @@ export default class ExclusiveBooking3 extends Component {
                 }
               </View>
 
-            {/* City */}
-            <View style={[styles.inputContainer, styles.marginTop]}>
-              { booking.dropoffProvince !== '' ?
+              {/* City */}
+              <View style={[styles.inputContainer, styles.marginTop]}>
+              { booking.pickupProvince != '' ?
                 <ModalSelector
                   data={this.state.cityList}
                   keyExtractor= {city => city.code}
                   labelExtractor= {city => city.name}
-                  initValue={booking.isRebook ? booking.dropoffCity : "Select City"}
+                  initValue={booking.isRebook ? booking.pickupCity : "Select City"}
                   disabled={booking.isRebook ? true : false}
                   onChange={(city) => {
-                    booking.dropoffCity = city.name;
+                    booking.pickupCity = city.name;
                     this.setState({booking}, async () => {
                       await this.loadBarangay(city.code);
                     });
@@ -332,7 +485,7 @@ export default class ExclusiveBooking3 extends Component {
                 :
                 <ModalSelector
                   disabled={true}
-                  initValue="Select City"
+                  initValue={"Select City"}
                   searchText={'Search'}
                   cancelText={'Cancel'}
                   style={styles.disabledFullWidthInput}
@@ -347,19 +500,19 @@ export default class ExclusiveBooking3 extends Component {
                   touchableActiveOpacity={styles.touchableActiveOpacity}
                 />
               }
-            </View>
+              </View>
 
-            {/* Barangay */}
-            <View style={[styles.inputContainer, styles.marginTop]}>
-              { booking.dropoffCity !== '' ? 
+              {/* Barangay */}
+              <View style={[styles.inputContainer, styles.marginTop]}>
+              { booking.pickupCity != '' ? 
                 <ModalSelector
                   data={this.state.barangayList}
                   keyExtractor= {barangay => barangay.code}
                   labelExtractor= {barangay => barangay.name}
-                  initValue={booking.isRebook ? booking.dropoffBarangay : "Select Barangay"}
+                  initValue={booking.isRebook ? booking.pickupBarangay : "Select Barangay"}
                   disabled={booking.isRebook ? true : false}
                   onChange={(barangay) => {
-                    booking.dropoffBarangay = barangay.name;
+                    booking.pickupBarangay = barangay.name;
                     this.setState({booking});
                   }} 
                   searchText={'Search'}
@@ -377,7 +530,7 @@ export default class ExclusiveBooking3 extends Component {
                 :
                 <ModalSelector
                   disabled={true}
-                  initValue="Select Barangay"
+                  initValue={"Select Barangay"}
                   searchText={'Search'}
                   cancelText={'Cancel'}
                   style={styles.disabledFullWidthInput}
@@ -392,14 +545,15 @@ export default class ExclusiveBooking3 extends Component {
                   touchableActiveOpacity={styles.touchableActiveOpacity}
                 />
               }
-            </View>
+              </View>
 
               {/* Landmarks */}
               <View style={styles.inputContainer}>
                 <TextInput
+                  value={booking.pickupLandmark}
                   style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
                   onChangeText={(landmark) => {
-                    booking.dropoffLandmark = landmark;
+                    booking.pickupLandmark = landmark;
                     this.setState({booking})
                   }}
                   placeholder='Landmarks (Optional)'
@@ -409,9 +563,10 @@ export default class ExclusiveBooking3 extends Component {
               {/* Special Instruction */}
               <View style={styles.inputContainer}>
                 <TextInput
+                  value={booking.pickupSpecialInstructions}
                   style={[styles.marginTop, styles.specialInstructions]}
                   onChangeText={(specialInstructions) => {
-                    booking.dropoffSpecialInstructions = specialInstructions;
+                    booking.pickupSpecialInstructions = specialInstructions;
                     this.setState({booking})
                   }}
                   placeholder='Special Instruction (Optional)'
@@ -424,21 +579,23 @@ export default class ExclusiveBooking3 extends Component {
               </View>
             </ScrollView>
           </View>
+          
 
         <View style={styles.btnContainer}>
           {/* Select from Saved Addresses */}
           <TouchableOpacity style={[styles.nextButtonGray, styles.buttonMargin]} disabled={true}>
               <Text style={styles.buttonText}> Select from Saved Addresses </Text>
           </TouchableOpacity>
+          
           {/* Next Button */}
             {/* Make button gray when not all inputs are filled out, orange when filled out */}
-          { booking.dropoffStreetAddress == '' || booking.dropoffBarangay == '' || booking.dropoffCity == '' || booking.dropoffProvince == '' || booking.dropoffRegion == '' || booking.dropoffZipcode == '' ?
+          { booking.pickupDate == '' || booking.pickupTime == '' || booking.pickupStreetAddress == '' || booking.pickupBarangay == '' || booking.pickupCity == '' || booking.pickupProvince == '' || booking.pickupRegion == '' || booking.pickupZipcode == '' ?
           <TouchableOpacity style={styles.nextButtonGray} disabled={true}>
             <Text style={styles.buttonText}> NEXT </Text>
           </TouchableOpacity>
           :
           <TouchableOpacity style={styles.nextButtonOrange} onPress={() => {
-              this.booking();
+            this.booking();
           }}>
             <Text style={styles.buttonText}> NEXT </Text>
           </TouchableOpacity>
@@ -454,12 +611,11 @@ export default class ExclusiveBooking3 extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1, 
-    backgroundColor: 'rgb(238, 241, 217)',
+    backgroundColor: UMColors.BGOrange,
     alignItems: 'center'
   },
   labelContainer: {
-    marginTop: '7%',
-    marginBottom: '3%',
+    marginTop: '4%',
     marginLeft: '6%'
   },
   labelText: {
@@ -487,6 +643,29 @@ const styles = StyleSheet.create({
   },
   marginRight: {
     marginRight: '2%'
+  },
+  dateInput: {
+    backgroundColor: 'white',
+    width: '59%',
+    marginRight: 7,
+    height: 40,
+    borderTopLeftRadius: 25,
+    borderBottomLeftRadius: 25,
+    borderWidth: 1,
+    borderColor: 'rgb(223,131,68)',
+    paddingLeft: '5%',
+    justifyContent: 'center'
+  },
+  timeInput: {
+    backgroundColor: 'white',
+    width: '29%',
+    height: 40,
+    borderTopRightRadius: 25,
+    borderBottomRightRadius: 25,
+    borderWidth: 1,
+    borderColor: 'rgb(223,131,68)',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   fullWidthInput: {
     backgroundColor: 'white',
@@ -601,10 +780,7 @@ const styles = StyleSheet.create({
     justifyContent:'center',
     alignItems: 'center',
     backgroundColor: 'gray',
-    shadowColor: '#171717',
-    shadowOffset: {width: -2, height: 6},
-    shadowOpacity: 0.9,
-    shadowRadius: 3,
+    elevation: 5,
   },
   nextButtonOrange: {
     marginTop: '2%',
@@ -614,10 +790,7 @@ const styles = StyleSheet.create({
     justifyContent:'center',
     alignItems: 'center',
     backgroundColor: 'rgb(223,131,68)',
-    shadowColor: '#171717',
-    shadowOffset: {width: -2, height: 6},
-    shadowOpacity: 0.9,
-    shadowRadius: 3,
+    elevation: 5
   },
   buttonMargin: {
     marginTop: '2%'
@@ -638,13 +811,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderColor: 'rgb(223,131,68)',
     borderWidth: 1,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
     elevation: 5
   },
   modalButton: {
@@ -665,6 +831,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)'
+  },
+  dateTimeSpinner: {
+    color: 'black',
+    borderRadius: 10,
   },
   btnContainer: {
     alignItems: 'center',

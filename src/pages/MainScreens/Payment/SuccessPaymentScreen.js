@@ -91,7 +91,7 @@ export default SuccessPaymentScreen = (props) => {
         </View>
         <View style={styles.dottedBottom}/>
       </View>
-      <TouchableOpacity onPress={() => { resetNavigation('ExclusiveBooking7', { booking: booking })} } style={styles.confirmBtn}>
+      <TouchableOpacity onPress={() => { resetNavigation('BookingAndDriverDescription', { booking: booking })} } style={styles.confirmBtn}>
         <Text style={styles.confirmBtnTxt}>Confirm</Text>
       </TouchableOpacity>
     </SafeAreaView>

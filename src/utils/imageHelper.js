@@ -27,7 +27,7 @@ export const UMIcons = {
   profilePicIcon: require('../assets/icons/profile-pic.png'),
   //Profile Drawer
   homeWalletIcon: require('../assets/drawer/UMoveWalletIcon.png'),
-  transactionIcon: require('../assets/drawer/history.png'),
+  historyIcon: require('../assets/drawer/history.png'),
   addressIcon: require('../assets/drawer/location.png'),
   voucherIcon: require('../assets/drawer/voucher.png'),
   questionIcon: require('../assets/drawer/question.png'),
@@ -37,6 +37,11 @@ export const UMIcons = {
   googleIcon: require('../assets/socials/google.png'),
   facebookIcon: require('../assets/socials/facebook.png'),
   appleIcon: require('../assets/socials/apple.png'),
+  //Bottom Nav
+  navProfileIcon: require('../assets/icons/profile.png'),
+  navMessageIcon: require('../assets/icons/messages.png'),
+  navCalendarIcon: require('../assets/icons/calendar.png'),
+  navHomeIcon: require('../assets/icons/home.png'),
   //Icons
   sentIcon: require('../assets/icons/sent.png'),
   tagIcon: require('../assets/icons/tag-icon.png'),
@@ -56,6 +61,14 @@ export const UMIcons = {
   xIcon: require('../assets/icons/x-icon.png'),
   notificationIcon: require('../assets/icons/notificationEmpty.png'),
   downloadIcon: require('../assets/icons/downloadIcon.png'),
+  truckNoBgIcon: require('../assets/vehicles/exclusive_nobg.png'),
+  fullVaccinatedIcon: require('../assets/icons/vaccination.png'),
+  callIcon: require('../assets/icons/call-icon.png'),
+  messageIcon: require('../assets/icons/message-icon.png'),
+  transactionIcon: require('../assets/icons/transactionIcon.png'),
+  headsetIcon2: require('../assets/icons/headsetIcon2.png'),
+  walletBlackIcon: require('../assets/icons/walletBlackIcon.png'),
+  shieldCheckBlackIcon: require('../assets/icons/shieldCheckBlackIcon.png'),
   // Error Icons
   warningSign: require('../assets/errors/warning-sign.png'),
   // Payment Icons

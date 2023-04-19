@@ -34,7 +34,7 @@ const Transactions = () => {
                 <TouchableOpacity style={styles.alignItemCenter}
                   onPress={() => {
                     setModalVisible(false)
-                    navigate('ExclusiveBooking1', { bookingType: 'Exclusive' })
+                    navigate('BookingItemScreen', { bookingType: 'Exclusive' })
                   }}
                   >
                   <Image source={require('../../assets/truck/exclusive.png')} style={styles.exclusiveTruck}/>
@@ -45,7 +45,7 @@ const Transactions = () => {
                 <TouchableOpacity style={styles.alignItemCenter}
                   onPress={() => {
                     setModalVisible(false)
-                    navigate('ExclusiveBooking1', { bookingType: 'Shared' })
+                    navigate('BookingItemScreen', { bookingType: 'Shared' })
                   }}
                 >
                   <Image source={require('../../assets/truck/shared.png')} style={styles.sharedTruck}/>

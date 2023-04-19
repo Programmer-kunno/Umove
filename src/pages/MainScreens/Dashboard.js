@@ -8,6 +8,7 @@ import Messages from './DashboardComponents/Messages';
 import Notification from './DashboardComponents/Notification';
 import Profile from './DashboardComponents/Profile';
 import { UMColors } from '../../utils/ColorHelper';
+import { UMIcons } from '../../utils/imageHelper';
 
 
 const Tab = createBottomTabNavigator();
@@ -23,25 +24,25 @@ export default Dashboard = () => {
             let height;
             let activeColor;
             if (route.name === 'Home') {
-              image = require('../../assets/icons/home.png')
+              image = UMIcons.navHomeIcon
               color = focused
                 ? UMColors.primaryOrange : UMColors.black
               width = 25;
               height = 25;              
             } else if(route.name === 'Calendar') {
-              image = require('../../assets/icons/calendar.png')
+              image = UMIcons.navCalendarIcon
               color = focused
                 ? UMColors.primaryOrange : UMColors.black
               width = 25;
               height = 25;
             } else if(route.name === 'Messages') {
-              image = require('../../assets/icons/messages.png')
+              image = UMIcons.navMessageIcon
               color = focused
                 ? UMColors.primaryOrange : UMColors.black
               width = 25;
               height = 25;  
             } else if(route.name === 'Profile') {
-              image = require('../../assets/icons/profile.png')
+              image = UMIcons.navProfileIcon
               color = focused
                 ? UMColors.primaryOrange : UMColors.black
               width = 23;
