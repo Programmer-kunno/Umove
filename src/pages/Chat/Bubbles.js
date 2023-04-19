@@ -37,7 +37,6 @@ const styles = StyleSheet.create({
   baseImage: {
     height: 50, 
     width: 50, 
-    borderWidth: 1, 
     backgroundColor: 'white', 
     borderRadius: 25
   }
