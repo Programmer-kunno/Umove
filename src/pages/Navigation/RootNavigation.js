@@ -45,6 +45,15 @@ import TransactionScreen from '../Transactions/TransactionScreen';
 import TermsAndCondition from '../MainScreens/ProfileDrawerScreens/TermsAndCondition';
 import DataPrivacy from '../MainScreens/ProfileDrawerScreens/DataPrivacy';
 import Help from '../MainScreens/ProfileDrawerScreens/Help';
+import ChooseToEditScreen from '../MainScreens/EditProfile/ChooseToEditScreen';
+import UserProfileScreen from '../MainScreens/EditProfile/UserProfileScreen';
+import CompanyProfileScreen from '../MainScreens/EditProfile/CompanyProfileScreen';
+import EditName from '../MainScreens/EditProfile/EditUserScreens/EditName';
+import EditUsername from '../MainScreens/EditProfile/EditUserScreens/EditUsername';
+import EditEmail from '../MainScreens/EditProfile/EditUserScreens/EditEmail';
+import EditMobileNumber from '../MainScreens/EditProfile/EditUserScreens/EditMobileNumber';
+import EditAddress from '../MainScreens/EditProfile/EditUserScreens/EditAddress';
+import EditValidID from '../MainScreens/EditProfile/EditUserScreens/EditValidID';
 
 export default RootNavigation = () => {
   const Stack = createStackNavigator();
@@ -122,6 +131,17 @@ export default RootNavigation = () => {
       <Stack.Screen name="TermsAndCondition" component={TermsAndCondition} />
       <Stack.Screen name="DataPrivacy" component={DataPrivacy} />
       <Stack.Screen name="Help" component={Help} />
+      <Stack.Screen name="ChooseToEditScreen" component={ChooseToEditScreen} />
+      <Stack.Screen name="UserProfileScreen" component={UserProfileScreen} />
+      <Stack.Screen name="CompanyProfileScreen" component={CompanyProfileScreen} />
+      {/* Edit Profile Screens */}
+      <Stack.Screen name="EditName" component={EditName} />
+      <Stack.Screen name="EditUsername" component={EditUsername} />
+      <Stack.Screen name="EditEmail" component={EditEmail} />
+      <Stack.Screen name="EditMobileNumber" component={EditMobileNumber} />
+      <Stack.Screen name="EditAddress" component={EditAddress} />
+      <Stack.Screen name="EditValidID" component={EditValidID} />
+
       {/* There are Pages in the Archive and Hidden Folder */}
 
     </Stack.Navigator>

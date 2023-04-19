@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     color: UMColors.white,
-    fontSize: 22,
+    fontSize: 20,
   },
   headerBackBtn: {
     height: 30,
@@ -84,8 +84,8 @@ const styles = StyleSheet.create({
     backgroundColor: UMColors.darkerGray
   }, 
   rightBtn: {
-    height: 30,
-    width: 30,
+    height: 25,
+    width: 25,
     marginHorizontal: '5%',
     justifyContent: 'center',
     alignItems: 'center'

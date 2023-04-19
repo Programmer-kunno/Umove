@@ -324,7 +324,7 @@ export class BookingProcessingScreen extends Component {
                 latitude: parseFloat(this.state.destination.latitude),
                 longitude: parseFloat(this.state.destination.longitude)
               }}
-              apikey={"AIzaSyCjh5lmz5CQu1MKjEKaLa552Cq5fCXTlCo"}
+              apikey={"AIzaSyBTKmk04d6UkPSY2j3l3OUqGPRlZzalN2w"}
               strokeColor={"rgb(223,131,68)"}
               strokeWidth={4}
             /> 

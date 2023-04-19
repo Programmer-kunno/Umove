@@ -1,7 +1,8 @@
 import { 
   post,
   del,
-  get
+  get,
+  patch
  } from './helper/http';
 // import { Request } from './helper/http'
 
@@ -27,6 +28,15 @@ export class CustomerApi {
   static async getCustomerData() {
     try {
       const response = await get('/api/customers/', {}, false)
+      return response
+    } catch(err) {
+      return err
+    }
+  }
+
+  static async updateCustomer(data) {
+    try {
+      const response = await patch('/api/customers/', data)
       return response
     } catch(err) {
       return err
@@ -60,7 +70,16 @@ export class CustomerApi {
     }
   }
 
-  static corporateSignup = async(data) => {
+  static async validateUser(data) {
+    try {
+      const response = await post('/api/users/validate', data)
+      return response
+    } catch(err) {
+      return err
+    }
+  }
+
+  static signUp = async(data) => {
     const register = data
     const formdata = new FormData();
 

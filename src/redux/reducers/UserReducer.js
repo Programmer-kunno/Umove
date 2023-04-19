@@ -3,13 +3,15 @@ import {
   SAVE_USER_DETAILS,
   SAVE_USER_PASS,
   USER_LOGOUT,
-  UPDATE_USER_ACCESS
+  UPDATE_USER_ACCESS,
+  SAVE_USER_CHANGES
 } from "../actions/User";
 
 const initialState = {
   userData: {},
   userDetailsData: {},
-  logInData: {}
+  logInData: {},
+  userChangesData: {}
 }
 
 export const userOperations = (state = initialState, action) => {
@@ -44,6 +46,12 @@ export const userOperations = (state = initialState, action) => {
           ...state.userData,
           access: action.value
         }
+      }
+    }
+    case SAVE_USER_CHANGES: {
+      return {
+        ...state,
+        userChangesData: action.value
       }
     }
     default: 
