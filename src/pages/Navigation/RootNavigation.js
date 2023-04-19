@@ -54,6 +54,7 @@ import EditEmail from '../MainScreens/EditProfile/EditUserScreens/EditEmail';
 import EditMobileNumber from '../MainScreens/EditProfile/EditUserScreens/EditMobileNumber';
 import EditAddress from '../MainScreens/EditProfile/EditUserScreens/EditAddress';
 import EditValidID from '../MainScreens/EditProfile/EditUserScreens/EditValidID';
+import Chat from '../Chat/Chat';
 
 export default RootNavigation = () => {
   const Stack = createStackNavigator();
@@ -142,6 +143,7 @@ export default RootNavigation = () => {
       <Stack.Screen name="EditAddress" component={EditAddress} />
       <Stack.Screen name="EditValidID" component={EditValidID} />
 
+      <Stack.Screen name="ChatScreen" component={Chat} />
       {/* There are Pages in the Archive and Hidden Folder */}
 
     </Stack.Navigator>

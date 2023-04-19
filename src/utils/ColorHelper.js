@@ -10,5 +10,6 @@ export const UMColors = {
   black: 'black',
   cream: 'rgb(245, 247, 232)',
   BGGray: 'rgb(81, 79, 80)',
-  darkerBgOrange: 'rgb(238, 247, 191)'
+  darkerBgOrange: 'rgb(238, 247, 191)',
+  skyBlue: '#B1D1FF'
 }

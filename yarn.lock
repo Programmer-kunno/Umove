@@ -7069,6 +7069,11 @@
     "unimodules-app-loader" "~2.2.0"
     "unimodules-task-manager-interface" "~6.2.0"
 
+"react-native-use-websocket@^0.2.6":
+  "integrity" "sha512-P+bj0rt+pSDFfte6VokMrpYVXg8Z+MCwhjQAyca5bFKpZ7NKJ/eBjuhJKg8lZS4gedYU0dPaNSVceVsk6RpToQ=="
+  "resolved" "https://registry.npmjs.org/react-native-use-websocket/-/react-native-use-websocket-0.2.6.tgz"
+  "version" "0.2.6"
+
 "react-native-vector-icons@*", "react-native-vector-icons@>7.0.0":
   "integrity" "sha512-wKYLaFuQST/chH3AJRjmOLoLy3JEs1JR6zMNgTaemFpNoXs0ztRnTxcxFD9xhX7cJe1/zoN5BpQYe7kL0m5yyA=="
   "resolved" "https://registry.npmjs.org/react-native-vector-icons/-/react-native-vector-icons-9.2.0.tgz"

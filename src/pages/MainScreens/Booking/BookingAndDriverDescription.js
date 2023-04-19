@@ -14,6 +14,7 @@ import { setLoading } from '../../../redux/actions/Loader';
 import { BookingApi } from '../../../api/booking';
 import { showError } from '../../../redux/actions/ErrorModal';
 import { UMIcons } from '../../../utils/imageHelper';
+import { openNumber } from '../../../utils/phone';
 
 export default class BookingAndDriverDescription extends Component {
   constructor(props){
@@ -42,6 +43,14 @@ export default class BookingAndDriverDescription extends Component {
       userProfile: bookRes?.booking_routes[0]?.booking_appointments[0]?.driver?.user?.user_profile,
       userVehicle: bookRes?.booking_routes[0]?.booking_appointments[0]?.vehicle,
     })
+  }
+
+  onPressCall() {
+    openNumber(this.state.userProfile.mobile_number)
+  }
+
+  onPressChat() {
+    navigate('ChatScreen', { data: this.state.userProfile.account_number })
   }
 
   bookDetailsModal() {
@@ -136,7 +145,7 @@ export default class BookingAndDriverDescription extends Component {
             <View style={styles.contactDriverContainter}>
               <TouchableOpacity
                 style={styles.contactBtn}
-                onPress={() => {}}
+                onPress={() => this.onPressCall()}
               >
                 <Image
                   style={{ width: '90%' }}
@@ -146,7 +155,7 @@ export default class BookingAndDriverDescription extends Component {
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.contactBtn}
-                onPress={() => {}}
+                onPress={() => this.onPressChat()}
               >
                 <Image
                   style={{ width: '90%' }}
