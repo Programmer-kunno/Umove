@@ -36,3 +36,11 @@ export const updateUserAccess = (data) => {
     value: data
   }
 }
+
+export const SAVE_USER_CHANGES = "SAVE_USER_CHANGES"
+export const saveUserChanges = (data) => {
+  return {
+    type: SAVE_USER_CHANGES,
+    value: data
+  }
+} 

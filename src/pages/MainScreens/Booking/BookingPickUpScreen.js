@@ -49,6 +49,7 @@ export default class BookingPickUpScreen extends Component {
   checkTimeDate = async() => {
     dispatch(setLoading(true))
     const response = await BookingApi.book(this.state.booking)
+    console.log(response.data)
     if(response == undefined){
       dispatch(setLoading(false))
       dispatch(showError(true))
