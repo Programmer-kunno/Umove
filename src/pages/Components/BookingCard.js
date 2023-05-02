@@ -74,18 +74,22 @@ const BookingCard = (props) => {
           type === "past" &&
             <View style={styles.pastButtonContainer}>
               <View style={styles.pastButtonFirstRow}>
-                <Text>₱   {moneyFormat(data.total_price)}</Text>
-                <Image 
+                <TouchableOpacity style={styles.trackButton} onPress={() => {
+                  navigate('BookingItemScreen', { rebookData: rebookData, isRebook: true })}}>
+                  <Text style={styles.buttonText}>Book</Text>
+                </TouchableOpacity>
+                {/* <Text>₱   {moneyFormat(data.total_price)}</Text> */}
+                {/* <Image 
                   source={UMIcons.save}
                   style={styles.saveIcon}
-                />
+                /> */}
               </View>
-
-              <TouchableOpacity style={styles.trackButton} onPress={() => {
+{/*                 
+              <TouchableOpacity style={styles.saveButton} onPress={() => {
                 console.log(data)
                 navigate('BookingItemScreen', { rebookData: rebookData, isRebook: true })}}>
-                <Text style={styles.buttonText}>Rebook</Text>
-              </TouchableOpacity>
+                <Text style={[styles.buttonText, {color: UMColors.primaryOrange}]}>Save</Text>
+              </TouchableOpacity> */}
             </View>
         }
       </View>
@@ -153,7 +157,7 @@ const styles = StyleSheet.create({
     alignItems: 'center', 
     paddingVertical: 5, 
     backgroundColor: UMColors.primaryOrange, 
-    borderRadius: 5,
+    borderRadius: 50,
     shadowColor: UMColors.black,
     shadowOpacity: 0.1,
     shadowOffset: {
@@ -161,6 +165,13 @@ const styles = StyleSheet.create({
       height: 4
     },
     elevation: 7
+  },
+  saveButton: {
+    paddingHorizontal: 30, 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    paddingVertical: 5, 
+    borderRadius: 50,
   },
   pastButtonContainer: {
     justifyContent: 'space-between', 

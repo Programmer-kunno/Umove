@@ -10,7 +10,7 @@ import {
   Dimensions,
   Modal
 } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Polyline } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import { PROVIDER_GOOGLE } from 'react-native-maps';
 import { BookingApi } from '../../../api/booking';
@@ -26,6 +26,7 @@ import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModa
 import { setLoading } from '../../../redux/actions/Loader';
 import { Loader } from '../../Components/Loader';
 import ErrorOkModal from '../../Components/ErrorOkModal';
+import { decode } from '@googlemaps/polyline-codec'
 
 export class BookingProcessingScreen extends Component {  
   constructor(props) {
@@ -40,7 +41,8 @@ export class BookingProcessingScreen extends Component {
       bookingRes: null,
       confirmationModal: false,
       errMessage: '',
-      errorOkModalVisible: false
+      errorOkModalVisible: false,
+      polyCoordinates: []
     };
 
     this.mapView = null
@@ -66,8 +68,32 @@ export class BookingProcessingScreen extends Component {
 
   async init() {
     this.computeRates()
-    console.log(this.state.bookingData)
+    this.getRoutes()
     dispatch(setLoading(false))
+  }
+
+  async getRoutes() {
+    refreshTokenHelper(async() => {
+      const response = await BookingApi.getBookingRoutes(this.state.bookingData?.booking_number)
+      if(response == undefined){
+        dispatch(showError(true))
+        this.setState({isLoading: false, errMessage: 'Cant Connect to the server'})
+      } else {
+        if(response?.data?.success) {
+          const decodedPoly = decode(response?.data?.data[0]?.overview_polyline?.points)
+          const newData = decodedPoly.map(item => {
+            return {
+                latitude: item[0],
+                longitude: item[1]
+            }
+          })
+          this.setState({ polyCoordinates: newData })
+        }
+        else {
+          this.setState({ isLoading: false, errMessage: response?.data?.message || response?.data, errorOkModalVisible: true })
+        }
+      }
+    })
   }
   
   async computeRates() {
@@ -119,7 +145,6 @@ export class BookingProcessingScreen extends Component {
     dispatch(setLoading(true))
     refreshTokenHelper(async() => {
       const response = await BookingApi.cancelBooking(this.state.bookingData?.booking_number)
-      console.log(response.data)
       if(response == undefined){
         dispatch(showError(true))
         dispatch(setLoading(false))
@@ -315,16 +340,8 @@ export class BookingProcessingScreen extends Component {
                 resizeMode={'contain'}
               />
             </Marker>
-            <MapViewDirections
-              origin={{
-                latitude: parseFloat(this.state.origin.latitude),
-                longitude: parseFloat(this.state.origin.longitude)
-              }}
-              destination={{
-                latitude: parseFloat(this.state.destination.latitude),
-                longitude: parseFloat(this.state.destination.longitude)
-              }}
-              apikey={"AIzaSyBTKmk04d6UkPSY2j3l3OUqGPRlZzalN2w"}
+            <Polyline
+              coordinates={this.state.polyCoordinates}
               strokeColor={"rgb(223,131,68)"}
               strokeWidth={4}
             /> 

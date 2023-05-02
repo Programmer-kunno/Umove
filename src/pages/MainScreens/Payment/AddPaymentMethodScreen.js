@@ -11,7 +11,7 @@ import {
   Keyboard
 } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import GrayNavbar from '../../Components/GrayNavbar'
+import CustomNavbar from '../../Components/CustomNavbar'
 import { UMColors } from '../../../utils/ColorHelper'
 import { UMIcons } from '../../../utils/imageHelper'
 import { CardPayment } from '../../../api/paymentCard'
@@ -108,7 +108,7 @@ export default AddPaymentMethodScreen = () => {
             onSuccessBack()
           }}
         />
-        <GrayNavbar
+        <CustomNavbar
           Title={'Add Card'}
         />
         <TextInput

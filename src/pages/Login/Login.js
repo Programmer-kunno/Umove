@@ -7,7 +7,7 @@ import { CustomerApi } from '../../api/customer';
 import { UMColors } from '../../utils/ColorHelper';
 import { dispatch } from '../../utils/redux';
 import { saveUserDetailsRedux, saveUserPass } from '../../redux/actions/User';
-import { resetNavigation } from '../../utils/navigationHelper';
+import { navigate, resetNavigation } from '../../utils/navigationHelper';
 import { Loader } from '../Components/Loader';
 import { setLoading } from '../../redux/actions/Loader';
 import ErrorWithCloseButtonModal from '../Components/ErrorWithCloseButtonModal';
@@ -18,9 +18,8 @@ import { useIsFocused } from '@react-navigation/native';
 
 const deviceWidth = Dimensions.get('screen').width
 
-export default Login = () => {
+export default Login = (props) => {
   const logInData = useSelector(state => state.userOperations.logInData)
-  console.log(logInData)
   const [username, setUsername] = useState( logInData ? logInData.username : '')
   const [password, setPassword] = useState( logInData ? logInData.password : '')
   const [remember, setRemember] = useState(false)
@@ -111,7 +110,7 @@ export default Login = () => {
                   />
                   <Text style={styles.rememberMeTxt}>Remember Me</Text>
                 </View>
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('ForgotPassword')}>
+                <TouchableOpacity onPress={() => navigate('ForgotPassword')}>
                   <Text style={styles.forgotPassword}>Forgot Password?</Text>
                 </TouchableOpacity>
               </View>
@@ -177,7 +176,7 @@ export default Login = () => {
                     Don't have an account? {" "}
                   </Text>
                   <TouchableOpacity onPress={() => {
-                    this.props.navigation.navigate('SignUpScreen')
+                    navigate('SignUpScreen')
                   }}>
                     <Text style={styles.underline}>
                       Sign Up

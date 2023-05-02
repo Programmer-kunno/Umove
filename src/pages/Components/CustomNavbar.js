@@ -4,7 +4,7 @@ import { UMColors } from '../../utils/ColorHelper';
 import { UMIcons } from '../../utils/imageHelper';
 import { goBack } from '../../utils/navigationHelper';
 
-export default class GrayNavbar extends Component {
+export default class CustomNavbar extends Component {
   constructor(props){
     super(props);
 
@@ -12,7 +12,7 @@ export default class GrayNavbar extends Component {
 
   render() {
     return (
-      <View style={styles.headerContainer}>
+      <View style={[styles.headerContainer, { backgroundColor: this.props.ColorChange || UMColors.darkerGray }]}>
         <StatusBar barStyle={'light-content'}/>
         <View style={styles.headerItems}>
           <TouchableOpacity
@@ -27,12 +27,12 @@ export default class GrayNavbar extends Component {
             }
           >
             <Image
-              style={{height: '60%'}}
+              style={{height: '60%', tintColor: this.props.ChangeBackColor || UMColors.white}}
               source={UMIcons.backIcon}
               resizeMode={'contain'}
             />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>{this.props.Title}</Text>
+          <Text style={[styles.headerTitle, { color: this.props.ChangeTitleColor || UMColors.white }]}>{this.props.Title}</Text>
 
           <TouchableOpacity
             style={styles.rightBtn}
@@ -60,7 +60,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '11%',
     paddingTop: '10%',
-    backgroundColor: 'rgb(29, 32, 39)', 
   },
   headerItems: {
     height: '60%',
@@ -81,7 +80,6 @@ const styles = StyleSheet.create({
     marginHorizontal: '5%',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: UMColors.darkerGray
   }, 
   rightBtn: {
     height: 25,

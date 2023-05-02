@@ -8,7 +8,7 @@ import {
   Image
 } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import GrayNavbar from '../../Components/GrayNavbar'
+import CustomNavbar from '../../Components/CustomNavbar'
 import { UMColors } from '../../../utils/ColorHelper'
 import { UMIcons } from '../../../utils/imageHelper'
 import { navigate } from '../../../utils/navigationHelper'
@@ -105,7 +105,7 @@ export default PaymentMethodScreen = () => {
         }}
       />
       <StatusBar barStyle={'light-content'}/>
-      <GrayNavbar
+      <CustomNavbar
         Title={'Payment Methods'}
       />
       <View style={styles.titleContainer}>

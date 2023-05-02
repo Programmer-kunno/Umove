@@ -6,7 +6,7 @@ import { dispatch } from '../../../utils/redux'
 import { setLoading } from '../../../redux/actions/Loader'
 import { refreshTokenHelper } from '../../../api/helper/userHelper'
 import { BookingApi } from '../../../api/booking'
-import GrayNavbar from '../../Components/GrayNavbar'
+import CustomNavbar from '../../Components/CustomNavbar'
 import ErrorOkModal from '../../Components/ErrorOkModal'
 import { capitalizeFirst, moneyFormat } from '../../../utils/stringHelper'
 import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal'
@@ -56,7 +56,7 @@ export default ReceiptScreen = (props) => {
           })
         }}
       />
-      <GrayNavbar
+      <CustomNavbar
         Title={'Confirmation'}
       />
       <View style={styles.recieptContainer}>

@@ -13,7 +13,7 @@ import {
 import DropDownPicker from 'react-native-dropdown-picker';
 import { UMColors } from '../../utils/ColorHelper';
 import { FetchApi } from '../../api/fetch';
-import GrayNavbar from '../Components/GrayNavbar';
+import CustomNavbar from '../Components/CustomNavbar';
 import { navigate } from '../../utils/navigationHelper';
 import ErrorWithCloseButtonModal from '../Components/ErrorWithCloseButtonModal';
 import { dispatch } from '../../utils/redux';
@@ -190,7 +190,7 @@ export default class QuickQuotationItemDesc extends Component {
           <StatusBar translucent backgroundColor={'transparent'} barStyle={'light-content'} />
 
           {/* Header for Quick Quotation */}
-          <GrayNavbar
+          <CustomNavbar
             Title={'Quick Quotation'}
             onBack={() => {
               this.props.navigation.navigate('Start1')

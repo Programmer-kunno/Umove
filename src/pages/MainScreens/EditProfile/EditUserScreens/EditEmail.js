@@ -1,10 +1,20 @@
-import { SafeAreaView, StyleSheet, Text, View, TextInput, Dimensions, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native'
+import { 
+  SafeAreaView, 
+  StyleSheet, 
+  Text, 
+  View, 
+  TextInput, 
+  Dimensions, 
+  TouchableOpacity, 
+  TouchableWithoutFeedback, 
+  Keyboard 
+} from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { UMColors } from '../../../../utils/ColorHelper'
-import GrayNavbar from '../../../Components/GrayNavbar'
+import CustomNavbar from '../../../Components/CustomNavbar'
 import { navigate } from '../../../../utils/navigationHelper'
 import { dispatch } from '../../../../utils/redux'
-import { saveUserChanges } from '../../../../redux/actions/User'
+import { forUpdateUserData, saveUserChanges } from '../../../../redux/actions/User'
 import { useSelector } from 'react-redux'
 import { emailRegex } from '../../../../utils/stringHelper'
 import ErrorOkModal from '../../../Components/ErrorOkModal'
@@ -19,6 +29,7 @@ const deviceWidth = Dimensions.get('screen').width
 
 export default EditEmail = (props) => {
   const userChangesData = useSelector((state) => state.userOperations.userChangesData)
+  const updateUserData = useSelector((state) => state.userOperations.updateUserData)
   const [email, setEmail] = useState(props.route.params?.email)
   const [error, setError] = useState({
     value: false,
@@ -48,6 +59,10 @@ export default EditEmail = (props) => {
               email: email
             }
           }))
+          dispatch(forUpdateUserData({
+            ...updateUserData,
+            email: email
+          }))
           navigate('UserProfileScreen')
           dispatch(setLoading(false))
         } else {
@@ -67,7 +82,7 @@ export default EditEmail = (props) => {
           ErrMsg={error.message}
           OkButton={() => setError({ value: false, message: '' })}
         />
-        <GrayNavbar
+        <CustomNavbar
           Title={'Edit Email'}
         />
         <View style={[styles.componentContainer, { marginTop: 20 }]}>
@@ -79,8 +94,11 @@ export default EditEmail = (props) => {
           />
         </View>
         <TouchableOpacity
-          style={[styles.updateBtn, { backgroundColor: email ? UMColors.primaryOrange : UMColors.primaryGray }]}
-          disabled={email ? false : true}
+          style={[styles.updateBtn, { 
+                backgroundColor: props.route.params?.email === email || email.length === 0 ? 
+                                 UMColors.primaryGray  : UMColors.primaryOrange 
+                                }]}
+          disabled={props.route.params?.email === email || email.length === 0 ? true : false}
           onPress={() => {
             if(!emailRegex(email)){
               setError({ value: true, message: 'Email is not valid' })

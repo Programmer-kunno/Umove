@@ -3,6 +3,25 @@ import {
  } from './helper/http'
 
 export class FetchApi {
+
+  static async helpCategories() {
+    try {
+      const response = await get('/api/settings/help-center/categories', {}, true)
+      return response
+    } catch (err) {
+      return err
+    }
+  }
+
+  static async helpList(categoryNumber, keyword) {
+    try {
+      const response = await get(`/api/settings/help-center?category=${categoryNumber}`, {}, true)
+      return response
+    } catch (err) {
+      return err
+    }
+  }
+
   static async companyTypes() {
     try {
       const response = await get('/api/companies/types')

@@ -11,24 +11,27 @@ import {
 } from 'react-native'
 import React, { useState } from 'react'
 import { UMColors } from '../../../../utils/ColorHelper'
-import GrayNavbar from '../../../Components/GrayNavbar'
+import CustomNavbar from '../../../Components/CustomNavbar'
 import { navigate } from '../../../../utils/navigationHelper'
 import { dispatch } from '../../../../utils/redux'
-import { saveUserChanges } from '../../../../redux/actions/User'
+import { forUpdateUserData, saveUserChanges } from '../../../../redux/actions/User'
 import { useSelector } from 'react-redux'
 
 const deviceWidth = Dimensions.get('screen').width
 
 export default EditName = (props) => {
   const userChangesData = useSelector((state) => state.userOperations.userChangesData)
+  const updateUserData = useSelector((state) => state.userOperations.updateUserData)
   const [firstName, setFirstName] = useState(props.route.params?.firstName)
   const [middleName, setMiddleName] = useState(props.route.params?.middleName)
   const [lastName, setLastName] = useState(props.route.params?.lastName)
 
+  console.log(firstName.length)
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView style={styles.mainContainer}>
-        <GrayNavbar
+        <CustomNavbar
           Title={'Edit Name'}
         />
         <View style={[styles.componentContainer, { marginTop: 20 }]}>
@@ -57,7 +60,19 @@ export default EditName = (props) => {
           />
         </View>
         <TouchableOpacity
-          style={styles.updateBtn}
+          style={[styles.updateBtn, { 
+            backgroundColor: props.route.params?.firstName === firstName && 
+                             props.route.params?.middleName === middleName && 
+                             props.route.params?.lastName === lastName || 
+                             firstName.length === 0 || lastName.length === 0
+                             ? UMColors.primaryGray : UMColors.primaryOrange 
+                          }]}
+          disabled={
+            props.route.params?.firstName === firstName && 
+            props.route.params?.middleName === middleName && 
+            props.route.params?.lastName === lastName || 
+            firstName.length === 0 || lastName.length === 0 ? true : false
+          }
           onPress={() => {
             dispatch(saveUserChanges({ 
               ...userChangesData, 
@@ -68,7 +83,13 @@ export default EditName = (props) => {
                 lastName: lastName
               }
             }))
-            navigate('UserProfileScreen', )
+            dispatch(forUpdateUserData({
+              ...updateUserData,
+              firstName: firstName,
+              middleName: middleName,
+              lastName: lastName
+            }))
+            navigate('UserProfileScreen')
           }}
         >
           <Text style={styles.updateBtnTxt}>Update</Text>

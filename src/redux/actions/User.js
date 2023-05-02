@@ -43,4 +43,12 @@ export const saveUserChanges = (data) => {
     type: SAVE_USER_CHANGES,
     value: data
   }
-} 
+}
+
+export const FOR_UPDATE_USER_DATA = "FOR_UPDATE_USER_DATA"
+export const forUpdateUserData = (data) => {
+  return {
+    type: FOR_UPDATE_USER_DATA,
+    value: data
+  }
+}

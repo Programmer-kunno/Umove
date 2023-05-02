@@ -14,6 +14,15 @@ export class BookingApi {
     }
   }
 
+  static async getBookingRoutes(bookNumber) {
+    try {
+      const response = await get(`/api/bookings/route/${bookNumber}`, {}, false)
+      return response
+    } catch (err) {
+      return err
+    }
+  }
+
   static async payBooking(bookNumber, data) {
     try {
       const response = await post(`/api/bookings/pay/${bookNumber}`, data)   

@@ -55,6 +55,18 @@ import EditMobileNumber from '../MainScreens/EditProfile/EditUserScreens/EditMob
 import EditAddress from '../MainScreens/EditProfile/EditUserScreens/EditAddress';
 import EditValidID from '../MainScreens/EditProfile/EditUserScreens/EditValidID';
 import Chat from '../Chat/Chat';
+import EditCompanyName from '../MainScreens/EditProfile/EditCompanyScreens/EditCompanyName';
+import EditCompanyEmail from '../MainScreens/EditProfile/EditCompanyScreens/EditCompanyEmail';
+import EditCompanyMobileNumber from '../MainScreens/EditProfile/EditCompanyScreens/EditCompanyMobileNumber';
+import EditCompanyAddress from '../MainScreens/EditProfile/EditCompanyScreens/EditCompanyAddress';
+import EditCompanyLogo from '../MainScreens/EditProfile/EditCompanyScreens/EditCompanyLogo';
+import Settings from '../MainScreens/ProfileDrawerScreens/Settings';
+import EditDocuments from '../MainScreens/EditProfile/EditDocuments';
+import MyAccountHelpList from '../MainScreens/ProfileDrawerScreens/HelpItems/MyAccountHelpList';
+import HelpUpdateAccountInfo from '../MainScreens/ProfileDrawerScreens/HelpItems/MyAccountList/HelpUpdateAccountInfo';
+import HelpUpdateCompanyInfo from '../MainScreens/ProfileDrawerScreens/HelpItems/MyAccountList/HelpUpdateCompanyInfo';
+import HelpUpdateDocuments from '../MainScreens/ProfileDrawerScreens/HelpItems/MyAccountList/HelpUpdateDocuments';
+import BackendHelpScreen from '../MainScreens/ProfileDrawerScreens/HelpItems/BackendHelpScreen';
 
 export default RootNavigation = () => {
   const Stack = createStackNavigator();
@@ -67,7 +79,6 @@ export default RootNavigation = () => {
       opacity: current.progress,
     },
   });
-  
 
   const DrawerNavigation = () => {
     return ( 
@@ -135,6 +146,8 @@ export default RootNavigation = () => {
       <Stack.Screen name="ChooseToEditScreen" component={ChooseToEditScreen} />
       <Stack.Screen name="UserProfileScreen" component={UserProfileScreen} />
       <Stack.Screen name="CompanyProfileScreen" component={CompanyProfileScreen} />
+      <Stack.Screen name="ChatScreen" component={Chat} />
+      <Stack.Screen name="Settings" component={Settings} />
       {/* Edit Profile Screens */}
       <Stack.Screen name="EditName" component={EditName} />
       <Stack.Screen name="EditUsername" component={EditUsername} />
@@ -142,8 +155,20 @@ export default RootNavigation = () => {
       <Stack.Screen name="EditMobileNumber" component={EditMobileNumber} />
       <Stack.Screen name="EditAddress" component={EditAddress} />
       <Stack.Screen name="EditValidID" component={EditValidID} />
+      {/* Edit Profile Screens */}
+      <Stack.Screen name="EditCompanyName" component={EditCompanyName} />
+      <Stack.Screen name="EditCompanyEmail" component={EditCompanyEmail} />
+      <Stack.Screen name="EditCompanyMobileNumber" component={EditCompanyMobileNumber} />
+      <Stack.Screen name="EditCompanyAddress" component={EditCompanyAddress} />
+      <Stack.Screen name="EditCompanyLogo" component={EditCompanyLogo} />
+      <Stack.Screen name="EditDocuments" component={EditDocuments} />
+      {/* Help */}
+      <Stack.Screen name="MyAccountHelpList" component={MyAccountHelpList} />
+      <Stack.Screen name="HelpUpdateAccountInfo" component={HelpUpdateAccountInfo} />
+      <Stack.Screen name="HelpUpdateCompanyInfo" component={HelpUpdateCompanyInfo} />
+      <Stack.Screen name="HelpUpdateDocuments" component={HelpUpdateDocuments} />
+      <Stack.Screen name="BackendHelpScreen" component={BackendHelpScreen} />
 
-      <Stack.Screen name="ChatScreen" component={Chat} />
       {/* There are Pages in the Archive and Hidden Folder */}
 
     </Stack.Navigator>

@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, SafeAreaView, StatusBar,  } from 'react-native'
 import React, { useEffect } from 'react'
 import { UMColors } from '../../../utils/ColorHelper'
-import GrayNavbar from '../../Components/GrayNavbar'
+import CustomNavbar from '../../Components/CustomNavbar'
 import WebView from 'react-native-webview'
 import { focusedScreenName, goBack } from '../../../utils/navigationHelper'
 import { dispatch } from '../../../utils/redux'
@@ -32,7 +32,7 @@ export default AddPaymentMethodWebView = (props) => {
   return (
     <SafeAreaView style={styles.mainContainer}>
       <StatusBar barStyle={'light-content'}/>
-      <GrayNavbar
+      <CustomNavbar
         Title={'Payment'}
       />
       <WebView

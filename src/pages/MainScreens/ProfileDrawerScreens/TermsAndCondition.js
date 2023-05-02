@@ -1,6 +1,6 @@
 import { View, Text, SafeAreaView, StyleSheet, ScrollView} from 'react-native'
 import React, { useEffect, useState } from 'react'
-import GrayNavbar from '../../Components/GrayNavbar'
+import CustomNavbar from '../../Components/CustomNavbar'
 import { UMColors } from '../../../utils/ColorHelper'
 import { SettingsApi } from '../../../api/settings'
 import { dispatch } from '../../../utils/redux'
@@ -47,7 +47,7 @@ export default TermsAndCondition = () => {
         ErrMsg={error.message}
         OkButton={() => setError({ value: false, message: '' })}
       />
-      <GrayNavbar
+      <CustomNavbar
         Title={'Terms & Conditions'}
       />
       <ScrollView style={styles.termsBody}>

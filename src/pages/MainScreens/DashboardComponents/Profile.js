@@ -1,4 +1,4 @@
-import React, { useEffect, useState }  from 'react';
+import React, { useEffect, useRef, useState }  from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Image, Dimensions, StatusBar, Modal } from 'react-native';
 import { UMColors } from '../../../utils/ColorHelper';
 import { UMIcons } from '../../../utils/imageHelper';
@@ -7,29 +7,30 @@ import { CustomerApi } from '../../../api/customer';
 import { TextInput } from 'react-native-gesture-handler';
 import { Loader } from '../../Components/Loader';
 import { dispatch } from '../../../utils/redux';
-import { saveUserChanges, userLogout } from '../../../redux/actions/User';
+import { saveUser, saveUserChanges, userLogout } from '../../../redux/actions/User';
 import { setLoading } from '../../../redux/actions/Loader';
 import { navigate, resetNavigation } from '../../../utils/navigationHelper';
 import { refreshTokenHelper } from '../../../api/helper/userHelper';
 import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal';
 import { showError } from '../../../redux/actions/ErrorModal';
+import ImagePicker from 'react-native-image-crop-picker';
+import RBSheet from 'react-native-raw-bottom-sheet';
+import DocumentPicker from 'react-native-document-picker'
+import getPath from '@flyerhq/react-native-android-uri-path';
+import { canAccessCamera, canReadMedia } from '../../../utils/mediaHelper';
+import ErrorOkModal from '../../Components/ErrorOkModal';
 
 const deviceWidth = Dimensions.get('screen').width
+const deviceHeight = Dimensions.get('screen').height
 
 export default Profile = () => {  
   
   const user = useSelector((state) => state.userOperations.userData)
   const userDetailsData = useSelector((state) => state.userOperations.userDetailsData)
-  console.log(userDetailsData.user)
-  const [name, setName] = useState('')
-  const [password, setPassword] = useState('')
-  const [err, setErr] = useState({
-    value: false,
-    message: 'Password is incorrect'
-  })
-  const [cancelModalVisible, setCancelModalVisible] = useState(false)
+  console.log(userDetailsData)
   const editUserData = {
-    customerType: userDetailsData.customer_type,
+    customerType: userDetailsData.customer_type?.includes('Corporate' || 'corporate') ? 'corporate' : 'individual',
+    accountNumber: userDetailsData?.user?.user_profile?.account_number,
     firstName: userDetailsData?.user?.user_profile?.first_name,
     middleName: userDetailsData?.user?.user_profile?.middle_name,
     lastName: userDetailsData?.user?.user_profile?.last_name,
@@ -53,12 +54,29 @@ export default Profile = () => {
     officeCity: userDetailsData?.company?.office_city,
     officeProvince: userDetailsData?.company?.office_province,
     officeZipCode: userDetailsData?.company?.office_zip_code,
-    companyLogo: userDetailsData?.company?.company_logo
-  } : null 
+    companyLogo: userDetailsData?.company?.company_logo,
+    bir: userDetailsData?.company?.company_requirement?.bir,
+    dti: userDetailsData?.company?.company_requirement?.dti
+  } : null
+  const RBSheetRef = useRef(null)
+  const setRef = (ref) => { RBSheetRef.current = ref; }
+  const [name, setName] = useState('')
+  const [password, setPassword] = useState('')
+  const [cancelModalVisible, setCancelModalVisible] = useState(false)
+  const [profilePic, setProfilePic] = useState('')
+  const [errorPass, setErrorPass] = useState({
+    value: false,
+    message: ''
+  })
+  const [error, setError] = useState({
+    value: false,
+    message: ''
+  })
 
   useEffect(() => {
     dispatch(setLoading(false))
-    setName(user.first_name.charAt(0).toUpperCase() + user.first_name.slice(1) + ' ' + user.last_name.charAt(0).toUpperCase() + user.last_name.slice(1))
+    setName(userDetailsData?.user?.user_profile?.first_name.charAt(0).toUpperCase() + userDetailsData?.user?.user_profile?.first_name.slice(1) + ' ' + 
+            userDetailsData?.user?.user_profile?.last_name.charAt(0).toUpperCase() + userDetailsData?.user?.user_profile?.last_name.slice(1))
   }, [])
 
   const deleteUser = () => {
@@ -78,10 +96,7 @@ export default Profile = () => {
           dispatch(userLogout())
           dispatch(setLoading(false))
         } else {
-          setErr({
-            ...err,
-            value: true
-          })
+          setErrorPass({ value: true, message: 'Password is incorrect' })
           dispatch(setLoading(false))
           setCancelModalVisible(true)
         }
@@ -100,7 +115,7 @@ export default Profile = () => {
         <View style={styles.mainMdlContainer}>
           <View style={styles.mdlContainer}>
             <View style={styles.mdlTxtContainer}>
-              <Text style={styles.mdlTxt}>{err.value ? err.message : 'Input your password to confirm'}</Text>
+              <Text style={styles.mdlTxt}>{errorPass.value ? errorPass.message : 'Input your password to confirm'}</Text>
               <TextInput
                 style={styles.mdlPasswordInput}
                 secureTextEntry={true}
@@ -114,7 +129,6 @@ export default Profile = () => {
                 style={styles.mdlBtn}
                 onPress={() => {
                   setCancelModalVisible(false)
-                  console.log(password)
                   deleteUser()
                 }}
               >
@@ -124,10 +138,7 @@ export default Profile = () => {
                 style={styles.mdlBtn}
                 onPress={() => {
                   setCancelModalVisible(false)
-                  setErr({
-                   ...err,
-                   value: false
-                  })
+                  setErrorPass({ value: false })
                 }}
               >
                 <Text style={styles.mdlBtnTxt}>No</Text>
@@ -138,28 +149,180 @@ export default Profile = () => {
       </Modal>
     )
   }
+
+  const updateUser = (imgData) => {
+    dispatch(setLoading(true))
+    const data ={
+      profilePicture: imgData
+    }
+    refreshTokenHelper(async() => {
+      const response = await CustomerApi.updateCustomer(data, editUserData.customerType, editUserData.accountNumber)
+      if(response == undefined){
+        dispatch(showError(true))
+        dispatch(setLoading(false))
+      } else {
+        if(response?.data?.success){
+          updateRedux()
+        } else {
+          setError({ value: true, message: response?.data?.message || response?.data })
+          dispatch(setLoading(false))
+        }
+      }
+    })
+  }
+
+  const updateRedux = () => {
+    refreshTokenHelper(async() => {
+      const response = await CustomerApi.getCustomerData()
+      if(response == undefined){
+        dispatch(showError(true))
+        dispatch(setLoading(false))
+      } else {
+        if(response?.data?.success) {
+          dispatch(saveUser(response?.data?.data))
+          dispatch(setLoading(false))
+        } else {
+          setError({ value: true, message: response?.data?.message || response?.data })
+          dispatch(setLoading(false))
+        }
+      }
+    })
+  }
+
+  const onPressImage = async () => {
+    RBSheetRef.current.close()
+    const granted = await canAccessCamera();
+    
+    if(granted){
+      ImagePicker.openCamera({
+        width: 400,
+        height: 400,
+        cropping: true
+      }).then(image => {
+        console.log(image);
+        let result = image
+        let filename = result.path.substring(result.path.lastIndexOf('/') + 1, result.path.length);
+        const imageData = {
+          uri: result.path,
+          type: result.mime,
+          name: filename
+        }
+        updateUser(imageData)
+      }).catch(err => {
+        console.log(err)
+      });
+    } else {
+      return;
+    }
+  }
+
+  const onChooseGallery = async() => {
+    RBSheetRef.current.close()
+    const granted = await canReadMedia();
+    
+    if(granted){
+      ImagePicker.openPicker({
+        width: 400,
+        height: 400,
+        cropping: true
+      }).then(image => {
+        console.log(image);
+        let result = image
+        let filename = result.path.substring(result.path.lastIndexOf('/') + 1, result.path.length);
+        const imageData = {
+          uri: result.path,
+          type: result.mime,
+          name: filename
+        }
+        updateUser(imageData)
+      }).catch(err => {
+        console.log(err)
+      });
+    } else {
+      return;
+    }
+  }
+
+  const bottomSheet = () => {
+    return(
+      <RBSheet
+        ref={setRef}
+        height={deviceHeight / 4.5}
+        openDuration={250}
+        customStyles={{
+          container: {
+            justifyContent: "center",
+            alignItems: "center",
+            borderTopLeftRadius: 15,
+            borderTopRightRadius: 15,
+          }
+        }}
+      >
+        <TouchableOpacity
+          style={styles.rbSheetBtn}
+          onPress={() => onPressImage()}
+        >
+          <Text style={styles.rbSheetText}>Take a photo</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.rbSheetBtn}
+          onPress={() => onChooseGallery()}
+        >
+          <Text style={styles.rbSheetText}>Choose from gallery</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.rbSheetBtn}
+          onPress={() => RBSheetRef.current.close()}
+        >
+          <Text style={[styles.rbSheetText, { color: UMColors.red }]}>Cancel</Text>
+        </TouchableOpacity>
+      </RBSheet>
+    )
+  }
   
 
-    return(
-      <View style={styles.mainContainer}>
-      <ErrorWithCloseButtonModal/>
-      {cancelConfirmModal()}
-      <StatusBar translucent barStyle={'light-content'}/>
-        {/* Header */}
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerTitleTxt}>Profile</Text>
-        </View>
+  return(
+    <View style={styles.mainContainer}>
+    <ErrorWithCloseButtonModal/>
+    <ErrorOkModal
+      Visible={error.value}
+      ErrMsg={error.message}
+      OkButton={() => setError({ value: false, message: '' })}
+    />
+    {cancelConfirmModal()}
+    <StatusBar translucent barStyle={'light-content'}/>
+      {/* Header */}
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerTitleTxt}>Profile</Text>
+      </View>
 
-        {/* Body */}
-        <View style={styles.bodyContainer}>
-          {/* Profile */}
-          <View style={styles.profileContainer}>
+      {/* Body */}
+      <View style={styles.bodyContainer}>
+        {/* Profile */}
+        <View style={styles.profileContainer}>
+          <TouchableOpacity
+            style={{ overflow: 'hidden' , width: 110, height: 110, borderRadius: 100 }}
+            onPress={() => RBSheetRef.current.open()}
+          >
             <Image
               style={styles.profilePicture}
-              source={UMIcons.userBlankProfile}
+              source={userDetailsData?.user?.user_profile?.profile_image ? {uri: userDetailsData?.user?.user_profile?.profile_image} : UMIcons.userBlankProfile }
               resizeMode={'contain'}
             />
-            <Text style={styles.profileName}>{name}</Text>
+            <View style={styles.profileCameraContainer}>
+              <Image
+                style={{ width: 25, height: 25, marginVertical: 5 }}
+                source={UMIcons.cameraWhiteIcon}
+                resizeMode='contain'
+              />
+            </View>
+          </TouchableOpacity>
+          <Text style={styles.profileName}>{name}</Text>
+          {
+            userDetailsData.customer_type?.includes('Corporate' || 'corporate') &&
+              <Text style={styles.companyName}>{userDetailsData?.company?.company_name}</Text>
+          }
+          <View style={styles.editButtonsContainer}>
             <TouchableOpacity
               style={styles.editProfileBtn}
               onPress={() => {
@@ -174,74 +337,88 @@ export default Profile = () => {
             >
               <Text style={styles.editProfileBtnTxt}>Edit Profile</Text>
             </TouchableOpacity>
-            <View style={[styles.contactContainer, { marginTop: 12 }]}>
-              <Text style={[styles.contactTxt, { textAlign: 'left' }]}>Email Address:</Text>
-              <Text style={styles.contactTxt}>{user.email}</Text>
-            </View>
-            <View style={styles.contactContainer}>
-              <Text style={[styles.contactTxt, { textAlign: 'left' }]}>Phone Number:</Text>
-              <Text style={styles.contactTxt}>{user.mobile_number}</Text>
-            </View>
+            {
+              userDetailsData.customer_type?.includes('Corporate' || 'corporate') &&
+                <TouchableOpacity
+                  style={styles.editProfileBtn}
+                  onPress={() => {
+                    navigate('EditDocuments')
+                    dispatch(saveUserChanges({ userDetails: editUserData, companyDetails: editCompanyData }))
+                  }}
+                >
+                  <Text style={styles.editProfileBtnTxt}>Upload Documents</Text>
+                </TouchableOpacity>
+            }
           </View>
-          {/* Connected Accounts */}
-          <View style={styles.connectedAcctContainer}>
-            <Text style={styles.connectedAcctTxt}>Connected Accounts</Text>
-            <TouchableOpacity
-              style={styles.acctsBtn}
-              onPress={() => {}}
-            >
-              <View style={styles.acctIconContainer}>
-                <Image
-                  style={styles.socialIcon}
-                  source={UMIcons.googleIcon}
-                  resizeMode={'contain'}
-                />
-                <Text style={styles.socialTxt}>Google</Text>
-              </View>
-              <Text style={styles.socialConnectTxt}>Connect</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.acctsBtn}
-              onPress={() => {}}
-            >
-              <View style={styles.acctIconContainer}>
-                <Image
-                  style={styles.socialIcon}
-                  source={UMIcons.facebookIcon}
-                  resizeMode={'contain'}
-                />
-                <Text style={styles.socialTxt}>Facebook</Text>
-              </View>
-              <Text style={styles.socialConnectTxt}>Connect</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.acctsBtn}
-              onPress={() => {}}
-            >
-              <View style={styles.acctIconContainer}>
-                <Image
-                  style={styles.socialIcon}
-                  source={UMIcons.appleIcon}
-                  resizeMode={'contain'}
-                />
-                <Text style={styles.socialTxt}>Apple</Text>
-              </View>
-              <Text style={styles.socialConnectTxt}>Connect</Text>
-            </TouchableOpacity>
+          {/* <View style={[styles.contactContainer, { marginTop: 12 }]}>
+            <Text style={[styles.contactTxt, { textAlign: 'left' }]}>Email Address:</Text>
+            <Text style={styles.contactTxt}>{userDetailsData?.user?.user_profile?.email}</Text>
           </View>
-          {/* Delete Account */}
+          <View style={styles.contactContainer}>
+            <Text style={[styles.contactTxt, { textAlign: 'left' }]}>Phone Number:</Text>
+            <Text style={styles.contactTxt}>{userDetailsData?.user?.user_profile?.mobile_number}</Text>
+          </View> */}
+        </View>
+        {/* Connected Accounts */}
+        <View style={styles.connectedAcctContainer}>
+          <Text style={styles.connectedAcctTxt}>Connected Accounts</Text>
           <TouchableOpacity
-            style={styles.deleteAcctBtn}
-            onPress={() => {
-              setCancelModalVisible(true)
-            }}
+            style={styles.acctsBtn}
+            onPress={() => {}}
           >
-            <Text style={styles.deleteBtnTxt}>Delete Account</Text>
+            <View style={styles.acctIconContainer}>
+              <Image
+                style={styles.socialIcon}
+                source={UMIcons.googleIcon}
+                resizeMode={'contain'}
+              />
+              <Text style={styles.socialTxt}>Google</Text>
+            </View>
+            <Text style={styles.socialConnectTxt}>Connect</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.acctsBtn}
+            onPress={() => {}}
+          >
+            <View style={styles.acctIconContainer}>
+              <Image
+                style={styles.socialIcon}
+                source={UMIcons.facebookIcon}
+                resizeMode={'contain'}
+              />
+              <Text style={styles.socialTxt}>Facebook</Text>
+            </View>
+            <Text style={styles.socialConnectTxt}>Connect</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.acctsBtn}
+            onPress={() => {}}
+          >
+            <View style={styles.acctIconContainer}>
+              <Image
+                style={styles.socialIcon}
+                source={UMIcons.appleIcon}
+                resizeMode={'contain'}
+              />
+              <Text style={styles.socialTxt}>Apple</Text>
+            </View>
+            <Text style={styles.socialConnectTxt}>Connect</Text>
           </TouchableOpacity>
         </View>
-        <Loader/>
+        {/* Delete Account */}
+        <TouchableOpacity
+          style={styles.deleteAcctBtn}
+          onPress={() => {
+            setCancelModalVisible(true)
+          }}
+        >
+          <Text style={styles.deleteBtnTxt}>Delete Account</Text>
+        </TouchableOpacity>
       </View>
-    )
+      {bottomSheet()}
+      <Loader/>
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -272,32 +449,51 @@ const styles = StyleSheet.create({
     marginTop: '5%',
     height: '42%',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   profilePicture: {
     width: 110,
     height: 110,
-    borderRadius: 50
+    borderRadius: 100
   },
   profileName: {
-    fontSize: 21,
-    color: UMColors.black,
-    marginTop: 15
+    fontSize: 25,
+    color: UMColors.primaryOrange,
+    marginTop: 5,
+    fontWeight: 'bold',
+  },
+  companyName: {
+    fontSize: 15,
+    color: UMColors.primaryGray,
+  },
+  editButtonsContainer: {
+    width: deviceWidth,
+    flexDirection: 'row',
+    justifyContent: 'space-evenly'
   },
   editProfileBtn: {
-    backgroundColor: UMColors.white,
-    width: 110,
-    height: 25,
+    backgroundColor: UMColors.BGOrange,
+    width: '38%',
+    height: 37,
+    borderWidth: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 50,
-    marginTop: 5,
+    borderRadius: 5,
+    marginTop: 15,
     marginBottom: 10,
-    elevation: 10
+    elevation: 10,
   },
   editProfileBtnTxt: {
     fontSize: 14,
     color: UMColors.black
+  },
+  profileCameraContainer: {
+    width: 110,
+    backgroundColor: 'rgba(27, 32, 39, 0.5)',
+    alignItems: 'center',
+    position: 'absolute',
+    alignSelf: 'center',
+    bottom: 0, 
   },
   contactContainer: {
     flexDirection: 'row',
@@ -364,13 +560,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 5,
-    backgroundColor: UMColors.red,
-    elevation: 10,
-    marginTop: '14%'
+    position: 'absolute',
+    bottom: 40
   },
   deleteBtnTxt: {
-    fontSize: 13,
-    color: UMColors.white,
+    fontSize: 15,
+    color: UMColors.red,
     fontWeight: 'bold'
   },
   mainMdlContainer: {
@@ -427,5 +622,17 @@ const styles = StyleSheet.create({
     marginTop: 6,
     fontSize: 14,
     paddingLeft: 10
+  },
+  rbSheetBtn: {
+    borderBottomWidth: 0.5,
+    width: deviceWidth / 1.4,
+    height: '22%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10
+  },
+  rbSheetText: {
+    fontSize: 17,
+    color: UMColors.primaryOrange
   }
 })

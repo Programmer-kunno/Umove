@@ -69,6 +69,22 @@ export const UMIcons = {
   headsetIcon2: require('../assets/icons/headsetIcon2.png'),
   walletBlackIcon: require('../assets/icons/walletBlackIcon.png'),
   shieldCheckBlackIcon: require('../assets/icons/shieldCheckBlackIcon.png'),
+  exclusiveTruckIcon: require('../assets/truck/exclusive.png'),
+  sharedTruckIcon: require('../assets/truck/shared.png'),
+  cameraWhiteIcon: require('../assets/icons/camera-white-icon.png'),
+  //Help
+  orangeCircleTarget: require('../assets/help/orange-circle-target.png'),
+  orangeCircleHeadset: require('../assets/help/orange-circle-headset.png'),
+  updateProfile: require('../assets/help/update-profile.png'),
+  updateAccountInfo1: require('../assets/help/update-account-info1.png'),
+  updateAccountInfo2: require('../assets/help/update-account-info2.png'),
+  updateAccountInfo3: require('../assets/help/update-account-info3.png'),
+  updateCompanyInfo1: require('../assets/help/update-company-info1.png'),
+  updateCompanyInfo2: require('../assets/help/update-company-info2.png'),
+  updateCompanyInfo3: require('../assets/help/update-company-info3.png'),
+  updateDocuments1: require('../assets/help/update-documents1.png'),
+  updateDocuments2: require('../assets/help/update-documents2.png'),
+
   // Error Icons
   warningSign: require('../assets/errors/warning-sign.png'),
   // Payment Icons

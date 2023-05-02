@@ -10,7 +10,7 @@ import {
   StatusBar 
 } from 'react-native';
 import ModalSelector from 'react-native-modal-selector-searchable'
-import GrayNavbar from '../Components/GrayNavbar';
+import CustomNavbar from '../Components/CustomNavbar';
 import { UMColors } from '../../utils/ColorHelper';
 import { FetchApi } from '../../api/fetch';
 import { navigate } from '../../utils/navigationHelper';
@@ -102,7 +102,7 @@ export default class QuickQuotationDelivery extends Component {
         <StatusBar translucent backgroundColor={'transparent'} barStyle={'light-content'} />
 
             {/* Header for Delivery Address */}
-            <GrayNavbar
+            <CustomNavbar
               Title={'Delivery Address'}
               onBack={() => {
                 this.props.navigation.navigate('QuickQuotationPickUp')

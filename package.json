@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@flyerhq/react-native-android-uri-path": "^2.3.0",
+    "@googlemaps/polyline-codec": "^1.0.28",
     "@quanle94/react-native-otp-inputs": "^4.0.0-alpha.1.1",
     "@react-native-async-storage/async-storage": "^1.17.11",
     "@react-native-community/blur": "^4.3.0",

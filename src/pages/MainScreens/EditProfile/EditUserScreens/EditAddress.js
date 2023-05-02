@@ -11,10 +11,10 @@ import {
 } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { UMColors } from '../../../../utils/ColorHelper'
-import GrayNavbar from '../../../Components/GrayNavbar'
+import CustomNavbar from '../../../Components/CustomNavbar'
 import { navigate } from '../../../../utils/navigationHelper'
 import { dispatch } from '../../../../utils/redux'
-import { saveUserChanges } from '../../../../redux/actions/User'
+import { forUpdateUserData, saveUserChanges } from '../../../../redux/actions/User'
 import { useSelector } from 'react-redux'
 import ModalSelector from 'react-native-modal-selector-searchable'
 import { FetchApi } from '../../../../api/fetch'
@@ -23,6 +23,7 @@ const deviceWidth = Dimensions.get('screen').width
 
 export default EditAddress = (props) => {
   const userChangesData = useSelector((state) => state.userOperations.userChangesData)
+  const updateUserData = useSelector((state) => state.userOperations.updateUserData)
   const [address, setAddress] = useState('')
   const [barangay, setBarangay] = useState('')
   const [city, setCity] = useState('')
@@ -97,7 +98,7 @@ export default EditAddress = (props) => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView style={styles.mainContainer}>
-        <GrayNavbar
+        <CustomNavbar
           Title={'Edit Address'}
         />
         <View style={styles.bodyContainer}>
@@ -298,6 +299,15 @@ export default EditAddress = (props) => {
                 city: city,
                 barangay: barangay
               }
+            }))
+            dispatch(forUpdateUserData({
+              ...updateUserData,
+              address: address,
+              region: region,
+              zipCode: zipCode,
+              province: province,
+              city: city,
+              barangay: barangay
             }))
             navigate('UserProfileScreen')
           }}

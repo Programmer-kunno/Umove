@@ -11,10 +11,10 @@ import {
 } from 'react-native'
 import React, { useState } from 'react'
 import { UMColors } from '../../../../utils/ColorHelper'
-import GrayNavbar from '../../../Components/GrayNavbar'
+import CustomNavbar from '../../../Components/CustomNavbar'
 import { navigate } from '../../../../utils/navigationHelper'
 import { dispatch } from '../../../../utils/redux'
-import { saveUserChanges } from '../../../../redux/actions/User'
+import { forUpdateUserData, saveUserChanges } from '../../../../redux/actions/User'
 import { useSelector } from 'react-redux'
 import { mobileNumberRegex } from '../../../../utils/stringHelper'
 import ErrorOkModal from '../../../Components/ErrorOkModal'
@@ -29,6 +29,7 @@ const deviceWidth = Dimensions.get('screen').width
 
 export default EditMobileNumber = (props) => {
   const userChangesData = useSelector((state) => state.userOperations.userChangesData)
+  const updateUserData = useSelector((state) => state.userOperations.updateUserData)
   const [mobileNumber, setMobileNumber] = useState(props.route.params?.mobileNumber.replace('+63', ''))
   const [error, setError] = useState({
     value: false,
@@ -42,7 +43,6 @@ export default EditMobileNumber = (props) => {
     }
     refreshTokenHelper(async() => {
       const response = await CustomerApi.validateUser(data)
-      console.log(response.data)
       if(response == undefined){
         dispatch(showError(true))
         dispatch(setLoading(false))
@@ -54,6 +54,10 @@ export default EditMobileNumber = (props) => {
               ...userChangesData.userDetails,
               mobileNumber: '+63' + mobileNumber
             }
+          }))
+          dispatch(forUpdateUserData({
+            ...updateUserData,
+            mobileNumber: '+63' + mobileNumber
           }))
           navigate('UserProfileScreen')
           dispatch(setLoading(false))
@@ -68,6 +72,7 @@ export default EditMobileNumber = (props) => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView style={styles.mainContainer}>
+        <ErrorWithCloseButtonModal/>
         <ErrorOkModal
           Visible={error.value}
           ErrMsg={error.message}
@@ -75,7 +80,7 @@ export default EditMobileNumber = (props) => {
             setError({ value: false, message: '' })
           }}
         />
-        <GrayNavbar
+        <CustomNavbar
           Title={'Edit Mobile Number'}
         />
         <View style={[styles.componentContainer, { marginTop: 20 }]}>
@@ -98,7 +103,11 @@ export default EditMobileNumber = (props) => {
           </View>
         </View>
         <TouchableOpacity
-          style={styles.updateBtn}
+          style={[styles.updateBtn, { 
+            backgroundColor: props.route.params?.mobileNumber === mobileNumber || mobileNumber.length === 0 ? 
+                             UMColors.primaryGray  : UMColors.primaryOrange 
+                            }]}
+          disabled={props.route.params?.mobileNumber === mobileNumber || mobileNumber.length === 0 ? true : false}
           onPress={() => {
             if(!mobileNumberRegex('+63' + mobileNumber)){
               setError({ value: true, message: 'Mobile Number is not valid'})

@@ -7,6 +7,7 @@ import { setLoading } from '../../redux/actions/Loader'
 import { dispatch } from '../../utils/redux'
 import Socket from '../../api/helper/socket';
 import { UMColors } from '../../utils/ColorHelper'
+import CustomNavbar from '../Components/CustomNavbar'
 
 const Chat = (props) => {
   const accountNumber = props.route.params.data;
@@ -59,6 +60,12 @@ const Chat = (props) => {
 
   return (
     <View style={styles.container}>
+      <CustomNavbar
+        Title={'Message'}
+        ColorChange={UMColors.BGOrange}
+        ChangeTitleColor={UMColors.black}
+        ChangeBackColor={UMColors.black}
+      />
       <SafeAreaView style={styles.safeAreView}>
         <View style={styles.messagesContainer}>
           <ChatList 

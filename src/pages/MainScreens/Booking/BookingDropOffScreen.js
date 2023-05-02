@@ -13,7 +13,7 @@ import ModalSelector from 'react-native-modal-selector-searchable'
 import { FetchApi } from '../../../api/fetch';
 import { BookingApi } from '../../../api/booking';
 import ErrorOkModal from '../../Components/ErrorOkModal';
-import GrayNavbar from '../../Components/GrayNavbar';
+import CustomNavbar from '../../Components/CustomNavbar';
 import { dispatch } from '../../../utils/redux';
 import { saveBookingDetails } from '../../../redux/actions/Booking';
 import { navigate } from '../../../utils/navigationHelper';
@@ -168,7 +168,7 @@ export default class BookingDropOffScreen extends Component {
         <StatusBar translucent backgroundColor={'transparent'} barStyle={'light-content'} />
 
             {/* Header for Delivery Address */}
-            <GrayNavbar
+            <CustomNavbar
               Title={'Destination Address'}
               onBack={() => {
                 this.props.navigation.navigate('BookingPickUpScreen')
@@ -427,9 +427,9 @@ export default class BookingDropOffScreen extends Component {
 
         <View style={styles.btnContainer}>
           {/* Select from Saved Addresses */}
-          <TouchableOpacity style={[styles.nextButtonGray, styles.buttonMargin]} disabled={true}>
+          {/* <TouchableOpacity style={[styles.nextButtonGray, styles.buttonMargin]} disabled={true}>
               <Text style={styles.buttonText}> Select from Saved Addresses </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           {/* Next Button */}
             {/* Make button gray when not all inputs are filled out, orange when filled out */}
           { booking.dropoffStreetAddress == '' || booking.dropoffBarangay == '' || booking.dropoffCity == '' || booking.dropoffProvince == '' || booking.dropoffRegion == '' || booking.dropoffZipcode == '' ?

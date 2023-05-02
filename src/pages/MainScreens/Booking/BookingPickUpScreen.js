@@ -5,7 +5,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment/moment';
 import { UMColors } from '../../../utils/ColorHelper';
 import { FetchApi } from '../../../api/fetch';
-import GrayNavbar from '../../Components/GrayNavbar';
+import CustomNavbar from '../../Components/CustomNavbar';
 import { navigate } from '../../../utils/navigationHelper';
 import { dispatch } from '../../../utils/redux';
 import { showError } from '../../../redux/actions/ErrorModal';
@@ -290,7 +290,7 @@ export default class BookingPickUpScreen extends Component {
         </Modal>
 
             {/* Header for Delivery Address */}
-            <GrayNavbar
+            <CustomNavbar
               Title={'Pick Up Address'}
               onBack={() => {
                 this.props.navigation.navigate('BookingItemScreen')
@@ -583,9 +583,9 @@ export default class BookingPickUpScreen extends Component {
 
         <View style={styles.btnContainer}>
           {/* Select from Saved Addresses */}
-          <TouchableOpacity style={[styles.nextButtonGray, styles.buttonMargin]} disabled={true}>
+          {/* <TouchableOpacity style={[styles.nextButtonGray, styles.buttonMargin]} disabled={true}>
               <Text style={styles.buttonText}> Select from Saved Addresses </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           
           {/* Next Button */}
             {/* Make button gray when not all inputs are filled out, orange when filled out */}

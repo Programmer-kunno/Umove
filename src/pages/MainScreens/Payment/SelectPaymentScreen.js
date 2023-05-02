@@ -9,7 +9,7 @@ import {
   BackHandler
 } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import GrayNavbar from '../../Components/GrayNavbar'
+import CustomNavbar from '../../Components/CustomNavbar'
 import { UMColors } from '../../../utils/ColorHelper'
 import { RadioButton } from 'react-native-paper'
 import { UMIcons } from '../../../utils/imageHelper'
@@ -147,7 +147,7 @@ export default SelectPaymentScreen = (props) => {
         }}
       />
       {/* Header */}
-      <GrayNavbar
+      <CustomNavbar
         Title={'Select Payment'}
         onGoBack={() => {
           setIsGoingBack(true)

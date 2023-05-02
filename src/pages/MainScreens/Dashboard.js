@@ -35,12 +35,12 @@ export default Dashboard = () => {
                 ? UMColors.primaryOrange : UMColors.black
               width = 25;
               height = 25;
-            } else if(route.name === 'Messages') {
-              image = UMIcons.navMessageIcon
-              color = focused
-                ? UMColors.primaryOrange : UMColors.black
-              width = 25;
-              height = 25;  
+            // } else if(route.name === 'Messages') {
+            //   image = UMIcons.navMessageIcon
+            //   color = focused
+            //     ? UMColors.primaryOrange : UMColors.black
+            //   width = 25;
+            //   height = 25;  
             } else if(route.name === 'Profile') {
               image = UMIcons.navProfileIcon
               color = focused
@@ -67,7 +67,7 @@ export default Dashboard = () => {
       >
         <Tab.Screen name="Home" component={Home} options={{ gestureEnabled: false }}/>
         <Tab.Screen name="Calendar" component={Calendar} options={{ gestureEnabled: false }}/>
-        <Tab.Screen name="Messages" component={Messages} options={{ gestureEnabled: false }}/>
+        {/* <Tab.Screen name="Messages" component={Messages} options={{ gestureEnabled: false }}/> */}
         <Tab.Screen name="Notification" component={Notification} options={{ gestureEnabled: false, tabBarButton: () => null }}/>
         <Tab.Screen name="Profile" component={Profile} options={{ gestureEnabled: false }}/>
       </Tab.Navigator>

@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import ModalSelector from 'react-native-modal-selector-searchable'
 import { UMColors } from '../../utils/ColorHelper';
-import GrayNavbar from '../Components/GrayNavbar';
+import CustomNavbar from '../Components/CustomNavbar';
 import { FetchApi } from '../../api/fetch';
 import { navigate } from '../../utils/navigationHelper';
 import { dispatch } from '../../utils/redux';
@@ -102,7 +102,7 @@ export default class QuickQuotationPickUp extends Component {
         <StatusBar translucent backgroundColor={'transparent'} barStyle={'light-content'} />
 
             {/* Header for Delivery Address */}
-           <GrayNavbar 
+           <CustomNavbar 
             Title={'Delivery Address'}
             onBack={() => {
               this.props.navigation.navigate('QuickQuotationItemDesc')

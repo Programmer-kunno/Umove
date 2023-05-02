@@ -9,7 +9,8 @@ import {
   Modal, 
   TouchableWithoutFeedback ,
   StatusBar,
-  Alert
+  Alert,
+  Dimensions
 } from 'react-native';
 import { UMColors } from '../../../utils/ColorHelper';
 import { UMIcons } from '../../../utils/imageHelper';
@@ -20,8 +21,10 @@ import { useSelector } from 'react-redux';
 import { navigate } from '../../../utils/navigationHelper';
 import SelectPaymentScreen from '../Payment/SelectPaymentScreen';
 import { moneyFormat } from '../../../utils/stringHelper';
+import { decode } from '@googlemaps/polyline-codec';
 
 const bgImage = '../../../assets/bg-image.jpg';
+const deviceWidth = Dimensions.get('screen').width
 
 export default Home = () => {  
   const userDetailsData = useSelector(state => state.userOperations.userDetailsData)
@@ -107,30 +110,53 @@ export default Home = () => {
             <View style={styles.walletContainer}>
               <View style={styles.balanceContainer}>
                 <View style={styles.balanceTxtContainer}>
-                  <Text style={styles.balanceTxt}>₱</Text>
                   <Text style={styles.balanceTxt}>{moneyFormat(userDetailsData.remaining_credits)}</Text>
                 </View>
-                <Text style={[styles.balanceTxt, { fontSize: 18, margin: 0, paddingLeft: 20 }]}>Balance</Text>
-                <TouchableOpacity
-                  style={styles.balancePlusBtn}
-                >
-                  <Image
-                    style={{ width: '90%' }}
-                    source={UMIcons.orangePlusIcon}
-                    resizeMode={'contain'}
-                  />
-                </TouchableOpacity>
+                <Text style={[{ fontSize: 14, marginTop: 5, color: UMColors.white, alignSelf: 'center' }]}>
+                  Credit Limit Available Balance
+                </Text>
               </View>
               <View style={styles.pontsContainer}>
+                <Text style={styles.pointsTxt}>Points</Text>
                 <Text style={styles.pointsTxt}>{wallet.points}</Text>
-                <Text style={styles.pointsTxt}>pts</Text>
               </View>
             </View>
             <View style={styles.paragraphContainer}>
               <Text style={styles.paragraphTitle}>Send{'\n'}anything{'\n'}fast</Text>
               <Text style= {styles.paragraph}>There is no transfer, {'\n'}leading to the destination, {'\n'}real-time monitoring, first compensation {'\n'}guarantee and peace of mind.</Text>
             </View>
-            <TouchableOpacity
+            <View style={styles.chooseMoveContainer}>
+              <Text style={styles.chooseMoveTitle}>Choose how you make your move</Text>
+              <View style={styles.chooseMoveBtnContainer}>
+                <TouchableOpacity
+                  style={styles.chooseMoveBtn}
+                  onPress={() => {
+                    navigate('BookingItemScreen', { bookingType: 'Exclusive' })
+                  }}
+                >
+                  <Image
+                    style={styles.chooseMoveImg}
+                    source={UMIcons.exclusiveTruckIcon}
+                    resizeMode='contain'
+                  />
+                  <Text style={styles.chooseMoveTxt}>Exclusive</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.chooseMoveBtn}
+                  onPress={() => {
+                    navigate('BookingItemScreen', { bookingType: 'Shared' })
+                  }}
+                >
+                  <Image
+                    style={styles.chooseMoveImg}
+                    source={UMIcons.sharedTruckIcon}
+                    resizeMode='contain'
+                  />
+                  <Text style={styles.chooseMoveTxt}>Shared</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            {/* <TouchableOpacity
               style={styles.bookBtn}
               onPress={() => {
                 chooseTypeBooking()
@@ -138,7 +164,7 @@ export default Home = () => {
               }}
             >
               <Text style={styles.bookBtnTxt}>Book</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
           
         </View>
@@ -234,9 +260,9 @@ const styles = StyleSheet.create({
     fontSize: 30
   },
   walletContainer: {
-    width: '55%',
+    width: deviceWidth / 1.10,
     height: '25%',
-    marginTop: '5%',
+    marginTop: '1%',
     alignItems: 'center',
     justifyContent: 'center'
   },
@@ -248,8 +274,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 10,
   },
   balanceTxtContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between'
+    alignItems: 'center'
   },
   balanceTxt: {
     color: UMColors.white,
@@ -268,7 +293,7 @@ const styles = StyleSheet.create({
     right: 0
   },
   pontsContainer: {
-    width: '82%',
+    width: '100%',
     height: '20%',
     marginTop: 5,
     backgroundColor: 'rgba(67, 71, 77, 0.8)',
@@ -277,36 +302,65 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    justifyContent: 'space-between'
   },
   pointsTxt: {
     color: UMColors.white,
     fontSize: 15,
-    marginHorizontal: 5,
+    marginHorizontal: 15,
   },
   paragraphContainer: {
     width: '90%',
-    height: '40%',
-    marginTop: '10%'
+    marginTop: '5%',
   },
   paragraphTitle: {
     color: UMColors.white,
-    fontSize: 35
+    fontSize: 30
   },
   paragraph: {
     marginTop: 15,
     color: UMColors.white,
-    fontSize: 17,
-    lineHeight: 23
+    fontSize: 15,
+    lineHeight: 23,
   },
-  bookBtn: {
-    marginTop: '15%',
-    width: '80%',
-    height: '8%',
-    backgroundColor: UMColors.primaryOrange,
+  chooseMoveContainer: {
+    marginTop: 25,
+    width: deviceWidth
+  },
+  chooseMoveTitle: {
+    color: UMColors.white,
+    fontSize: 16,
+    fontWeight: 'bold',
+    alignSelf: 'center',
+    marginBottom: 11
+  },
+  chooseMoveBtnContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly'
+  },
+  chooseMoveBtn: {
+    width: '35%',
     justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 100
+    alignItems: 'center'
   },
+  chooseMoveImg: {
+    width: '100%',
+    height: 80
+  },
+  chooseMoveTxt: {
+    color: UMColors.primaryOrange,
+    fontSize: 16
+  },
+  // bookBtn: {
+  //   marginTop: '15%',
+  //   width: '80%',
+  //   height: '8%',
+  //   backgroundColor: UMColors.primaryOrange,
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   borderRadius: 100
+  // },
   bookBtnTxt: {
     color: UMColors.white,
     fontSize: 20

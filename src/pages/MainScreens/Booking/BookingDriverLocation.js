@@ -8,13 +8,15 @@ import { UMColors } from '../../../utils/ColorHelper';
 import { startTask, finishTask } from '../../../utils/taskManagerHelper';
 
 import { DriverApi } from '../../../api/driver';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Polyline } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import { refreshTokenHelper } from '../../../api/helper/userHelper';
 import { dispatch } from '../../../utils/redux';
 import { showError } from '../../../redux/actions/ErrorModal';
 import { goBack } from '../../../utils/navigationHelper';
 import ErrorOkModal from '../../Components/ErrorOkModal';
+import { decode } from '@googlemaps/polyline-codec';
+import { BookingApi } from '../../../api/booking';
 
 export default class BookingDriverLocation extends Component {  
   constructor(props) {
@@ -26,12 +28,14 @@ export default class BookingDriverLocation extends Component {
       origin: this.props.route?.params?.origin,
       errModalVisible: false,
       errMessage: '',
+      polyCoordinates: [],
     }
     
     this.mapView = null
   }
 
   componentDidMount() {
+    this.getRoutes()
     refreshTokenHelper(async() => {
       finishTask('GET_LOCATION')
       startTask('GET_LOCATION', async() => {
@@ -49,6 +53,30 @@ export default class BookingDriverLocation extends Component {
           }
         }
       }, 30000)
+    })
+  }
+
+  async getRoutes() {
+    refreshTokenHelper(async() => {
+      const response = await BookingApi.getBookingRoutes(this.state.bookingNumber)
+      if(response == undefined){
+        dispatch(showError(true))
+        this.setState({errMessage: 'Cant Connect to the server'})
+      } else {
+        if(response?.data?.success) {
+          const decodedPoly = decode(response?.data?.data[0]?.overview_polyline?.points)
+          const newData = decodedPoly.map(item => {
+            return {
+                latitude: item[0],
+                longitude: item[1]
+            }
+          })
+          this.setState({ polyCoordinates: newData })
+        }
+        else {
+          this.setState({ errMessage: response?.data?.message || response?.data, errorOkModalVisible: true })
+        }
+      }
     })
   }
 
@@ -116,19 +144,11 @@ export default class BookingDriverLocation extends Component {
               resizeMode={'contain'}
             />
           </Marker>
-          <MapViewDirections
-              origin={{
-                latitude: this.state.origin?.latitude,
-                longitude: this.state.origin?.longitude
-              }}
-              destination={{
-                latitude: this.state.destination?.latitude,
-                longitude: this.state.destination?.longitude
-              }}
-              apikey={"AIzaSyBTKmk04d6UkPSY2j3l3OUqGPRlZzalN2w"}
-              strokeColor={"rgb(223,131,68)"}
-              strokeWidth={4}
-            /> 
+          <Polyline
+            coordinates={this.state.polyCoordinates}
+            strokeColor={"rgb(223,131,68)"}
+            strokeWidth={4}
+          /> 
           </MapView>
         </View>
       </View>

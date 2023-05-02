@@ -22,11 +22,11 @@ export default CustomDrawer = () => {
   const deviceHeigth = Dimensions.get('screen').height
   const user = useSelector((state) => state.userOperations.userData)
   const userDetailsData = useSelector(state => state.userOperations.userDetailsData)
-  const [walletBalance, setWalletBalance] = useState("1,000.00")
   const [name, setName] = useState('')
   
   useEffect(() => {
-    setName(user.first_name.charAt(0).toUpperCase() + user.first_name.slice(1) + ' ' + user.last_name.charAt(0).toUpperCase() + user.last_name.slice(1))
+    setName(userDetailsData?.user?.user_profile?.first_name.charAt(0).toUpperCase() + userDetailsData?.user?.user_profile?.first_name.slice(1) + ' ' + 
+            userDetailsData?.user?.user_profile?.last_name.charAt(0).toUpperCase() + userDetailsData?.user?.user_profile?.last_name.slice(1))
   }, [])
 
   logOut = () => {
@@ -49,7 +49,7 @@ export default CustomDrawer = () => {
            >
             <Image
                 style={styles.profilePic}
-                source={UMIcons.userBlankProfile}
+                source={userDetailsData?.user?.user_profile?.profile_image ? {uri: userDetailsData?.user?.user_profile?.profile_image} : UMIcons.userBlankProfile }
                 resizeMode={'contain'}
              />
            </TouchableOpacity>
@@ -91,7 +91,7 @@ export default CustomDrawer = () => {
           />
           <Text style={styles.drawerTxt}>Transaction</Text>
         </TouchableOpacity>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.drawerBtn}
         >
           <Image
@@ -110,7 +110,7 @@ export default CustomDrawer = () => {
             resizeMode={'contain'}
           />
           <Text style={styles.drawerTxt}>Vouchers</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
           style={styles.drawerBtn}
           onPress={() => {
@@ -126,6 +126,7 @@ export default CustomDrawer = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.drawerBtn, { marginTop: '15%', justifyContent: 'space-between', borderBottomWidth: 0}]}
+          onPress={() => navigate('Settings')}
         >
           <Text style={[styles.drawerTxt, { marginLeft: '4%' }]}>Settings</Text>
           <Image
@@ -184,7 +185,7 @@ const styles = StyleSheet.create({
   profilePicBtn: {
     width: 80,
     height: 80,
-    borderRadius: 50,
+    borderRadius: 100,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',

@@ -1,7 +1,7 @@
 import { SafeAreaView, StyleSheet, Text, Image, Dimensions, View } from 'react-native'
 import React from 'react'
 import { UMColors } from '../../../utils/ColorHelper'
-import GrayNavbar from '../../Components/GrayNavbar'
+import CustomNavbar from '../../Components/CustomNavbar'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { UMIcons } from '../../../utils/imageHelper'
 import { navigate } from '../../../utils/navigationHelper'
@@ -13,7 +13,7 @@ export default ChooseToEditScreen = () => {
 
   return (
     <SafeAreaView style={styles.mainContainer}>
-      <GrayNavbar
+      <CustomNavbar
         Title={'Edit Profile'}
       />
       <View style={styles.bodyContainer}>

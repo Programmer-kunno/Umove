@@ -4,14 +4,16 @@ import {
   SAVE_USER_PASS,
   USER_LOGOUT,
   UPDATE_USER_ACCESS,
-  SAVE_USER_CHANGES
+  SAVE_USER_CHANGES,
+  FOR_UPDATE_USER_DATA
 } from "../actions/User";
 
 const initialState = {
   userData: {},
   userDetailsData: {},
   logInData: {},
-  userChangesData: {}
+  userChangesData: {},
+  updateUserData: {}
 }
 
 export const userOperations = (state = initialState, action) => {
@@ -52,6 +54,12 @@ export const userOperations = (state = initialState, action) => {
       return {
         ...state,
         userChangesData: action.value
+      }
+    }
+    case FOR_UPDATE_USER_DATA: {
+      return {
+        ...state,
+        updateUserData: action.value
       }
     }
     default: 

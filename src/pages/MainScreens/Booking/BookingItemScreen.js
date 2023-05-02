@@ -11,7 +11,7 @@ import {
 import DropDownPicker from 'react-native-dropdown-picker';
 import { FetchApi } from '../../../api/fetch';
 import { UMColors } from '../../../utils/ColorHelper';
-import GrayNavbar from '../../Components/GrayNavbar';
+import CustomNavbar from '../../Components/CustomNavbar';
 import { dispatch } from '../../../utils/redux';
 import { clearBookingDetails } from '../../../redux/actions/Booking';
 import { goBack, navigate } from '../../../utils/navigationHelper';
@@ -193,7 +193,7 @@ export default class BookingItemScreen extends Component {
 
 
           {/* Header for Exclusive */}
-          <GrayNavbar
+          <CustomNavbar
             Title={this.state.booking.bookingType}
             onBack={() => {
               goBack()

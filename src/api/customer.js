@@ -34,9 +34,80 @@ export class CustomerApi {
     }
   }
 
-  static async updateCustomer(data) {
+  static async updateCustomer(data, customerType, accountNumber) {
+    const formdata = new FormData();
+      console.log(data)
+      formdata.append('customer_type', customerType);
+      if(data.profilePicture) {
+        const newData = data.profilePicture;
+        newData.mimeType = newData.type
+        formdata.append('user[user_profile][profile_image]', { uri: newData?.uri, name: newData?.name, type: newData?.mimeType })
+      }
+      if(data.username){
+        formdata.append('user[username]', data.username);
+      }
+      if(data.firstName && data.lastName){
+        formdata.append('user[user_profile][first_name]', data.firstName);
+        formdata.append('user[user_profile][middle_name]', data.middleName);
+        formdata.append('user[user_profile][last_name]', data.lastName);
+      }
+      if(data.mobileNumber){
+        formdata.append('user[user_profile][mobile_number]', data.mobileNumber);
+      }
+      if(data.email){
+        formdata.append('user[user_profile][email]', data.email);
+      }
+      if(data.address && data.region && data.province && data.city && data.barangay && data.zipCode){
+        formdata.append('user[user_profile][address]', data.address);
+        formdata.append('user[user_profile][region]', data.region);
+        formdata.append('user[user_profile][province]', data.province);
+        formdata.append('user[user_profile][city]', data.city);
+        formdata.append('user[user_profile][barangay]', data.barangay);
+        formdata.append('user[user_profile][zip_code]', data.zipCode);
+      }
+      if(data.validID) {
+        const newData = data.validID;
+        newData.mimeType = newData.type
+        formdata.append('valid_id', { uri: newData?.uri, name: newData?.name, type: newData?.mimeType })
+      }
+      if(data.companyLogo) {
+        const newData = data.companyLogo;
+        newData.mimeType = newData.type
+        formdata.append('company[company_logo]', { uri: newData?.uri, name: newData?.name, type: newData?.mimeType })
+      }
+      if(data.bir) {
+        const newData = data.bir;
+        newData.mimeType = newData.type
+        formdata.append('company[company_requirement][bir]', { uri: newData?.uri, name: newData?.name, type: newData?.mimeType })
+      }
+      if(data.dti) {
+        const newData = data.dti;
+        newData.mimeType = newData.type
+        formdata.append('company[company_requirement][dti]', { uri: newData?.uri, name: newData?.name, type: newData?.mimeType })
+      }
+      if(data.companyEmail){
+        formdata.append('company[company_email]', data.companyEmail)
+      }
+      if(data.companyName){
+        formdata.append('company[company_name]', data.companyName)
+      }
+      if(data.companyMobileNumber){
+        formdata.append('company[company_mobile_number]', data.companyMobileNumber)
+      }
+      if(data.officeAddress && data.officeRegion && 
+        data.officeProvince && data.officeCity && 
+        data.officeBarangay && data.officeZipCode){
+          formdata.append('company[office_address]', data.officeAddress);
+          formdata.append('company[office_region]', data.officeRegion);
+          formdata.append('company[office_province]', data.officeProvince);
+          formdata.append('company[office_city]', data.officeCity);
+          formdata.append('company[office_barangay]', data.officeBarangay);
+          formdata.append('company[office_zip_code]', data.officeZipCode);
+      }
+
     try {
-      const response = await patch('/api/customers/', data)
+      console.log(formdata)
+      const response = await patch(`/api/customers/update/${accountNumber}`, formdata, { 'Content-Type': 'multipart/form-data '})
       return response
     } catch(err) {
       return err

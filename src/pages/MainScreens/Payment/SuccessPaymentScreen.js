@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, SafeAreaView, Image, TouchableOpacity, BackHandler } from 'react-native'
 import { UMColors } from '../../../utils/ColorHelper'
 import { UMIcons } from '../../../utils/imageHelper'
-import GrayNavbar from '../../Components/GrayNavbar'
+import CustomNavbar from '../../Components/CustomNavbar'
 import ErrorOkModal from '../../Components/ErrorOkModal'
 import {resetNavigation } from '../../../utils/navigationHelper'
 import { capitalizeFirst, moneyFormat } from '../../../utils/stringHelper'
@@ -56,7 +56,7 @@ export default SuccessPaymentScreen = (props) => {
           setIsGoingBack(false)
         }}
       />
-      <GrayNavbar
+      <CustomNavbar
         Title={'Receipt'}
         onGoBack={() => {
           setIsGoingBack(true)

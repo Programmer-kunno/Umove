@@ -1,12 +1,14 @@
 import React, { Component }  from 'react';
-import { StyleSheet, StatusBar, View, Text, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, StatusBar, View, Text, TouchableOpacity, Image, Dimensions } from 'react-native';
 import RadioButtonGroup, { RadioButtonItem } from "expo-radio-button";
-import GrayNavbar from '../../Components/GrayNavbar';
+import CustomNavbar from '../../Components/CustomNavbar';
 import { connect } from 'react-redux';
 import { navigate } from '../../../utils/navigationHelper';
 import { goBack } from '../../../utils/navigationHelper';
 import { UMColors } from '../../../utils/ColorHelper';
 import { UMIcons } from '../../../utils/imageHelper';
+
+const deviceWidth = Dimensions.get('screen').width
 
 export class BookingDescriptionScreen extends Component {  
   constructor(props) {
@@ -40,7 +42,7 @@ export class BookingDescriptionScreen extends Component {
         <StatusBar translucent backgroundColor={'transparent'} barStyle={'light-content'} />
 
         {/* Header for Booking Summary */}
-        <GrayNavbar
+        <CustomNavbar
           Title={'Booking Summary'}
           onBack={() => {
             goBack()
@@ -93,7 +95,12 @@ export class BookingDescriptionScreen extends Component {
           
           {/* Part 2 */}
           <View style={styles.contentContainer2}>
-            <View style={[styles.row, styles.alignItemCenter, styles.justifyContentSpaceBetween, styles.borderPart2]}>
+            <View style={[
+              styles.row, 
+              styles.alignItemCenter, 
+              styles.justifyContentSpaceBetween,
+              // styles.borderPart2
+            ]}>
               <View>
                 <Text style={styles.contentText}> Require Signatures</Text>
                 <Text style={styles.contentSubText}> Applies to all locations</Text>
@@ -109,7 +116,7 @@ export class BookingDescriptionScreen extends Component {
                 <RadioButtonItem value="true" label={""}/>
               </RadioButtonGroup>
             </View>
-            <RadioButtonGroup
+            {/* <RadioButtonGroup
               containerStyle={{ margin: 10 }}
               selected={booking.paymentAddress}
               onSelected={(value) => {
@@ -134,11 +141,11 @@ export class BookingDescriptionScreen extends Component {
                   <Text style={styles.contextPaymentText2}>Responsible For Payment</Text>
                 }
               />
-            </RadioButtonGroup>
+            </RadioButtonGroup> */}
           </View>
         </View>
 
-        <View style={styles.alignItemCenter}>
+        <View style={[styles.alignItemCenter, styles.bookBtnContainer]}>
           {/* Book Button */}
           <TouchableOpacity style={styles.bookButtonOrange} onPress={() => {
             navigate('BookingProcessingScreen')
@@ -238,6 +245,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgb(28, 32, 38)',
     margin: '3%',
     padding: '5%',
+    borderRadius: 5,
+    elevation: 7,
     shadowColor: '#171717',
     shadowOffset: {width: -2, height: 6},
     shadowOpacity: 0.7,
@@ -283,6 +292,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     justifyContent:'center',
     alignItems: 'center',
+    elevation: 7,
     backgroundColor: 'rgb(223,131,68)',
     shadowColor: '#171717',
     shadowOffset: {width: -2, height: 6},
@@ -294,4 +304,9 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight:'bold'
   },
+  bookBtnContainer: {
+    position: 'absolute',
+    width: deviceWidth,
+    bottom: 50
+  }
 })

@@ -4,7 +4,7 @@ import { UMColors } from '../../utils/ColorHelper'
 import { UMIcons } from '../../utils/imageHelper'
 import { navigate } from '../../utils/navigationHelper'
 import ErrorWithCloseButtonModal from '../Components/ErrorWithCloseButtonModal'
-import GrayNavbar from '../Components/GrayNavbar'
+import CustomNavbar from '../Components/CustomNavbar'
 import { Loader } from '../Components/Loader'
 import TransactionTabs from './TransactionTabs'
 
@@ -12,7 +12,7 @@ const Transactions = () => {
   const [modalVisible, setModalVisible] = useState(false);
   return (
     <View style={styles.container}>
-      <GrayNavbar
+      <CustomNavbar
         Title={'Transactions'}
         rightBtnImage={UMIcons.downloadIcon}
         onRightPress={() => {
@@ -37,7 +37,11 @@ const Transactions = () => {
                     navigate('BookingItemScreen', { bookingType: 'Exclusive' })
                   }}
                   >
-                  <Image source={require('../../assets/truck/exclusive.png')} style={styles.exclusiveTruck}/>
+                  <Image 
+                    source={UMIcons.exclusiveTruckIcon} 
+                    style={styles.exclusiveTruck}
+                    resizeMode='contain'
+                  />
                   <View style={[styles.button, styles.modalButton]}>
                     <Text style={styles.textStyle}>Exclusive</Text>
                   </View>
@@ -48,7 +52,11 @@ const Transactions = () => {
                     navigate('BookingItemScreen', { bookingType: 'Shared' })
                   }}
                 >
-                  <Image source={require('../../assets/truck/shared.png')} style={styles.sharedTruck}/>
+                  <Image 
+                    source={UMIcons.sharedTruckIcon} 
+                    style={styles.sharedTruck}
+                    resizeMode='contain'
+                  />
                   <View style={[styles.button, styles.modalButton]}>
                     <Text style={styles.textStyle}>Shared</Text>
                   </View>

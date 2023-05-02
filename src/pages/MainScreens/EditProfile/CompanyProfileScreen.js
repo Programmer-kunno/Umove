@@ -1,17 +1,44 @@
-import { View, Text, SafeAreaView, StyleSheet, Dimensions, Image, TouchableOpacity } from 'react-native'
-import React from 'react'
+import { 
+  View, 
+  Text, 
+  SafeAreaView, 
+  StyleSheet, 
+  Dimensions, 
+  Image, 
+  TouchableOpacity 
+} from 'react-native'
+import React, { useState } from 'react'
 import { UMColors } from '../../../utils/ColorHelper'
-import GrayNavbar from '../../Components/GrayNavbar'
+import CustomNavbar from '../../Components/CustomNavbar'
 import { UMIcons } from '../../../utils/imageHelper'
 import { useSelector } from 'react-redux'
 import { ScrollView } from 'react-native-gesture-handler'
+import { navigate, resetNavigation } from '../../../utils/navigationHelper'
+import { dispatch } from '../../../utils/redux'
+import { setLoading } from '../../../redux/actions/Loader'
+import { refreshTokenHelper } from '../../../api/helper/userHelper'
+import { CustomerApi } from '../../../api/customer'
+import { showError } from '../../../redux/actions/ErrorModal'
+import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal'
+import ErrorOkModal from '../../Components/ErrorOkModal'
+import SuccessOkModal from '../../Components/SuccessOkModal'
+import { Loader } from '../../Components/Loader'
+import { saveUser } from '../../../redux/actions/User'
 
 const deviceWidth = Dimensions.get('screen').width
 
 export default CompanyProfileScreen = () => {
 
   const userChangesData = useSelector((state) => state.userOperations.userChangesData)
-  console.log(userChangesData)
+  const updateUserData = useSelector((state) => state.userOperations.updateUserData)
+  const [error, setError] = useState({
+    value: false,
+    message: ''
+  })
+  const [success, setSuccess] = useState({
+    value: false,
+    message: ''
+  })
   const companyName = userChangesData?.companyDetails?.companyName
   const companyEmail = userChangesData?.companyDetails?.companyEmail
   const companyMobileNumber = userChangesData?.companyDetails?.companyMobileNumber
@@ -21,18 +48,78 @@ export default CompanyProfileScreen = () => {
                        userChangesData?.companyDetails?.officeProvince + ', ' +
                        userChangesData?.companyDetails?.officeZipCode
 
+  const updateUser = () => {
+    dispatch(setLoading(true))
+    refreshTokenHelper(async() => {
+      const response = await CustomerApi.updateCustomer(updateUserData, userChangesData?.userDetails?.customerType, userChangesData?.userDetails?.accountNumber)
+      if(response == undefined){
+        dispatch(showError(true))
+        dispatch(setLoading(false))
+      } else {
+        if(response?.data?.success){
+          updateRedux()
+        } else {
+          setError({ value: true, message: response?.data?.message || response?.data })
+          dispatch(setLoading(false))
+        }
+      }
+    })
+  }
+
+  const updateRedux = () => {
+    refreshTokenHelper(async() => {
+      const response = await CustomerApi.getCustomerData()
+      if(response == undefined){
+        dispatch(showError(true))
+        dispatch(setLoading(false))
+      } else {
+        if(response?.data?.success) {
+          dispatch(saveUser(response?.data?.data))
+          setSuccess({ value: true, message: 'Company Update Success!'})
+          dispatch(setLoading(false))
+        } else {
+          setError({ value: true, message: response?.data?.message || response?.data })
+          dispatch(setLoading(false))
+        }
+      }
+    })
+  }
+
   return (
     <SafeAreaView style={styles.mainContainer}>
-      <GrayNavbar
+      <ErrorWithCloseButtonModal/>
+      <ErrorOkModal
+        Visible={error.value}
+        ErrMsg={error.message}
+        OkButton={() => {
+          setError({ value: false, message: '' })
+        }}
+      />
+      <SuccessOkModal
+        Visible={success.value}
+        SuccessMsg={success.message}
+        OkButton={() => {
+          setSuccess({ value: false, message: '' })
+          resetNavigation('DrawerNavigation')
+        }}
+      />
+      <CustomNavbar
         Title={'Company Profile'}
       />
       <ScrollView showsVerticalScrollIndicator={false} style={{ width: deviceWidth }} contentContainerStyle={{ alignItems: 'center' }}>
         <TouchableOpacity
           style={styles.editCompanyLogoBtn}
+          onPress={() => {
+            navigate('EditCompanyLogo', {
+              companyLogo: {
+                uri: userChangesData?.companyDetails?.companyLogo
+              }
+            })
+          }}
         >
           <Image
             style={styles.idImage}
-            source={{ uri: userChangesData?.companyDetails?.companyLogo }}
+            source={{ uri: userChangesData?.companyDetails?.companyLogo?.uri || userChangesData?.companyDetails?.companyLogo }}
             resizeMode='contain'
           />
         </TouchableOpacity>
@@ -41,6 +128,9 @@ export default CompanyProfileScreen = () => {
           <Text style={styles.detailsValue}>{companyName}</Text>
           <TouchableOpacity
             style={styles.editBtn}
+            onPress={() => {
+              navigate('EditCompanyName', { companyName: companyName })
+            }}
           >
             <Image
               style={styles.editIcon}
@@ -54,6 +144,9 @@ export default CompanyProfileScreen = () => {
           <Text style={styles.detailsValue}>{companyEmail}</Text>
           <TouchableOpacity
             style={styles.editBtn}
+            onPress={() => {
+              navigate('EditCompanyEmail', { companyEmail: companyEmail })
+            }}
           >
             <Image
               style={styles.editIcon}
@@ -67,6 +160,9 @@ export default CompanyProfileScreen = () => {
           <Text style={styles.detailsValue}>{companyMobileNumber}</Text>
           <TouchableOpacity
             style={styles.editBtn}
+            onPress={() => {
+              navigate('EditCompanyMobileNumber', { companyMobileNumber: companyMobileNumber })
+            }}
           >
             <Image
               style={styles.editIcon}
@@ -80,6 +176,14 @@ export default CompanyProfileScreen = () => {
           <Text style={styles.detailsValue}>{legalAddress}</Text>
           <TouchableOpacity
             style={styles.editBtn}
+            onPress={() => {
+              navigate('EditCompanyAddress', {
+                address: userChangesData?.companyDetails?.officeAddress,
+                barangay: userChangesData?.companyDetails?.officeBarangay,
+                city: userChangesData?.companyDetails?.officeCity,
+                province: userChangesData?.companyDetails?.officeProvince,
+              })
+            }}
           >
             <Image
               style={styles.editIcon}
@@ -91,9 +195,13 @@ export default CompanyProfileScreen = () => {
       </ScrollView>
       <TouchableOpacity
         style={styles.saveBtn}
+        onPress={() => {
+          updateUser()
+        }}
       >
         <Text style={styles.saveBtnTxt}>Save</Text>
       </TouchableOpacity>
+      <Loader/>
     </SafeAreaView>
   )
 }

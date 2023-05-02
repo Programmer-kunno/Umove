@@ -1,20 +1,36 @@
 import { View, Text, SafeAreaView, StyleSheet, Dimensions, Image, TouchableOpacity } from 'react-native'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { UMColors } from '../../../utils/ColorHelper'
-import GrayNavbar from '../../Components/GrayNavbar'
+import CustomNavbar from '../../Components/CustomNavbar'
 import { UMIcons } from '../../../utils/imageHelper'
 import { useSelector } from 'react-redux'
 import { ScrollView } from 'react-native-gesture-handler'
-import { navigate } from '../../../utils/navigationHelper'
+import { navigate, resetNavigation } from '../../../utils/navigationHelper'
 import { dispatch } from '../../../utils/redux'
-import { saveUserChanges } from '../../../redux/actions/User'
+import { saveUser, saveUserChanges } from '../../../redux/actions/User'
+import { refreshTokenHelper } from '../../../api/helper/userHelper'
+import { CustomerApi } from '../../../api/customer'
+import { showError } from '../../../redux/actions/ErrorModal'
+import { setLoading } from '../../../redux/actions/Loader'
+import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal'
+import ErrorOkModal from '../../Components/ErrorOkModal'
+import SuccessOkModal from '../../Components/SuccessOkModal'
+import { Loader } from '../../Components/Loader'
 
 const deviceWidth = Dimensions.get('screen').width
 
 export default UserProfileScreen = (props) => {
 
   const userChangesData = useSelector((state) => state.userOperations.userChangesData)
-  console.log(userChangesData)
+  const updateUserData = useSelector((state) => state.userOperations.updateUserData)
+  const [error, setError] = useState({
+    value: false,
+    message: ''
+  })
+  const [success, setSuccess] = useState({
+    value: false,
+    message: ''
+  })
   const fullname = userChangesData?.userDetails?.firstName + ' ' + 
                    userChangesData?.userDetails?.lastName
   const username = userChangesData?.userDetails?.username
@@ -26,9 +42,63 @@ export default UserProfileScreen = (props) => {
                        userChangesData?.userDetails?.province + ', ' +
                        userChangesData?.userDetails?.zipCode
 
+  const updateUser = () => {
+    console.log(updateUserData)
+    dispatch(setLoading(true))
+    refreshTokenHelper(async() => {
+      const response = await CustomerApi.updateCustomer(updateUserData, userChangesData?.userDetails?.customerType, userChangesData?.userDetails?.accountNumber)
+      if(response == undefined){
+        dispatch(showError(true))
+        dispatch(setLoading(false))
+      } else {
+        if(response?.data?.success){
+          updateRedux()
+        } else {
+          setError({ value: true, message: response?.data?.message || response?.data })
+          dispatch(setLoading(false))
+        }
+      }
+    })
+  }
+
+  const updateRedux = () => {
+    refreshTokenHelper(async() => {
+      const response = await CustomerApi.getCustomerData()
+      if(response == undefined){
+        dispatch(showError(true))
+        dispatch(setLoading(false))
+      } else {
+        if(response?.data?.success) {
+          dispatch(saveUser(response?.data?.data))
+          setSuccess({ value: true, message: 'User Update Success!'})
+          dispatch(setLoading(false))
+        } else {
+          setError({ value: true, message: response?.data?.message || response?.data })
+          dispatch(setLoading(false))
+        }
+      }
+    })
+  }
+
   return (
     <SafeAreaView style={styles.mainContainer}>
-      <GrayNavbar
+      <ErrorWithCloseButtonModal/>
+      <ErrorOkModal
+        Visible={error.value}
+        ErrMsg={error.message}
+        OkButton={() => {
+          setError({ value: false, message: '' })
+        }}
+      />
+      <SuccessOkModal
+         Visible={success.value}
+         SuccessMsg={success.message}
+         OkButton={() => {
+          setSuccess({ value: false, message: '' })
+          resetNavigation('DrawerNavigation')
+         }}
+      />
+      <CustomNavbar
         Title={'User Profile'}
       />
       <ScrollView showsVerticalScrollIndicator={false} style={{ width: deviceWidth }} contentContainerStyle={{ alignItems: 'center' }}>
@@ -63,11 +133,11 @@ export default UserProfileScreen = (props) => {
               })
             }}
           >
-            <Image
+            {/* <Image
               style={styles.editIcon}
               source={UMIcons.whitePencil}
               resizeMode='contain'
-            />
+            /> */}
           </TouchableOpacity>
         </View>
         <View style={styles.detailsContainer}>
@@ -106,7 +176,7 @@ export default UserProfileScreen = (props) => {
             />
           </TouchableOpacity>
         </View>
-        <View style={styles.detailsContainer}>
+        <View style={[styles.detailsContainer, userChangesData?.userDetails?.customerType === 'individual' && { marginBottom: 50 }]}>
           <Text style={styles.detailsTitle}>Billing / Legal Address</Text>
           <Text style={styles.detailsValue}>{legalAddress}</Text>
           <TouchableOpacity
@@ -127,39 +197,46 @@ export default UserProfileScreen = (props) => {
             />
           </TouchableOpacity>
         </View>
-        <View style={[styles.detailsContainer, { marginBottom: 50}]}>
-          <Text style={styles.detailsTitle}>Valid ID</Text>
-          {
-            userChangesData?.userDetails?.validID ?
-              <Image
-                style={styles.idImage}
-                source={{ uri: userChangesData?.userDetails?.validID }}
-                resizeMode='contain'
-              />
-            :
-              <Text style={styles.noValidIDTxt}>No Valid ID</Text>
-          }
-          <TouchableOpacity
-            style={styles.editBtn}
-            onPress={() => {
-              navigate('EditValidID', {
-                validID: userChangesData?.userDetails?.validID
-              })
-            }}
-          >
-            <Image
-              style={styles.editIcon}
-              source={UMIcons.whitePencil}
-              resizeMode='contain'
-            />
-          </TouchableOpacity>
-        </View>
+        {
+          userChangesData?.userDetails?.customerType !== 'individual' && 
+            <View style={[styles.detailsContainer, { marginBottom: 50}]}>
+              <Text style={styles.detailsTitle}>Valid ID</Text>
+              {
+                userChangesData?.userDetails?.validID ?
+                  <Image
+                    style={styles.idImage}
+                    source={{ uri: userChangesData?.userDetails?.validID?.uri || userChangesData?.userDetails?.validID }}
+                    resizeMode='contain'
+                  />
+                :
+                  <Text style={styles.noValidIDTxt}>No Valid ID</Text>
+              }
+              <TouchableOpacity
+                style={styles.editBtn}
+                onPress={() => {
+                  navigate('EditValidID', {
+                    validID: {
+                      uri: userChangesData?.userDetails?.validID
+                    }
+                  })
+                }}
+              >
+                <Image
+                  style={styles.editIcon}
+                  source={UMIcons.whitePencil}
+                  resizeMode='contain'
+                />
+              </TouchableOpacity>
+            </View>
+        }
       </ScrollView>
       <TouchableOpacity
         style={styles.saveBtn}
+        onPress={() => updateUser()}
       >
         <Text style={styles.saveBtnTxt}>Save</Text>
       </TouchableOpacity>
+      <Loader/>
     </SafeAreaView>
   )
 }
