@@ -1,13 +1,13 @@
 export const returnIcon = (type) => {
   switch(type) {
     case "Motorcycle":
-      return require('../assets/vehicles/motor_nobg.png');
+      return require('../assets/vehicles/UMoveMotorcycle.png');
     case "Truck":
-      return require('../assets/vehicles/exclusive_nobg.png');
-    case "Ship":
-      return require('../assets/vehicles/ship_nobg.png');
+      return require('../assets/vehicles/UMoveTruck.png');
+    case "Car":
+      return require('../assets/vehicles/UMoveCar.png');
     default:
-      return require('../assets/vehicles/motor_nobg.png');
+      return require('../assets/vehicles/UMoveTruck.png');
   }
 }
 
@@ -72,6 +72,10 @@ export const UMIcons = {
   exclusiveTruckIcon: require('../assets/truck/exclusive.png'),
   sharedTruckIcon: require('../assets/truck/shared.png'),
   cameraWhiteIcon: require('../assets/icons/camera-white-icon.png'),
+  trashIcon: require('../assets/icons/trashIcon.png'),
+  UMoveTruckIcon: require('../assets/vehicles/UMoveTruck.png'),
+  UMoveCarIcon: require('../assets/vehicles/UMoveCar.png'),
+  UMoveMotorcycleIcon: require('../assets/vehicles/UMoveMotorcycle.png'),
   //Help
   orangeCircleTarget: require('../assets/help/orange-circle-target.png'),
   orangeCircleHeadset: require('../assets/help/orange-circle-headset.png'),
@@ -84,14 +88,24 @@ export const UMIcons = {
   updateCompanyInfo3: require('../assets/help/update-company-info3.png'),
   updateDocuments1: require('../assets/help/update-documents1.png'),
   updateDocuments2: require('../assets/help/update-documents2.png'),
-
+  homeIcon: require('../assets/help/homeIcon.png'),
+  workIcon: require('../assets/help/workIcon.png'),
+  heartIcon: require('../assets/help/heartIcon.png'),
+  plusIcon: require('../assets/help/plusIcon.png'),
   // Error Icons
   warningSign: require('../assets/errors/warning-sign.png'),
+  noSavedAddresses: require('../assets/errors/no-saved-addressess.png'),
   // Payment Icons
   topUpWalletIcon: require('../assets/payment/topUpWallet.png'),
   paymayaLogo: require('../assets/payment/paymayaLogo.png'),
   visaLogo: require('../assets/payment/visa.png'),
   masterCardLogo: require('../assets/payment/mastercard-logo.png'),
   creditCardLogo: require('../assets/payment/credit-card.png'),
-  receiptSheet: require('../assets/payment/receiptSheet.png')
+  receiptSheet: require('../assets/payment/receiptSheet.png'),
+  //Wallet
+  renewIcon: require('../assets/wallet/renewIcon.png'),
+  pastTransactionIcon: require('../assets/wallet/pastTransactionIcon.png'),
+  transactionSheetIcon: require('../assets/wallet/transactionSheetIcon.png'),
+  refundIcon: require('../assets/wallet/refundIcon.png'),
+  uploadIcon: require('../assets/wallet/uploadIcon.png')
 }

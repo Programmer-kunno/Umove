@@ -15,8 +15,6 @@ export default AddPaymentMethodWebView = (props) => {
   const navigation = useNavigation()
 
   const onNavigationStateChange = (data) => {
-    console.log(data)
-    console.log(focusedScreenName())
     if(focusedScreenName() === 'AddPaymentMethodWebView') {
       if(data?.url.includes('success')){
         navigation.dispatch(StackActions.pop(1))

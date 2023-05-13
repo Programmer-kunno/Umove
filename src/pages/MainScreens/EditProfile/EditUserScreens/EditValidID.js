@@ -228,7 +228,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   rbSheetBtn: {
-    borderBottomWidth: 0.5,
     width: deviceWidth / 1.4,
     height: '22%',
     alignItems: 'center',

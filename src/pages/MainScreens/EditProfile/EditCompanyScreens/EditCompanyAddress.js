@@ -334,17 +334,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontWeight: 'bold'
   },
-  valueTxtInput: {
-    borderWidth: 1,
-    borderColor: UMColors.primaryOrange,
-    width: '80%',
-    height: 40,
-    borderRadius: 50,
-    paddingLeft: 20,
-    backgroundColor: UMColors.white,
-    fontSize: 13,
-    marginBottom: 10
-  },
   updateBtn: {
     width: '45%',
     height: 40,

@@ -24,6 +24,7 @@ import QuickQuotationPickUp from '../QuickQuotation/QuickQuotationPickUp';
 import QuickQuotationDelivery from '../QuickQuotation/QuickQuotationDelivery';
 import QuickQuotateScreen from '../QuickQuotation/QuickQuotateScreen';
 import QuickQuotatePriceScreen from '../QuickQuotation/QuickQuotatePriceScreen';
+import BookingSelectVehicle from '../MainScreens/Booking/BookingSelectVehicle';
 import BookingItemScreen from '../MainScreens/Booking/BookingItemScreen';
 import BookingPickUpScreen from '../MainScreens/Booking/BookingPickUpScreen';
 import BookingDropOffScreen from '../MainScreens/Booking/BookingDropOffScreen';
@@ -67,6 +68,15 @@ import HelpUpdateAccountInfo from '../MainScreens/ProfileDrawerScreens/HelpItems
 import HelpUpdateCompanyInfo from '../MainScreens/ProfileDrawerScreens/HelpItems/MyAccountList/HelpUpdateCompanyInfo';
 import HelpUpdateDocuments from '../MainScreens/ProfileDrawerScreens/HelpItems/MyAccountList/HelpUpdateDocuments';
 import BackendHelpScreen from '../MainScreens/ProfileDrawerScreens/HelpItems/BackendHelpScreen';
+import Address from '../MainScreens/ProfileDrawerScreens/Addresses/Address';
+import AddAddress from '../MainScreens/ProfileDrawerScreens/Addresses/AddAddress';
+import WalletScreen from '../E-Wallet/WalletScreen';
+import ToPayScreen from '../E-Wallet/ToPayScreen';
+import ChequePaymentSuccessScreen from '../E-Wallet/ChequePaymentSuccessScreen';
+import ReviewPaymentScreen from '../E-Wallet/ReviewPaymentScreen';
+import ConfirmationPaymentScreen from '../E-Wallet/ConfirmationPaymentScreen';
+import CreditReceiptScreen from '../E-Wallet/CreditReceiptScreen';
+import OnlinePaymentSuccessScreen from '../E-Wallet/OnlinePaymentSuccessScreen';
 
 export default RootNavigation = () => {
   const Stack = createStackNavigator();
@@ -122,6 +132,7 @@ export default RootNavigation = () => {
       <Stack.Screen name="QuickQuotationDelivery" component={QuickQuotationDelivery} />
       <Stack.Screen name="QuickQuotateScreen" component={QuickQuotateScreen} />
       <Stack.Screen name="QuickQuotatePriceScreen" component={QuickQuotatePriceScreen} />
+      <Stack.Screen name="BookingSelectVehicle" component={BookingSelectVehicle} />
       <Stack.Screen name="BookingItemScreen" component={BookingItemScreen} />
       <Stack.Screen name="BookingPickUpScreen" component={BookingPickUpScreen} />
       <Stack.Screen name="BookingDropOffScreen" component={BookingDropOffScreen} />
@@ -168,6 +179,17 @@ export default RootNavigation = () => {
       <Stack.Screen name="HelpUpdateCompanyInfo" component={HelpUpdateCompanyInfo} />
       <Stack.Screen name="HelpUpdateDocuments" component={HelpUpdateDocuments} />
       <Stack.Screen name="BackendHelpScreen" component={BackendHelpScreen} />
+      {/* Address */}
+      <Stack.Screen name="Address" component={Address} />
+      <Stack.Screen name="AddAddress" component={AddAddress} />
+      {/* Wallet */}
+      <Stack.Screen name="WalletScreen" component={WalletScreen} />
+      <Stack.Screen name="ToPayScreen" component={ToPayScreen} />
+      <Stack.Screen name="ChequePaymentSuccessScreen" component={ChequePaymentSuccessScreen} />
+      <Stack.Screen name="ReviewPaymentScreen" component={ReviewPaymentScreen} />
+      <Stack.Screen name="ConfirmationPaymentScreen" component={ConfirmationPaymentScreen} />
+      <Stack.Screen name="CreditReceiptScreen" component={CreditReceiptScreen} />
+      <Stack.Screen name="OnlinePaymentSuccessScreen" component={OnlinePaymentSuccessScreen} />
 
       {/* There are Pages in the Archive and Hidden Folder */}
 

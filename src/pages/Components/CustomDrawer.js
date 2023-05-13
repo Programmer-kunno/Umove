@@ -70,6 +70,9 @@ export default CustomDrawer = () => {
         </View>
         <TouchableOpacity
           style={[styles.drawerBtn, { marginTop: '10%', justifyContent: 'space-between'}]}
+          onPress={() => {
+            navigate('WalletScreen')
+          }}
         >
           <Image
             style={styles.drawerWalletImg}
@@ -91,8 +94,9 @@ export default CustomDrawer = () => {
           />
           <Text style={styles.drawerTxt}>Transaction</Text>
         </TouchableOpacity>
-        {/* <TouchableOpacity
+        <TouchableOpacity
           style={styles.drawerBtn}
+          onPress={() => navigate('Address')}
         >
           <Image
             style={styles.drawerIcons}
@@ -101,7 +105,7 @@ export default CustomDrawer = () => {
           />
           <Text style={styles.drawerTxt}>Address</Text>
         </TouchableOpacity>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.drawerBtn}
         >
           <Image

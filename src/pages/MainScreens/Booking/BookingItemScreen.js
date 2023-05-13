@@ -24,7 +24,7 @@ export default class BookingItemScreen extends Component {
     this.state = {
       booking: {
         bookingType: this.props.route.params?.isRebook ? this.props.route.params?.rebookData?.bookingType : this.props.route.params.bookingType,
-        vehicleType: this.props.route.params?.isRebook ? this.props.route.params?.rebookData?.vehicleType : '2',
+        vehicleType: this.props.route.params?.isRebook ? this.props.route.params?.rebookData?.vehicleType : this.props.route.params.vehicleType,
         typeOfGoods: '',
         productCategory: '',
         productSubcategory: '',
@@ -74,7 +74,7 @@ export default class BookingItemScreen extends Component {
   }
 
   async componentDidMount() {
-    console.log(this.props.route.params?.rebookData)
+    console.log(this.props.route.params)
     dispatch(clearBookingDetails())
     this.loadType();
     this.loadPackaging();

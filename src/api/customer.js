@@ -34,9 +34,45 @@ export class CustomerApi {
     }
   }
 
+  static async getSavedAddresses() {
+    try {
+      const response = await get('/api/customers/addresses', {}, false)
+      return response
+    } catch(err) {
+      return err
+    }
+  }
+
+  static async createSavedAddresses(data) {
+    try {
+      const response = await post('/api/customers/addresses/create', data)
+      return response
+    } catch(err) {
+      return err
+    }
+  }
+
+  static async updateSavedAddresses(addressID, data) {
+    try {
+      const response = await patch(`/api/customers/addresses/update/${addressID}`, data)
+      return response
+    } catch(err) {
+      return err
+    }
+  }
+
+  static async deleteSavedAddress(addressID) {
+    try {
+      const response = await del(`/api/customers/addresses/delete/${addressID}`)
+      return response
+    } catch(err) {
+      return err
+    }
+  }
+
   static async updateCustomer(data, customerType, accountNumber) {
     const formdata = new FormData();
-      console.log(data)
+
       formdata.append('customer_type', customerType);
       if(data.profilePicture) {
         const newData = data.profilePicture;
@@ -106,7 +142,6 @@ export class CustomerApi {
       }
 
     try {
-      console.log(formdata)
       const response = await patch(`/api/customers/update/${accountNumber}`, formdata, { 'Content-Type': 'multipart/form-data '})
       return response
     } catch(err) {
