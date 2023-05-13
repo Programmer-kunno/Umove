@@ -102,4 +102,13 @@ export class FetchApi {
       return err
     }
   }
+
+  static async getVehicles() {
+    try {
+      const response = await get('/api/vehicles/types', {}, true)
+      return response
+    } catch(err) {
+      return err
+    }
+  }
 }

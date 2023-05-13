@@ -624,7 +624,6 @@ const styles = StyleSheet.create({
     paddingLeft: 10
   },
   rbSheetBtn: {
-    borderBottomWidth: 0.5,
     width: deviceWidth / 1.4,
     height: '22%',
     alignItems: 'center',

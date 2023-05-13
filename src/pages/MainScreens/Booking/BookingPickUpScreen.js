@@ -1,5 +1,16 @@
-import React, { Component }  from 'react';
-import { StatusBar, StyleSheet, View, Modal, TouchableWithoutFeedback, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, ScrollView, Keyboard, Image } from 'react-native';
+import React, { useEffect, useState }  from 'react';
+import { 
+  StatusBar, 
+  StyleSheet, 
+  View, 
+  Modal, 
+  TouchableWithoutFeedback, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  ScrollView, 
+  Keyboard
+} from 'react-native';
 import ModalSelector from 'react-native-modal-selector-searchable';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment/moment';
@@ -15,149 +26,170 @@ import { BookingApi } from '../../../api/booking';
 import { setLoading } from '../../../redux/actions/Loader';
 import { Loader } from '../../Components/Loader';
 import ErrorOkModal from '../../Components/ErrorOkModal';
+import { useIsFocused } from '@react-navigation/native';
 
-export default class BookingPickUpScreen extends Component {  
-  constructor(props) {
-    super(props);
-    
-    this.state = { 
-      booking: this.props.route?.params?.booking,
-      date: new Date(),
-      newDate: '',
-      time: new Date(),
-      newTime: '',
-      dateModalVisible: false,
-      timeModalVisible: false,
-      regionList: [],
-      provinceList: [],
-      cityList: [],
-      barangayList: [],
-      error: false,
-      errorMessage: ''
-    };
+export default BookingPickUpScreen = (props) => { 
+  const [bookingData, setBookingData] = useState({})
+  const [date, setDate] = useState(new Date())
+  const [newDate, setNewDate] = useState('')
+  const [time, setTime] = useState(new Date())
+  const [newTime, setNewTime] = useState('')
+  const [dateModalVisible, setDateModalVisible] = useState(false)
+  const [timeModalVisible, setTimeModalVisible] = useState(false)
+  const [regionList, setRegionList] = useState()
+  const [provinceList, setProvinceList] = useState()
+  const [cityList, setCityList] = useState()
+  const [barangayList, setBarangayList] = useState()
+  const isFocused = useIsFocused()
+  const [error, setError] = useState({
+    value: false,
+    message: ''
+  })
+
+  useEffect(() => {
+    if(isFocused){
+      dispatch(setLoading(false))
+      setBookingData(props.route.params.booking)
+      if(props.route.params?.booking?.fromSaveAddress){
+        updateDataFromSaveAddress()
+      }
+    }
+  }, [isFocused])
+
+  const booking = () => {
+    checkTimeDate()
   }
 
-  async componentDidMount() {
-    console.log(this.state.booking.pickupDate)
-    dispatch(setLoading(false))
-  }
-
-  async booking() {
-    this.checkTimeDate()
-  }
-
-  checkTimeDate = async() => {
+  const checkTimeDate = async() => {
     dispatch(setLoading(true))
-    const response = await BookingApi.book(this.state.booking)
-    console.log(response.data)
+    const response = await BookingApi.book(bookingData)
     if(response == undefined){
       dispatch(setLoading(false))
       dispatch(showError(true))
     } else {
       if(!response?.data?.message?.pickup_time){
-        navigate('BookingDropOffScreen', { booking: this.state.booking })
+        navigate('BookingDropOffScreen', { booking: { ...bookingData, fromSaveAddress: false } })
         dispatch(setLoading(false))
       } else {
-        this.setState({ error: true, errorMessage: 'Pick Up Time passed or too soon' })
+        setError({ value: true, message: 'Pick Up Time passed or too soon' })
         dispatch(setLoading(false))
       }
     }
   }
 
-  async loadRegion() {
-    let response = await FetchApi.regions()
+  const loadRegion = async() => {
+    const response = await FetchApi.regions()
     if(response == undefined){
       dispatch(showError(true))
     } else {
       if(response?.data?.success) {
-        let regionList = response?.data?.data
-        this.setState({regionList})
+        setRegionList(response?.data?.data)
       } else {
         console.log(response?.message)
       }
     }
   }
 
-  async loadProvince(regionCode) {
-    let response = await FetchApi.provinces(regionCode)
+  const loadProvince = async(regionCode) => {
+    const response = await FetchApi.provinces(regionCode)
     if(response == undefined){
       dispatch(showError(true))
     } else {
       if(response?.data?.success) {
-        let provinceList = response?.data?.data
-        this.setState({provinceList})
+        setProvinceList(response?.data?.data)
       } else {
         console.log(response?.message)
       }
     }
   }
 
-  async loadCity(provinceCode) {
-    let response = await FetchApi.cities(provinceCode)
+  const loadCity = async(provinceCode) => {
+    const response = await FetchApi.cities(provinceCode)
     if(response == undefined){
       dispatch(showError(true))
     } else {
       if(response?.data?.success) {
-        let cityList = response?.data?.data
-        this.setState({cityList})
+        setCityList(response?.data?.data)
       } else {
         console.log(response?.message)
       }
     }
   }
 
-  async loadBarangay(cityCode) {
-    let response = await FetchApi.barangays(cityCode)
+  const loadBarangay = async(cityCode) => {
+    const response = await FetchApi.barangays(cityCode)
     if(response == undefined){
       dispatch(showError(true))
     } else {
       if(response?.data?.success) {
-        let barangayList = response?.data?.data
-        this.setState({barangayList})
+        setBarangayList(response?.data?.data)
       } else {
         console.log(response?.message)
       }
     }
   }
 
-  showDatePicker = (visible) => {
-    this.setState({ dateModalVisible: visible });
+  const showDatePicker = (visible) => {
+    setDateModalVisible(visible);
   }
   
-  showTimePicker = (visible) => {
-    this.setState({ timeModalVisible: visible });
+  const showTimePicker = (visible) => {
+    setTimeModalVisible(visible);
   }
 
-  onChangeDate = (event, date) => {
-    this.setState({dateModalVisible: false})
-    const selectedDate = date.toLocaleDateString('zh-Hans-CN');
-    let unformattedDate = selectedDate
-      let rawDate = unformattedDate.replaceAll('/', '-') 
-      let nDate = new Date(rawDate)
-      this.setState({ newDate: nDate })
+  const onChangeDate = (event, date) => {
+    setDateModalVisible(false)
+    const selectedDate = date?.toLocaleDateString('zh-Hans-CN');
+    let rawDate = selectedDate.replaceAll('/', '-') 
+    let nDate = new Date(rawDate)
+    setNewDate(nDate)
 
-      let booking = this.state.booking
-      booking.pickupDate = moment(this.state.newDate).format("YYYY-MM-DD")
-      this.setState({ booking }); 
+    setBookingData({
+      ...bookingData,
+      pickupDate: moment(nDate).format("YYYY-MM-DD")
+    })
   };
 
-  onChangeTime = (event, time) => {
-    this.setState({timeModalVisible: false})
-    const selectedTime = time.toLocaleTimeString('en-GB', {hour: '2-digit', minute:'2-digit'});
+  const onChangeTime = (event, time) => {
+    setTimeModalVisible(false)
+    const selectedTime = time?.toLocaleTimeString('en-GB', {hour: '2-digit', minute:'2-digit'});
 
       let unformattedTime = selectedTime
-      this.setState({ newTime: unformattedTime })
+      setNewTime(unformattedTime)
 
-      let booking = this.state.booking
-      booking.pickupTime = selectedTime
-      this.setState({ booking });
+      setBookingData({
+        ...bookingData,
+        pickupTime: selectedTime
+      })
+  }
+
+  const updateDataFromSaveAddress = async() => {
+    await loadRegion();
+    if(regionList){
+      regionList.map(async(item, index) => {
+        if(item.name === bookingData?.pickupRegion){
+         await loadProvince(item.code)
+        }
+      })
+    }
+    if(provinceList){
+      provinceList.map(async(item, index) => {
+        if(item.name === bookingData?.pickupProvince){
+          console.log(item)
+          await loadCity(item.code)
+        }
+      })
+    }
+    if(cityList){
+      cityList.map(async(item, index) => {
+        if(item.name === bookingData?.pickupCity){
+          console.log(item)
+          await loadBarangay(item.code)
+        }
+      })
+    }
   }
   
-  render() {
-    let booking = this.state.booking;
-    const { dateModalVisible } = this.state;
-    const { timeModalVisible } = this.state;
-    
     //For-IOS
     // dateFormat = new Intl.DateTimeFormat('en-US', {
     //   year:  'numeric',
@@ -169,114 +201,58 @@ export default class BookingPickUpScreen extends Component {
     //   hour: '2-digit',
     //   minute: '2-digit',
     // });
-    tommorowDate = () => {
-      const today = new Date()
-      let tomorrow =  new Date()
-      tomorrow.setDate(today.getDate() + 1)
-      return tomorrow
-    }
 
-
-    return(
-      <View style={styles.container}>
-        <StatusBar translucent backgroundColor={'transparent'} barStyle={'light-content'} />
-        <ErrorWithCloseButtonModal/>
-        <ErrorOkModal
-          Visible={this.state.error}
-          ErrMsg={this.state.errorMessage}
-          OkButton={() => {
-            this.setState({ error: false, errorMessage: '' })
-          }}
-        />
-        {/* Date Modal */}
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={dateModalVisible}
-            onRequestClose={() => this.setState({dateModalVisible: false}) }
-          >
-            <View style={styles.blurContainer}>
-              <TouchableWithoutFeedback onPress={() => this.setState({dateModalVisible: false}) }>
-                <View style={styles.centeredView}>
-                  <View style={styles.modalView}>
-                    <DateTimePicker
-                      display="default" 
-                      mode="date"
-                      minimumDate={new Date().setDate(new Date().getDate())}
-                      themeVariant="light"
-                      value={this.state.date}
-                      onChange={this.onChangeDate}
-                    />
-                    {
-                    //IOS
-                    /* <View style={styles.alignItemCenter}>
-                      <TouchableOpacity
-                        style={styles.modalButton}
-                        onPress={() => this.setState({dateModalVisible: false}, () => {
-                          let booking = this.state.booking
-                          if(booking.pickupDate != '') {
-                            let unformattedDate = booking.pickupDate
-                            let rawDate = unformattedDate.replaceAll('/', '-') 
-                            let date = new Date(unformattedDate)
-
-                            this.setState({ newDate: date })
-                          } else {
-                            let date = new Date()
-                            this.setState({ newDate: date })
-                            
-                            const selectedDate = date.toLocaleDateString('zh-Hans-CN');
-                            let booking = this.state.booking
-                            booking.pickupDate = selectedDate
-                            this.setState({ booking }); 
-                          }
-                        })}
-                      >
-                        <Text style={styles.textStyle}> Done </Text>
-                      </TouchableOpacity>
-                    </View> */}
-                  </View>
-                </View>
-              </TouchableWithoutFeedback>
-            </View>
-          </Modal>
-
-        {/* Time Modal */}
+  return(
+    <View style={styles.container}>
+      <StatusBar translucent backgroundColor={'transparent'} barStyle={'light-content'} />
+      <ErrorWithCloseButtonModal/>
+      <ErrorOkModal
+        Visible={error.value}
+        ErrMsg={error.message}
+        OkButton={() => {
+          setError({ value: false, message: '' })
+        }}
+      />
+      {/* Date Modal */}
         <Modal
           animationType="slide"
           transparent={true}
-          visible={timeModalVisible}
-          onRequestClose={() => this.setState({timeModalVisible: false}) }
+          visible={dateModalVisible}
+          onRequestClose={() => setDateModalVisible(false) }
         >
-          <View style={styles.blurContainer}> 
-            <TouchableWithoutFeedback onPress={() => this.setState({timeModalVisible: false}) }>
+          <View style={styles.blurContainer}>
+            <TouchableWithoutFeedback onPress={() => setDateModalVisible(false) }>
               <View style={styles.centeredView}>
                 <View style={styles.modalView}>
-                  <DateTimePicker 
+                  <DateTimePicker
                     display="default" 
-                    mode="time"
+                    mode="date"
+                    minimumDate={new Date().setDate(new Date().getDate())}
                     themeVariant="light"
-                    is24Hour={false}
-                    value={this.state.time}
-                    onChange={this.onChangeTime}
+                    value={date}
+                    onChange={onChangeDate}
                   />
-                  {/* <View style={styles.alignItemCenter}>
+                  {
+                  //IOS
+                  /* <View style={styles.alignItemCenter}>
                     <TouchableOpacity
                       style={styles.modalButton}
-                      onPress={() => this.setState({timeModalVisible: false}, () => {
+                      onPress={() => this.setState({dateModalVisible: false}, () => {
                         let booking = this.state.booking
-                        if(booking.pickupTime != '') {
-                          let unformattedTime = booking.pickupTime
-                          let time = new Date( 'March, 28 2001 ' + unformattedTime )
+                        if(booking.pickupDate != '') {
+                          let unformattedDate = booking.pickupDate
+                          let rawDate = unformattedDate.replaceAll('/', '-') 
+                          let date = new Date(unformattedDate)
 
-                          this.setState({ newTime: time })
+                          this.setState({ newDate: date })
                         } else {
-                          let time = new Date()
-                          this.setState({ newTime: time })
+                          let date = new Date()
+                          this.setState({ newDate: date })
                           
-                          const selectedTime = time.toLocaleTimeString('en-GB');
+                          const selectedDate = date.toLocaleDateString('zh-Hans-CN');
                           let booking = this.state.booking
-                          booking.pickupTime = selectedTime
-                          this.setState({ booking });
+                          booking.pickupDate = selectedDate
+                          this.setState({ booking }); 
                         }
                       })}
                     >
@@ -289,322 +265,409 @@ export default class BookingPickUpScreen extends Component {
           </View>
         </Modal>
 
-            {/* Header for Delivery Address */}
-            <CustomNavbar
-              Title={'Pick Up Address'}
-              onBack={() => {
-                this.props.navigation.navigate('BookingItemScreen')
-              }}
-            />
-          <View style={{width: '100%', height: '71%', alignItems: 'center'}}>
-            <ScrollView style={{width: '100%'}}>
+      {/* Time Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={timeModalVisible}
+        onRequestClose={() => setTimeModalVisible(false) }
+      >
+        <View style={styles.blurContainer}> 
+          <TouchableWithoutFeedback onPress={() => setTimeModalVisible(false) }>
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <DateTimePicker 
+                  display="default" 
+                  mode="time"
+                  themeVariant="light"
+                  is24Hour={false}
+                  value={time}
+                  onChange={onChangeTime}
+                />
+                {/* <View style={styles.alignItemCenter}>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={() => this.setState({timeModalVisible: false}, () => {
+                      let booking = this.state.booking
+                      if(booking.pickupTime != '') {
+                        let unformattedTime = booking.pickupTime
+                        let time = new Date( 'March, 28 2001 ' + unformattedTime )
 
-              <View style={styles.labelContainer}>
-                <Text style={styles.labelText}> Pick Up Details </Text>
+                        this.setState({ newTime: time })
+                      } else {
+                        let time = new Date()
+                        this.setState({ newTime: time })
+                        
+                        const selectedTime = time.toLocaleTimeString('en-GB');
+                        let booking = this.state.booking
+                        booking.pickupTime = selectedTime
+                        this.setState({ booking });
+                      }
+                    })}
+                  >
+                    <Text style={styles.textStyle}> Done </Text>
+                  </TouchableOpacity>
+                </View> */}
               </View>
-
-              <View style={styles.inputContainer}>
-                {/* Sender Name */}
-                <TextInput
-                  value={booking.pickupName}
-                  style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
-                  onChangeText={(pickupName) => {
-                    booking.pickupName = pickupName;
-                    this.setState({ booking })
-                  }}
-                  placeholder="Sender's Name"
-                  placeholderTextColor={'#808080'}
-                />
-              </View>
-
-              {/* Date and Time */}
-              <View style={[styles.inputContainer, styles.row, styles.marginTop]}>
-                <TouchableOpacity style={styles.dateInput} onPress={() => this.showDatePicker(true)}>
-                  { this.state.newDate == '' ?
-                    <Text style={{ color:'#808080' }}>
-                      Pick Up Date
-                    </Text>
-                  :
-                    <Text style={{ color:'black' }}>
-                      {moment(this.state.newDate).format("YYYY-MM-DD")}
-                      {/* { dateFormat.format(this.state.newDate) } */}
-                    </Text>
-                  }
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.timeInput} onPress={() => this.showTimePicker(true)}>
-                  { this.state.newTime == '' ?
-                    <Text style={{ color:'#808080' }}>
-                      Time
-                      {/* { timeFormat.format(this.state.time) } */}
-                    </Text>
-                  :
-                    <Text style={{ color:'black' }}>
-                      {make12HoursFormat(this.state.newTime)}
-                      {/* { timeFormat.format(this.state.newTime) } */}
-                    </Text>
-                  }
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.inputContainer}>
-                {/* Street Address */}
-                <TextInput
-                  value={booking.pickupStreetAddress}
-                  style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
-                  onChangeText={(streetAddress) => {
-                    booking.pickupStreetAddress = streetAddress;
-                    this.setState({ booking })
-                  }}
-                  placeholder='House No., Lot, Street'
-                  placeholderTextColor={'#808080'}
-                />
-              </View>
-              {/* Region and Zip Code */}
-              <View style={[styles.inputContainer, styles.marginTop, styles.row]}>
-                {/* Region */}
-                <ModalSelector
-                  data={this.state.regionList}
-                  onModalOpen={() => {
-                    this.loadRegion();
-                  }}
-                  keyExtractor= {region => region.code}
-                  labelExtractor= {region => region.name}
-                  initValue={booking.isRebook ? booking.pickupRegion : "Select Region"}
-                  disabled={booking.isRebook ? true : false}
-                  onChange={(region) => {
-                    booking.pickupRegion = region.name;
-                    this.setState({booking}, async () => {
-                      await this.loadProvince(region.code);
-                    });
-                  }}  
-                  searchText={'Search'}
-                  cancelText={'Cancel'}
-                  style={styles.regionInput}
-                  initValueTextStyle={styles.initValueTextStyle}
-                  searchStyle={styles.searchStyle}
-                  selectStyle={[styles.selectStyle2, { backgroundColor: booking.isRebook ? UMColors.ligthGray : UMColors.white}]}
-                  selectTextStyle={styles.selectTextStyle}
-                  sectionTextStyle={styles.sectionTextStyle}
-                  cancelStyle={styles.cancelStyle}
-                  cancelTextStyle={styles.cancelTextStyle}
-                  overlayStyle={styles.overlayStyle}
-                  touchableActiveOpacity={styles.touchableActiveOpacity}
-                />
-                {/* ZIP Code */}
-                <TextInput
-                  value={booking.pickupZipcode}
-                  style={[styles.zipInput, { backgroundColor: booking.isRebook ? UMColors.ligthGray : UMColors.white}]}
-                  editable={booking.isRebook ? false : true}
-                  onChangeText={(val) => {
-                    booking.pickupZipcode = val;
-                    this.setState({booking})
-                  }}  
-                  placeholder='ZIP Code'
-                  placeholderTextColor={'#808080'}                        
-                  keyboardType='number-pad'
-                  returnKeyType='done'
-                  maxLength={4}
-                />
-              </View>
-              {/* Province */}
-              <View style={[styles.inputContainer, styles.marginTop, styles.row]}>
-                { booking.pickupRegion != '' ? 
-                <ModalSelector
-                  data={this.state.provinceList}
-                  keyExtractor= {province => province.code}
-                  labelExtractor= {province => province.name}
-                  initValue={booking.isRebook ? booking.pickupProvince : "Select Province"}
-                  disabled={booking.isRebook ? true : false}
-                  onChange={(province) => {
-                    booking.pickupProvince = province.name;
-                    this.setState({booking}, async () => {
-                      await this.loadCity(province.code);
-                    });
-                  }}
-                  searchText={'Search'}
-                  cancelText={'Cancel'}
-                  style={styles.fullWidthInput}
-                  initValueTextStyle={styles.initValueTextStyle}
-                  searchStyle={styles.searchStyle}
-                  selectStyle={[styles.selectStyle1, { backgroundColor: booking.isRebook ? UMColors.ligthGray : UMColors.white}]}
-                  selectTextStyle={styles.selectTextStyle}
-                  sectionTextStyle={styles.sectionTextStyle}
-                  cancelStyle={styles.cancelStyle}
-                  cancelTextStyle={styles.cancelTextStyle}
-                  overlayStyle={styles.overlayStyle}
-                  touchableActiveOpacity={styles.touchableActiveOpacity}
-                />
-                :
-                <ModalSelector
-                  disabled={true}
-                  data={this.state.provinceList}
-                  initValue={"Select Province"}
-                  searchText={'Search'}
-                  cancelText={'Cancel'}
-                  style={styles.disabledFullWidthInput}
-                  initValueTextStyle={styles.initValueTextStyle}
-                  searchStyle={styles.searchStyle}
-                  selectStyle={styles.disabledSelectStyle}
-                  selectTextStyle={styles.selectTextStyle}
-                  sectionTextStyle={styles.sectionTextStyle}
-                  cancelStyle={styles.cancelStyle}
-                  cancelTextStyle={styles.cancelTextStyle}
-                  overlayStyle={styles.overlayStyle}
-                  touchableActiveOpacity={styles.touchableActiveOpacity}
-                />
-                }
-              </View>
-
-              {/* City */}
-              <View style={[styles.inputContainer, styles.marginTop]}>
-              { booking.pickupProvince != '' ?
-                <ModalSelector
-                  data={this.state.cityList}
-                  keyExtractor= {city => city.code}
-                  labelExtractor= {city => city.name}
-                  initValue={booking.isRebook ? booking.pickupCity : "Select City"}
-                  disabled={booking.isRebook ? true : false}
-                  onChange={(city) => {
-                    booking.pickupCity = city.name;
-                    this.setState({booking}, async () => {
-                      await this.loadBarangay(city.code);
-                    });
-                  }}  
-                  searchText={'Search'}
-                  cancelText={'Cancel'}
-                  style={styles.fullWidthInput}
-                  initValueTextStyle={styles.initValueTextStyle}
-                  searchStyle={styles.searchStyle}
-                  selectStyle={[styles.selectStyle1, { backgroundColor: booking.isRebook ? UMColors.ligthGray : UMColors.white}]}
-                  selectTextStyle={styles.selectTextStyle}
-                  sectionTextStyle={styles.sectionTextStyle}
-                  cancelStyle={styles.cancelStyle}
-                  cancelTextStyle={styles.cancelTextStyle}
-                  overlayStyle={styles.overlayStyle}
-                />
-                :
-                <ModalSelector
-                  disabled={true}
-                  initValue={"Select City"}
-                  searchText={'Search'}
-                  cancelText={'Cancel'}
-                  style={styles.disabledFullWidthInput}
-                  initValueTextStyle={styles.initValueTextStyle}
-                  searchStyle={styles.searchStyle}
-                  selectStyle={styles.disabledSelectStyle}
-                  selectTextStyle={styles.selectTextStyle}
-                  sectionTextStyle={styles.sectionTextStyle}
-                  cancelStyle={styles.cancelStyle}
-                  cancelTextStyle={styles.cancelTextStyle}
-                  overlayStyle={styles.overlayStyle}
-                  touchableActiveOpacity={styles.touchableActiveOpacity}
-                />
-              }
-              </View>
-
-              {/* Barangay */}
-              <View style={[styles.inputContainer, styles.marginTop]}>
-              { booking.pickupCity != '' ? 
-                <ModalSelector
-                  data={this.state.barangayList}
-                  keyExtractor= {barangay => barangay.code}
-                  labelExtractor= {barangay => barangay.name}
-                  initValue={booking.isRebook ? booking.pickupBarangay : "Select Barangay"}
-                  disabled={booking.isRebook ? true : false}
-                  onChange={(barangay) => {
-                    booking.pickupBarangay = barangay.name;
-                    this.setState({booking});
-                  }} 
-                  searchText={'Search'}
-                  cancelText={'Cancel'}
-                  style={styles.fullWidthInput}
-                  initValueTextStyle={styles.initValueTextStyle}
-                  searchStyle={styles.searchStyle}
-                  selectStyle={[styles.selectStyle1, { backgroundColor: booking.isRebook ? UMColors.ligthGray : UMColors.white}]}
-                  selectTextStyle={styles.selectTextStyle}
-                  sectionTextStyle={styles.sectionTextStyle}
-                  cancelStyle={styles.cancelStyle}
-                  cancelTextStyle={styles.cancelTextStyle}
-                  overlayStyle={styles.overlayStyle}
-                />
-                :
-                <ModalSelector
-                  disabled={true}
-                  initValue={"Select Barangay"}
-                  searchText={'Search'}
-                  cancelText={'Cancel'}
-                  style={styles.disabledFullWidthInput}
-                  initValueTextStyle={styles.initValueTextStyle}
-                  searchStyle={styles.searchStyle}
-                  selectStyle={styles.disabledSelectStyle}
-                  selectTextStyle={styles.selectTextStyle}
-                  sectionTextStyle={styles.sectionTextStyle}
-                  cancelStyle={styles.cancelStyle}
-                  cancelTextStyle={styles.cancelTextStyle}
-                  overlayStyle={styles.overlayStyle}
-                  touchableActiveOpacity={styles.touchableActiveOpacity}
-                />
-              }
-              </View>
-
-              {/* Landmarks */}
-              <View style={styles.inputContainer}>
-                <TextInput
-                  value={booking.pickupLandmark}
-                  style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
-                  onChangeText={(landmark) => {
-                    booking.pickupLandmark = landmark;
-                    this.setState({booking})
-                  }}
-                  placeholder='Landmarks (Optional)'
-                  placeholderTextColor={'#808080'}
-                />
-              </View>
-              {/* Special Instruction */}
-              <View style={styles.inputContainer}>
-                <TextInput
-                  value={booking.pickupSpecialInstructions}
-                  style={[styles.marginTop, styles.specialInstructions]}
-                  onChangeText={(specialInstructions) => {
-                    booking.pickupSpecialInstructions = specialInstructions;
-                    this.setState({booking})
-                  }}
-                  placeholder='Special Instruction (Optional)'
-                  placeholderTextColor={'#808080'}
-                  multiline={true}
-                  returnKeyType='done'
-                  blurOnSubmit={true}
-                  onSubmitEditing={()=>{Keyboard.dismiss()}}
-                />
-              </View>
-            </ScrollView>
-          </View>
-          
-
-        <View style={styles.btnContainer}>
-          {/* Select from Saved Addresses */}
-          {/* <TouchableOpacity style={[styles.nextButtonGray, styles.buttonMargin]} disabled={true}>
-              <Text style={styles.buttonText}> Select from Saved Addresses </Text>
-          </TouchableOpacity> */}
-          
-          {/* Next Button */}
-            {/* Make button gray when not all inputs are filled out, orange when filled out */}
-          { booking.pickupDate == '' || booking.pickupTime == '' || booking.pickupStreetAddress == '' || booking.pickupBarangay == '' || booking.pickupCity == '' || booking.pickupProvince == '' || booking.pickupRegion == '' || booking.pickupZipcode == '' ?
-          <TouchableOpacity style={styles.nextButtonGray} disabled={true}>
-            <Text style={styles.buttonText}> NEXT </Text>
-          </TouchableOpacity>
-          :
-          <TouchableOpacity style={styles.nextButtonOrange} onPress={() => {
-            this.booking();
-          }}>
-            <Text style={styles.buttonText}> NEXT </Text>
-          </TouchableOpacity>
-          }
+            </View>
+          </TouchableWithoutFeedback>
         </View>
-        <Loader/>
+      </Modal>
+
+          {/* Header for Delivery Address */}
+          <CustomNavbar
+            Title={'Pick Up Address'}
+            onBack={() => {
+              navigate('BookingItemScreen')
+            }}
+          />
+        <View style={{width: '100%', height: '71%', alignItems: 'center'}}>
+          <ScrollView style={{width: '100%'}}>
+
+            <View style={styles.labelContainer}>
+              <Text style={styles.labelText}> Pick Up Details </Text>
+            </View>
+
+            <View style={styles.inputContainer}>
+              {/* Sender Name */}
+              <TextInput
+                value={bookingData?.pickupName}
+                style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
+                onChangeText={(pickupName) => {
+                  setBookingData({
+                    ...bookingData,
+                    pickupName: pickupName
+                  })
+                }}
+                placeholder="Sender's Name"
+                placeholderTextColor={'#808080'}
+              />
+            </View>
+
+            {/* Date and Time */}
+            <View style={[styles.inputContainer, styles.row, styles.marginTop]}>
+              <TouchableOpacity style={styles.dateInput} onPress={() => showDatePicker(true)}>
+                { newDate == '' ?
+                  <Text style={{ color:'#808080' }}>
+                    Pick Up Date
+                  </Text>
+                :
+                  <Text style={{ color:'black' }}>
+                    {moment(newDate).format("YYYY-MM-DD")}
+                    {/* { dateFormat.format(this.state.newDate) } */}
+                  </Text>
+                }
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.timeInput} onPress={() => showTimePicker(true)}>
+                { newTime == '' ?
+                  <Text style={{ color:'#808080' }}>
+                    Time
+                    {/* { timeFormat.format(time) } */}
+                  </Text>
+                :
+                  <Text style={{ color:'black' }}>
+                    {make12HoursFormat(newTime)}
+                    {/* { timeFormat.format(newTime) } */}
+                  </Text>
+                }
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.inputContainer}>
+              {/* Street Address */}
+              <TextInput
+                value={bookingData?.pickupStreetAddress}
+                style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
+                onChangeText={(streetAddress) => {
+                  setBookingData({
+                    ...bookingData,
+                    pickupStreetAddress: streetAddress
+                  })
+                }}
+                placeholder='House No., Lot, Street'
+                placeholderTextColor={'#808080'}
+              />
+            </View>
+            {/* Region and Zip Code */}
+            <View style={[styles.inputContainer, styles.marginTop, styles.row]}>
+              {/* Region */}
+              <ModalSelector
+                data={regionList}
+                onModalOpen={() => {
+                  loadRegion();
+                }}
+                keyExtractor= {region => region.code}
+                labelExtractor= {region => region.name}
+                initValue={bookingData?.isRebook || bookingData?.fromSaveAddress ? bookingData?.pickupRegion : "Select Region"}
+                disabled={bookingData?.isRebook ? true : false}
+                onChange={async(region) => {
+                  setBookingData(
+                    bookingData?.pickupRegion === region.name ?
+                      { ...bookingData, pickupRegion: region.name }
+                    :
+                      {
+                        ...bookingData, 
+                        pickupRegion: region.name,
+                        pickupProvince: '',
+                        pickupCity: '',
+                        pickupBarangay: '',
+                      }
+                  ), 
+                  await loadProvince(region.code);
+                }}  
+                searchText={'Search'}
+                cancelText={'Cancel'}
+                style={styles.regionInput}
+                initValueTextStyle={[styles.initValueTextStyle, bookingData?.fromSaveAddress && { color: UMColors.black }]}
+                searchStyle={styles.searchStyle}
+                selectStyle={[styles.selectStyle2, { backgroundColor: bookingData?.isRebook ? UMColors.ligthGray : UMColors.white}]}
+                selectTextStyle={styles.selectTextStyle}
+                sectionTextStyle={styles.sectionTextStyle}
+                cancelStyle={styles.cancelStyle}
+                cancelTextStyle={styles.cancelTextStyle}
+                overlayStyle={styles.overlayStyle}
+                touchableActiveOpacity={styles.touchableActiveOpacity}
+              />
+              {/* ZIP Code */}
+              <TextInput
+                value={bookingData?.pickupZipcode}
+                style={[styles.zipInput, { backgroundColor: bookingData?.isRebook ? UMColors.ligthGray : UMColors.white}]}
+                editable={bookingData?.isRebook ? false : true}
+                onChangeText={(val) => {
+                  setBookingData({
+                    ...bookingData,
+                    pickupZipcode: val
+                  })
+                }}  
+                placeholder='ZIP Code'
+                placeholderTextColor={'#808080'}                        
+                keyboardType='number-pad'
+                returnKeyType='done'
+                maxLength={4}
+              />
+            </View>
+            {/* Province */}
+            <View style={[styles.inputContainer, styles.marginTop, styles.row]}>
+              { bookingData?.pickupRegion != '' ? 
+              <ModalSelector
+                data={provinceList}
+                keyExtractor= {province => province.code}
+                labelExtractor= {province => province.name}
+                initValue={bookingData?.isRebook || bookingData?.fromSaveAddress ? bookingData?.pickupProvince : "Select Province"}
+                disabled={bookingData?.isRebook ? true : false}
+                onChange={async(province) => {
+                  setBookingData(
+                    bookingData?.pickupProvince === province.name ?
+                      { ...bookingData, pickupProvince: province.name }
+                    :
+                      {
+                        ...bookingData, 
+                        pickupProvince: province.name,
+                        pickupCity: '',
+                        pickupBarangay: '',
+                      }
+                  ), 
+                  await loadCity(province.code);
+                }}
+                searchText={'Search'}
+                cancelText={'Cancel'}
+                style={styles.fullWidthInput}
+                initValueTextStyle={[styles.initValueTextStyle, bookingData?.fromSaveAddress && { color: UMColors.black }]}
+                searchStyle={styles.searchStyle}
+                selectStyle={[styles.selectStyle1, { backgroundColor: bookingData?.isRebook ? UMColors.ligthGray : UMColors.white}]}
+                selectTextStyle={styles.selectTextStyle}
+                sectionTextStyle={styles.sectionTextStyle}
+                cancelStyle={styles.cancelStyle}
+                cancelTextStyle={styles.cancelTextStyle}
+                overlayStyle={styles.overlayStyle}
+                touchableActiveOpacity={styles.touchableActiveOpacity}
+              />
+              :
+              <ModalSelector
+                disabled={true}
+                data={provinceList}
+                initValue={"Select Province"}
+                searchText={'Search'}
+                cancelText={'Cancel'}
+                style={styles.disabledFullWidthInput}
+                initValueTextStyle={styles.initValueTextStyle}
+                searchStyle={styles.searchStyle}
+                selectStyle={styles.disabledSelectStyle}
+                selectTextStyle={styles.selectTextStyle}
+                sectionTextStyle={styles.sectionTextStyle}
+                cancelStyle={styles.cancelStyle}
+                cancelTextStyle={styles.cancelTextStyle}
+                overlayStyle={styles.overlayStyle}
+                touchableActiveOpacity={styles.touchableActiveOpacity}
+              />
+              }
+            </View>
+
+            {/* City */}
+            <View style={[styles.inputContainer, styles.marginTop]}>
+            { bookingData?.pickupProvince != '' ?
+              <ModalSelector
+                data={cityList}
+                keyExtractor= {city => city.code}
+                labelExtractor= {city => city.name}
+                initValue={bookingData?.isRebook || bookingData?.fromSaveAddress ? bookingData?.pickupCity : "Select City"}
+                disabled={bookingData?.isRebook ? true : false}
+                onChange={async(city) => {
+                  setBookingData(
+                    bookingData?.pickupCity === city.name ?
+                      { ...bookingData, pickupCity: city.name }
+                    :
+                      {
+                        ...bookingData, 
+                        pickupCity: city.name,
+                        pickupBarangay: '',
+                      }
+                  ), 
+                  await loadBarangay(city.code);
+                }}  
+                searchText={'Search'}
+                cancelText={'Cancel'}
+                style={styles.fullWidthInput}
+                initValueTextStyle={[styles.initValueTextStyle, bookingData?.fromSaveAddress && { color: UMColors.black }]}
+                searchStyle={styles.searchStyle}
+                selectStyle={[styles.selectStyle1, { backgroundColor: bookingData?.isRebook ? UMColors.ligthGray : UMColors.white}]}
+                selectTextStyle={styles.selectTextStyle}
+                sectionTextStyle={styles.sectionTextStyle}
+                cancelStyle={styles.cancelStyle}
+                cancelTextStyle={styles.cancelTextStyle}
+                overlayStyle={styles.overlayStyle}
+              />
+              :
+              <ModalSelector
+                disabled={true}
+                initValue={"Select City"}
+                searchText={'Search'}
+                cancelText={'Cancel'}
+                style={styles.disabledFullWidthInput}
+                initValueTextStyle={styles.initValueTextStyle}
+                searchStyle={styles.searchStyle}
+                selectStyle={styles.disabledSelectStyle}
+                selectTextStyle={styles.selectTextStyle}
+                sectionTextStyle={styles.sectionTextStyle}
+                cancelStyle={styles.cancelStyle}
+                cancelTextStyle={styles.cancelTextStyle}
+                overlayStyle={styles.overlayStyle}
+                touchableActiveOpacity={styles.touchableActiveOpacity}
+              />
+            }
+            </View>
+
+            {/* Barangay */}
+            <View style={[styles.inputContainer, styles.marginTop]}>
+            { bookingData?.pickupCity != '' ? 
+              <ModalSelector
+                data={barangayList}
+                keyExtractor= {barangay => barangay.code}
+                labelExtractor= {barangay => barangay.name}
+                initValue={bookingData?.isRebook || bookingData?.fromSaveAddress ? bookingData?.pickupBarangay : "Select Barangay"}
+                disabled={bookingData?.isRebook ? true : false}
+                onChange={(barangay) => {
+                  setBookingData({
+                    ...bookingData,
+                    pickupBarangay: barangay.name
+                  })
+                }} 
+                searchText={'Search'}
+                cancelText={'Cancel'}
+                style={styles.fullWidthInput}
+                initValueTextStyle={[styles.initValueTextStyle, bookingData?.fromSaveAddress && { color: UMColors.black }]}
+                searchStyle={styles.searchStyle}
+                selectStyle={[styles.selectStyle1, { backgroundColor: bookingData?.isRebook ? UMColors.ligthGray : UMColors.white}]}
+                selectTextStyle={styles.selectTextStyle}
+                sectionTextStyle={styles.sectionTextStyle}
+                cancelStyle={styles.cancelStyle}
+                cancelTextStyle={styles.cancelTextStyle}
+                overlayStyle={styles.overlayStyle}
+              />
+              :
+              <ModalSelector
+                disabled={true}
+                initValue={"Select Barangay"}
+                searchText={'Search'}
+                cancelText={'Cancel'}
+                style={styles.disabledFullWidthInput}
+                initValueTextStyle={styles.initValueTextStyle}
+                searchStyle={styles.searchStyle}
+                selectStyle={styles.disabledSelectStyle}
+                selectTextStyle={styles.selectTextStyle}
+                sectionTextStyle={styles.sectionTextStyle}
+                cancelStyle={styles.cancelStyle}
+                cancelTextStyle={styles.cancelTextStyle}
+                overlayStyle={styles.overlayStyle}
+                touchableActiveOpacity={styles.touchableActiveOpacity}
+              />
+            }
+            </View>
+
+            {/* Landmarks */}
+            <View style={styles.inputContainer}>
+              <TextInput
+                value={bookingData?.pickupLandmark}
+                style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
+                onChangeText={(landmark) => {
+                  setBookingData({
+                    ...bookingData,
+                    pickupLandmark: landmark
+                  })
+                }}
+                placeholder='Landmarks (Optional)'
+                placeholderTextColor={'#808080'}
+              />
+            </View>
+            {/* Special Instruction */}
+            <View style={styles.inputContainer}>
+              <TextInput
+                value={bookingData?.pickupSpecialInstructions}
+                style={[styles.marginTop, styles.specialInstructions]}
+                onChangeText={(specialInstructions) => {
+                  setBookingData({
+                    ...bookingData,
+                    pickupSpecialInstructions: specialInstructions
+                  })
+                }}
+                placeholder='Special Instruction (Optional)'
+                placeholderTextColor={'#808080'}
+                multiline={true}
+                returnKeyType='done'
+                blurOnSubmit={true}
+                onSubmitEditing={()=>{Keyboard.dismiss()}}
+              />
+            </View>
+          </ScrollView>
+        </View>
+        
+
+      <View style={styles.btnContainer}>
+        {/* Select from Saved Addresses */}
+        <TouchableOpacity 
+          style={[styles.nextButtonOrange, styles.buttonMargin]}
+          onPress={() => navigate('Address', { from: 'pickUp', booking: bookingData })}
+        >
+          <Text style={styles.buttonText}> Select from Saved Addresses </Text>
+        </TouchableOpacity>
+        
+        {/* Next Button */}
+          {/* Make button gray when not all inputs are filled out, orange when filled out */}
+        { bookingData?.pickupDate == '' || bookingData?.pickupTime == '' || bookingData?.pickupStreetAddress == '' || bookingData?.pickupBarangay == '' || bookingData?.pickupCity == '' || bookingData?.pickupProvince == '' || bookingData?.pickupRegion == '' || bookingData?.pickupZipcode == '' ?
+        <TouchableOpacity style={styles.nextButtonGray} disabled={true}>
+          <Text style={styles.buttonText}> NEXT </Text>
+        </TouchableOpacity>
+        :
+        <TouchableOpacity style={styles.nextButtonOrange} onPress={() => {
+          booking()
+        }}>
+          <Text style={styles.buttonText}> NEXT </Text>
+        </TouchableOpacity>
+        }
       </View>
-    )
-  }
+      <Loader/>
+    </View>
+  )
 }
 
 

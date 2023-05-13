@@ -49,6 +49,7 @@ export class BookingProcessingScreen extends Component {
   }
 
   async componentDidMount() {
+    console.log(this.state.bookingData)
     let bookingData = this.state.bookingData
     if(bookingData != ''){
       this.setState({ 

@@ -131,7 +131,7 @@ export default Home = () => {
                 <TouchableOpacity
                   style={styles.chooseMoveBtn}
                   onPress={() => {
-                    navigate('BookingItemScreen', { bookingType: 'Exclusive' })
+                    navigate('BookingSelectVehicle', { bookingType: 'Exclusive' })
                   }}
                 >
                   <Image
@@ -144,7 +144,7 @@ export default Home = () => {
                 <TouchableOpacity
                   style={styles.chooseMoveBtn}
                   onPress={() => {
-                    navigate('BookingItemScreen', { bookingType: 'Shared' })
+                    navigate('BookingSelectVehicle', { bookingType: 'Shared' })
                   }}
                 >
                   <Image
