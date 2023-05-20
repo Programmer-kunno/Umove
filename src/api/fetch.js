@@ -4,6 +4,15 @@ import {
 
 export class FetchApi {
 
+  static async PaymentsHistory() {
+    try {
+      const response = await get('/api/payments', {}, false)
+      return response
+    } catch (err) {
+      return err
+    }
+  }
+
   static async helpCategories() {
     try {
       const response = await get('/api/settings/help-center/categories', {}, true)

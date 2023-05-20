@@ -48,6 +48,7 @@ export default class BookingDriverLocation extends Component {
               latitude: parseFloat(response?.data?.data?.latitude),
               longitude: parseFloat(response?.data?.data?.longitude)
             }})
+            this.getRoutes()
           } else {
 
           }

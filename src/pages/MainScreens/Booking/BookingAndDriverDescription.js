@@ -33,6 +33,7 @@ export default class BookingAndDriverDescription extends Component {
   }
 
   async componentDidMount () {
+    console.log(this.state.booking?.status)
     this.init()
   }
 
@@ -188,7 +189,7 @@ export default class BookingAndDriverDescription extends Component {
               </TouchableOpacity>
             </View>
             <View style={styles.bookingDetailsContainer}>
-              <Text style={{ fontSize: 25, color: 'rgb(223,131,68)', fontWeight: '400' }}>On its way</Text>
+              <Text style={{ fontSize: 25, color: 'rgb(223,131,68)', fontWeight: '400' }}>{this.state.booking?.status}</Text>
               <View style={styles.bookigRefContainer}>
                 <Text style={styles.bookingRefTxt}>Booking No.</Text>
                 <Text style={[styles.bookingRefTxt, { textAlign: 'right' }]}>{this.state.booking?.booking_number}</Text>

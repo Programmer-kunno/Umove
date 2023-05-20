@@ -107,5 +107,8 @@ export const UMIcons = {
   pastTransactionIcon: require('../assets/wallet/pastTransactionIcon.png'),
   transactionSheetIcon: require('../assets/wallet/transactionSheetIcon.png'),
   refundIcon: require('../assets/wallet/refundIcon.png'),
-  uploadIcon: require('../assets/wallet/uploadIcon.png')
+  uploadIcon: require('../assets/wallet/uploadIcon.png'),
+  timeInputIcon: require('../assets/wallet/timeInputIcon.png'),
+  calendarInputIcon: require('../assets/wallet/calendarInputIcon.png'),
 }
+ 

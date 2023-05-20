@@ -18,7 +18,8 @@ import { resetNavigation } from '../../utils/navigationHelper'
 const deviceWidth = Dimensions.get('screen').width
 const deviceHeight = Dimensions.get('screen').height
 
-export default ChequePaymentSuccessScreen = () => {
+export default ChequePaymentSuccessScreen = (props) => {
+  const paymentMethodValue = props.route.params?.paymentMethodValue
   const [isLoading, setIsLoading] = useState(true)
   const isFocused = useIsFocused()
 
@@ -51,7 +52,14 @@ export default ChequePaymentSuccessScreen = () => {
                 <Image source={UMIcons.greenCheck} style={styles.greenCheck}/>
                 <View style={styles.textContainer2}>
                   <Text style={[styles.text, { marginBottom: 20 }]}>Thank you!</Text>
-                  <Text style={styles.text}>We will verify your pick-up details and get back to you.</Text>
+                  <Text style={styles.text}>
+                    {
+                      paymentMethodValue == 1 ?
+                        'We will verify your pick-up details and get back to you.'
+                      :
+                        'Payment Option Received.'
+                    }
+                  </Text>
                 </View>
             </View>
           }

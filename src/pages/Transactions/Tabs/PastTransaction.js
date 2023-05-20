@@ -32,6 +32,7 @@ const PastTransaction = () => {
       } else {
         setListLoading(false);
         if(response?.data?.success) {
+          console.log(response?.data?.data[0].booking_routes)
           setData(response.data.data);
         } else {
           setListLoading(false);

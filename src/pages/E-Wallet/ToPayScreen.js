@@ -8,13 +8,14 @@ import {
   TouchableOpacity,
   Image,
   TouchableWithoutFeedback,
-  Keyboard
+  Keyboard,
+  Modal
 } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { UMColors } from '../../utils/ColorHelper'
 import CustomNavbar from '../Components/CustomNavbar'
 import DropDownPicker from 'react-native-dropdown-picker'
-import { capitalizeFirst, moneyFormat } from '../../utils/stringHelper'
+import { capitalizeFirst, make12HoursFormat, mobileNumberRegex, moneyFormat } from '../../utils/stringHelper'
 import { useSelector } from 'react-redux'
 import ModalSelector from 'react-native-modal-selector-searchable'
 import { FetchApi } from '../../api/fetch'
@@ -36,12 +37,16 @@ import { useIsFocused } from '@react-navigation/native'
 import { navigate } from '../../utils/navigationHelper'
 import { CardPayment } from '../../api/paymentCard'
 import { RadioButton } from 'react-native-paper'
+import DateTimePicker from '@react-native-community/datetimepicker';
+import moment from 'moment'
+import { userLogout } from '../../redux/actions/User'
 
 const deviceWidth = Dimensions.get('screen').width
 const deviceHeight = Dimensions.get('screen').height
 
 export default ToPayScreen = () => {
   const userDetailsData = useSelector(state => state.userOperations.userDetailsData)
+  const userProfileData = useSelector(state => state.userOperations.userDetailsData?.user?.user_profile)
   const RBSheetRef = useRef(null)
   const setRef = (ref) => { RBSheetRef.current = ref; }
   const isFocused = useIsFocused()
@@ -49,11 +54,19 @@ export default ToPayScreen = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(undefined)
   const [paymentMethod, setPaymanetMethod] = useState([])
   const [chequeImg, setChequeImg] = useState(undefined)
+  const [contactName, setContactName] = useState('')
+  const [contactNumber, setContactNumber] = useState('')
+  const [date, setDate] = useState(new Date())
+  const [newDate, setNewDate] = useState('')
+  const [time, setTime] = useState(new Date())
+  const [newTime, setNewTime] = useState('')
+  const [dateModalVisible, setDateModalVisible] = useState(false)
+  const [timeModalVisible, setTimeModalVisible] = useState(false)
   const [address, setAddress] = useState('')
-  const [barangay, setBarangay] = useState('')
-  const [city, setCity] = useState('')
-  const [province, setProvince] = useState('')
-  const [region, setRegion] = useState('')
+  const [barangayData, setBarangay] = useState('')
+  const [cityData, setCity] = useState('')
+  const [provinceData, setProvince] = useState('')
+  const [regionData, setRegion] = useState('')
   const [zipCode, setZipCode] = useState('')
   const [regionList, setRegionList] = useState([])
   const [provinceList, setProvinceList] = useState([])
@@ -62,6 +75,7 @@ export default ToPayScreen = () => {
   const [paymentMehodOpen, setPaymentMehodOpen] = useState(false)
   const [paymentMethodValue, setPaymentMethodValue] = useState('')
   const [error, setError] = useState({ value: false, message: '' })
+  const [showSecondInputs, setShowSecondInput] = useState(false)
   const [paymentCategoryItems, setPaymentCategoryItems] = useState([
     {
       id: 1,
@@ -73,11 +87,11 @@ export default ToPayScreen = () => {
       label: 'Online Payment',
       value: 2
     },
-    // {
-    //   id: 3,
-    //   label: 'Deliver to UMove',
-    //   value: 3
-    // },
+    {
+      id: 3,
+      label: 'Deliver to UMove',
+      value: 3
+    },
   ])
 
   useEffect(() => {
@@ -92,11 +106,15 @@ export default ToPayScreen = () => {
     dispatch(setLoading(true))
     const data = {
       cheque: chequeImg,
+      type: paymentMethodValue == 1 ? 'pickup' : 'deliver',
+      pickUpDateTime: paymentMethodValue == 1 ? moment(newDate).format("YYYY-MM-DD") + ' ' + newTime + ':00' : '',
+      name: contactName,
+      mobileNumber: contactNumber,
       address: address,
-      region: region,
-      province: province,
-      city: city,
-      barangay: barangay,
+      region: regionData,
+      province: provinceData,
+      city: cityData,
+      barangay: barangayData,
       zipCode: zipCode
     }
     refreshTokenHelper(async() => {
@@ -106,10 +124,35 @@ export default ToPayScreen = () => {
         dispatch(setLoading(false))
       } else {
         if(response?.data?.success){
-          navigate('ChequePaymentSuccessScreen')
+          navigate('ChequePaymentSuccessScreen', { paymentMethodValue: paymentMethodValue })
           dispatch(setLoading(false))
         } else {
           setError({ value: true, message: response?.data?.message || response?.data })
+          dispatch(setLoading(false))
+        }
+      }
+    })
+  }
+
+  const chequePickUpTimeChecker = () => {
+    dispatch(setLoading(true))
+    const data = {
+      cheque: chequeImg,
+      zipCode: zipCode ? zipCode : '9999',
+      type: paymentMethodValue == 1 ? 'pickup' : 'deliver',
+      pickUpDateTime: moment(newDate).format("YYYY-MM-DD") + ' ' + newTime + ':00'
+    }
+    refreshTokenHelper(async() => {
+      const response = await PayCreditApi.chequePayment(data)
+      if(response == undefined){
+        dispatch(showError(true))
+        dispatch(setLoading(false))
+      } else {
+        if(!response?.data?.message?.pickup_time){
+          setShowSecondInput(true)
+          dispatch(setLoading(false))
+        } else {
+          setError({ value: true, message: 'Pick-up time passed or too soon' })
           dispatch(setLoading(false))
         }
       }
@@ -120,7 +163,6 @@ export default ToPayScreen = () => {
     dispatch(setLoading(true))
     refreshTokenHelper(async() => {
       const response = await CardPayment.getPaymentMetods()
-      console.log(response?.data)
       if(response == undefined){
         dispatch(setLoading(false))
         dispatch(showError(true))
@@ -143,6 +185,13 @@ export default ToPayScreen = () => {
     } else {
       if(response?.data?.success) {
         let regionList = response?.data?.data
+        if(paymentMethodValue == 1){
+          regionList.map(async(data, index) => {
+            if(data.name == userProfileData?.region){
+              await loadProvince(data.code)
+            }
+          })
+        }
         setRegionList(regionList)
       } else {
         console.log(response?.message)
@@ -157,6 +206,14 @@ export default ToPayScreen = () => {
     } else {
       if(response?.data?.success) {
         let provinceList = response?.data?.data
+        console.log(provinceList)
+        if(paymentMethodValue == 1){
+          provinceList.map(async(data, index) => {
+            if(data.name == userProfileData?.province){
+              await loadCity(data.code)
+            }
+          })
+        }
         setProvinceList(provinceList)
       } else {
         console.log(response?.message)
@@ -171,6 +228,13 @@ export default ToPayScreen = () => {
     } else {
       if(response?.data?.success) {
         let cityList = response?.data?.data
+        if(paymentMethodValue == 1){
+          cityList.map(async(data, index) => {
+            if(data.name == userProfileData?.city){
+              await loadBarangay(data.code)
+            }
+          })
+        }
         setCityList(cityList)
       } else {
         console.log(response?.message)
@@ -197,7 +261,6 @@ export default ToPayScreen = () => {
     
     if(granted){
       launchCamera().then(res => {
-        console.log(res)
         if(res.didCancel) {
           return;
         } else if(res?.assets?.length > 0) {
@@ -246,48 +309,57 @@ export default ToPayScreen = () => {
     }
   }
 
-  const bottomSheet = () => {
-    return(
-      <RBSheet
-        ref={setRef}
-        height={deviceHeight / 4.5}
-        openDuration={250}
-        customStyles={{
-          container: {
-            justifyContent: "center",
-            alignItems: "center",
-            borderTopLeftRadius: 15,
-            borderTopRightRadius: 15,
-          }
-        }}
-      >
-        <TouchableOpacity
-          style={styles.rbSheetBtn}
-          onPress={() => onPressImage()}
-        >
-          <Text style={styles.rbSheetText}>Take a photo</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.rbSheetBtn}
-          onPress={() => onChooseGallery()}
-        >
-          <Text style={styles.rbSheetText}>Choose from gallery</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.rbSheetBtn}
-          onPress={() => RBSheetRef.current.close()}
-        >
-          <Text style={[styles.rbSheetText, { color: UMColors.red }]}>Cancel</Text>
-        </TouchableOpacity>
-      </RBSheet>
-    )
+  const paymentMethodChanged = () => {
+    if(paymentMethodValue == 1){
+      restoreAddressData()
+    } else {
+      setShowSecondInput(false)
+      setContactName('')
+      setContactNumber('')
+      setAddress('')
+      setRegion('')
+      setZipCode('')
+      setProvince('')
+      setCity('')
+      setBarangay('')
+    }
+  }
+
+  const restoreAddressData = async() => {
+    setShowSecondInput(false)
+    setContactName(userProfileData?.first_name + ' ' + userProfileData?.last_name)
+    setContactNumber(userProfileData?.mobile_number.replace('+63', '0'))
+    setAddress(userProfileData?.address)
+    setRegion(userProfileData?.region)
+    setZipCode(userProfileData?.zip_code)
+    setProvince(userProfileData?.province)
+    setCity(userProfileData?.city)
+    setBarangay(userProfileData?.barangay)
+    await loadRegion()
   }
 
   const checkChequeInputs = () => {
-    if(chequeImg && address && region && zipCode && province && city && barangay){
+    if(chequeImg && address && regionData && zipCode && provinceData && cityData && barangayData){
       return true
     } else {
       return false
+    }
+  }
+  
+  const checkChequeFirstInputs = () => {
+    if(paymentMethodValue == 1){
+      if(contactName && newDate && newTime && contactNumber && chequeImg){
+        return true
+      } else {
+        return false
+      }
+    }
+    if(paymentMethodValue == 3){
+      if(contactName && contactNumber){
+        return true
+      } else {
+        return false
+      }
     }
   }
 
@@ -297,6 +369,29 @@ export default ToPayScreen = () => {
     } else {
       return false
     }
+  }
+  
+  const showDatePicker = (visible) => {
+    setDateModalVisible(visible);
+  }
+  
+  const showTimePicker = (visible) => {
+    setTimeModalVisible(visible);
+  }
+
+  const onChangeDate = (event, date) => {
+    setDateModalVisible(false)
+    const selectedDate = date?.toLocaleDateString('zh-Hans-CN');
+    let rawDate = selectedDate.replaceAll('/', '-') 
+    let nDate = new Date(rawDate)
+    setNewDate(nDate)
+  };
+
+  const onChangeTime = (event, time) => {
+    setTimeModalVisible(false)
+    const selectedTime = time?.toLocaleTimeString('en-GB', {hour: '2-digit', minute:'2-digit'});
+    let unformattedTime = selectedTime
+    setNewTime(unformattedTime)
   }
 
   const renderToPay = () => {
@@ -308,7 +403,7 @@ export default ToPayScreen = () => {
     )
   }
 
-  const renderCheckPayment = () => {
+  const renderChequePayment = () => {
     return (
       <View style={styles.checkContainer}>
         <View style={styles.mainWidthContainer}>
@@ -324,139 +419,261 @@ export default ToPayScreen = () => {
             { !chequeImg && <Text style={styles.uploadCheckBtnTxt}>Upload</Text> }
           </TouchableOpacity>
         </View>
-        <View style={[styles.mainWidthContainer, { marginTop: 20 }]}>
-          <TextInput
-            value={address}
-            style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
-            onChangeText={(address) => {
-              setAddress(address)
-            }}
-            placeholder="House No., Lot, Street"
-            placeholderTextColor={'#808080'}
-          />
+        {
+          !showSecondInputs ?
+            <View style={styles.checkContainer}>
+              <View style={[styles.mainWidthContainer, { marginTop: 20 }]}>
+                <TextInput
+                  value={contactName}
+                  style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
+                  onChangeText={(value) => {
+                    setContactName(value)
+                  }}
+                  placeholder="Contact Name"
+                  placeholderTextColor={'#808080'}
+                />
+              </View>
+              <View style={styles.mainWidthContainer}>
+                <TextInput
+                  value={contactNumber}
+                  maxLength={11}
+                  keyboardType='numeric'
+                  style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
+                  onChangeText={(value) => {
+                    setContactNumber(value)
+                  }}
+                  placeholder="Contact Number"
+                  placeholderTextColor={'#808080'}
+                />
+              </View>
+              {
+                paymentMethodValue == 1 &&
+                  <View style={[styles.mainWidthContainer, { flexDirection: 'row' }]}>
+                    <TouchableOpacity style={styles.dateInput} onPress={() => showDatePicker(true)}>
+                      { newDate == '' ?
+                        <Text style={{ color:'#808080' }}>
+                          Select Date
+                        </Text>
+                      :
+                        <Text style={{ color:'black' }}>
+                          {moment(newDate).format("YYYY-MM-DD")}
+                          {/* { dateFormat.format(this.state.newDate) } */}
+                        </Text>
+                      }
+                      <Image
+                        style={{ width: 20, height: 20 }}
+                        source={UMIcons.calendarInputIcon}
+                        resizeMode='contain'
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.timeInput} onPress={() => showTimePicker(true)}>
+                      { newTime == '' ?
+                        <Text style={{ color:'#808080' }}>
+                          Select time
+                        </Text>
+                      :
+                        <Text style={{ color:'black' }}>
+                          {make12HoursFormat(newTime)}
+                        </Text>
+                      }
+                      <Image
+                        style={{ width: 17, height: 17 }}
+                        source={UMIcons.timeInputIcon}
+                        resizeMode='contain'
+                      />
+                    </TouchableOpacity>
+                  </View>
+              }
+              <TouchableOpacity
+                  disabled={!checkChequeFirstInputs()}
+                  style={[styles.confirmBtn, checkChequeFirstInputs() && { backgroundColor: UMColors.primaryOrange }]}
+                  onPress={() => {
+                    if(!mobileNumberRegex(contactNumber)){
+                      setError({ value: true, message: 'Invalid Contact Number'})
+                    } else {
+                      if(paymentMethodValue == 1){
+                        chequePickUpTimeChecker()
+                      } else {
+                        setShowSecondInput(true)
+                      }
+                    }
+                  }}
+                >
+                  <Text style={styles.confirmBtnTxt}>
+                    Continue
+                  </Text>
+              </TouchableOpacity>
+            </View>
+          :
+            <View style={styles.checkContainer}>
+              <View style={[styles.mainWidthContainer, { marginTop: 20 }]}>
+                <TextInput
+                  value={address}
+                  style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
+                  onChangeText={(address) => {
+                    setAddress(address)
+                  }}
+                  placeholder="House No., Lot, Street"
+                  placeholderTextColor={'#808080'}
+                />
+              </View>
+              <View style={styles.regionZipContainer}>
+                <ModalSelector
+                  data={regionList}
+                  keyExtractor= {region => region.code}
+                  labelExtractor= {region =>  region.name}
+                  initValue={ paymentMethodValue == 1 ? regionData : "Select Region"}
+                  onChange={async(region) => {
+                    if(paymentMethodValue == 1){
+                      if(regionData !== region.name){
+                        setProvince('')
+                        setCity('')
+                        setBarangay('')
+                        setRegion(region.name)
+                        await loadProvince(region.code)
+                      } else {
+                        setRegion(region.name)
+                      }
+                    } else {
+                      setRegion(region.name)
+                      await loadProvince(region.code)
+                    }
+                  }}  
+                  searchText={'Search'}
+                  cancelText={'Cancel'}
+                  style={styles.regionInput}
+                  initValueTextStyle={[styles.initValueTextStyle, paymentMethodValue == 1 && { color: UMColors.black }]}
+                  searchStyle={styles.searchStyle}
+                  selectStyle={styles.selectStyle2}
+                  selectTextStyle={styles.selectTextStyle}
+                  sectionTextStyle={styles.sectionTextStyle}
+                  cancelStyle={styles.cancelStyle}
+                  cancelTextStyle={styles.cancelTextStyle}
+                  overlayStyle={styles.overlayStyle}
+                  touchableActiveOpacity={styles.touchableActiveOpacity}
+                />
+                {/* ZIP Code */}
+                <TextInput
+                  value={zipCode}
+                  style={[styles.zipInput]}
+                  onChangeText={(val) => {
+                    setZipCode(val)
+                  }}  
+                  placeholder='ZIP Code'
+                  placeholderTextColor={'#808080'}                        
+                  keyboardType='number-pad'
+                  returnKeyType='done'
+                  maxLength={4}
+                />
+              </View>
+              <View style={styles.mainWidthContainer}>
+                <ModalSelector
+                  disabled={!provinceList}
+                  data={provinceList}
+                  keyExtractor= {province => province.code}
+                  labelExtractor= {province => province.name}
+                  initValue={paymentMethodValue == 1 ? provinceData || !provinceData && "Select Province"  : "Select Province"}
+                  onChange={async(province) => {
+                    if(paymentMethodValue == 1){
+                      if(provinceData !== province.name){
+                        setCity('')
+                        setBarangay('')
+                        setProvince(province.name)
+                        await loadCity(province.code)
+                      } else {
+                        setProvince(province.name)
+                      }
+                    } else {
+                      setProvince(province.name)
+                      await loadCity(province.code)
+                    }
+                  }}
+                  searchText={'Search'}
+                  cancelText={'Cancel'}
+                  style={ regionData ? styles.fullWidthInput : styles.disabledFullWidthInput }
+                  initValueTextStyle={[styles.initValueTextStyle, paymentMethodValue == 1 && provinceData && { color: UMColors.black }]}
+                  searchStyle={styles.searchStyle}
+                  selectStyle={ regionData ? styles.selectStyle1 : styles.disabledSelectStyle }
+                  selectTextStyle={styles.selectTextStyle}
+                  sectionTextStyle={styles.sectionTextStyle}
+                  cancelStyle={styles.cancelStyle}
+                  cancelTextStyle={styles.cancelTextStyle}
+                  overlayStyle={styles.overlayStyle}
+                  touchableActiveOpacity={styles.touchableActiveOpacity}
+                />
+              </View>
+              <View style={styles.mainWidthContainer}>
+                <ModalSelector
+                  disabled={!cityList}
+                  data={cityList}
+                  keyExtractor= {city => city.code}
+                  labelExtractor= {city => city.name}
+                  initValue={paymentMethodValue == 1 ? cityData || !cityData && "Select City" : "Select City"}
+                  onChange={async(city) => {
+                    if(paymentMethodValue == 1){
+                      if(cityData !== city.name){
+                        setBarangay('')
+                        setCity(city.name)
+                        await loadBarangay(city.code)
+                      } else {
+                        setCity(city.name)
+                      }
+                    } else {
+                      setCity(city.name)
+                      await loadBarangay(city.code)
+                    }
+                  }}
+                  searchText={'Search'}
+                  cancelText={'Cancel'}
+                  style={ provinceData ? styles.fullWidthInput : styles.disabledFullWidthInput } 
+                  initValueTextStyle={[styles.initValueTextStyle, paymentMethodValue == 1 && cityData && { color: UMColors.black }]}
+                  searchStyle={styles.searchStyle}
+                  selectStyle={ provinceData ? styles.selectStyle1 : styles.disabledSelectStyle }
+                  selectTextStyle={styles.selectTextStyle}
+                  sectionTextStyle={styles.sectionTextStyle}
+                  cancelStyle={styles.cancelStyle}
+                  cancelTextStyle={styles.cancelTextStyle}
+                  overlayStyle={styles.overlayStyle}
+                  touchableActiveOpacity={styles.touchableActiveOpacity}
+                />
+              </View>
+              <View style={styles.mainWidthContainer}>
+                <ModalSelector
+                  disabled={!barangayList}
+                  data={barangayList}
+                  keyExtractor= {barangay => barangay.code}
+                  labelExtractor= {barangay => barangay.name}
+                  initValue={paymentMethodValue == 1 ? barangayData || !barangayData && "Select Province" : "Select Barangay"}
+                  onChange={(barangay) => {
+                    setBarangay(barangay.name)
+                  }}
+                  searchText={'Search'}
+                  cancelText={'Cancel'}
+                  style={ cityData ? styles.fullWidthInput : styles.disabledFullWidthInput } 
+                  initValueTextStyle={[styles.initValueTextStyle, paymentMethodValue == 1 && barangayData && { color: UMColors.black }]}
+                  searchStyle={styles.searchStyle}
+                  selectStyle={ cityData ? styles.selectStyle1 : styles.disabledSelectStyle }
+                  selectTextStyle={styles.selectTextStyle}
+                  sectionTextStyle={styles.sectionTextStyle}
+                  cancelStyle={styles.cancelStyle}
+                  cancelTextStyle={styles.cancelTextStyle}
+                  overlayStyle={styles.overlayStyle}
+                  touchableActiveOpacity={styles.touchableActiveOpacity}
+                />
+              </View>
+              <TouchableOpacity
+                disabled={!checkChequeInputs()}
+                style={[styles.confirmBtn, checkChequeInputs() && { backgroundColor: UMColors.primaryOrange }]}
+                onPress={() => onChequePayment()}
+              >
+                <Text style={styles.confirmBtnTxt}>
+                  Continue
+                </Text>
+              </TouchableOpacity>
+            </View>
+        }
         </View>
-        <View style={styles.regionZipContainer}>
-          <ModalSelector
-            data={regionList}
-            keyExtractor= {region => region.code}
-            labelExtractor= {region => region.name}
-            initValue="Select Region"
-            onChange={async(region) => {
-              await loadProvince(region.code)
-              setRegion(region.name)                
-            }}  
-            searchText={'Search'}
-            cancelText={'Cancel'}
-            style={styles.regionInput}
-            initValueTextStyle={styles.initValueTextStyle}
-            searchStyle={styles.searchStyle}
-            selectStyle={styles.selectStyle2}
-            selectTextStyle={styles.selectTextStyle}
-            sectionTextStyle={styles.sectionTextStyle}
-            cancelStyle={styles.cancelStyle}
-            cancelTextStyle={styles.cancelTextStyle}
-            overlayStyle={styles.overlayStyle}
-            touchableActiveOpacity={styles.touchableActiveOpacity}
-          />
-          {/* ZIP Code */}
-          <TextInput
-            value={zipCode}
-            style={[styles.zipInput]}
-            onChangeText={(val) => {
-              setZipCode(val)
-            }}  
-            placeholder='ZIP Code'
-            placeholderTextColor={'#808080'}                        
-            keyboardType='number-pad'
-            returnKeyType='done'
-            maxLength={4}
-          />
-        </View>
-        <View style={styles.mainWidthContainer}>
-          <ModalSelector
-            disabled={!region}
-            data={provinceList}
-            keyExtractor= {province => province.code}
-            labelExtractor= {province => province.name}
-            initValue="Select Province"
-            onChange={async(province) => {
-              await loadCity(province.code)
-              setProvince(province.name)
-            }}
-            searchText={'Search'}
-            cancelText={'Cancel'}
-            style={ region ? styles.fullWidthInput : styles.disabledFullWidthInput }
-            initValueTextStyle={styles.initValueTextStyle}
-            searchStyle={styles.searchStyle}
-            selectStyle={ region ? styles.selectStyle1 : styles.disabledSelectStyle }
-            selectTextStyle={styles.selectTextStyle}
-            sectionTextStyle={styles.sectionTextStyle}
-            cancelStyle={styles.cancelStyle}
-            cancelTextStyle={styles.cancelTextStyle}
-            overlayStyle={styles.overlayStyle}
-            touchableActiveOpacity={styles.touchableActiveOpacity}
-          />
-        </View>
-        <View style={styles.mainWidthContainer}>
-          <ModalSelector
-            disabled={!cityList}
-            data={cityList}
-            keyExtractor= {city => city.code}
-            labelExtractor= {city => city.name}
-            initValue="Select City"
-            onChange={async(city) => {
-              await loadBarangay(city.code)
-              setCity(city.name)
-            }}
-            searchText={'Search'}
-            cancelText={'Cancel'}
-            style={ province ? styles.fullWidthInput : styles.disabledFullWidthInput } 
-            initValueTextStyle={styles.initValueTextStyle}
-            searchStyle={styles.searchStyle}
-            selectStyle={ province ? styles.selectStyle1 : styles.disabledSelectStyle }
-            selectTextStyle={styles.selectTextStyle}
-            sectionTextStyle={styles.sectionTextStyle}
-            cancelStyle={styles.cancelStyle}
-            cancelTextStyle={styles.cancelTextStyle}
-            overlayStyle={styles.overlayStyle}
-            touchableActiveOpacity={styles.touchableActiveOpacity}
-          />
-        </View>
-        <View style={styles.mainWidthContainer}>
-          <ModalSelector
-            disabled={!barangayList}
-            data={barangayList}
-            keyExtractor= {barangay => barangay.code}
-            labelExtractor= {barangay => barangay.name}
-            initValue="Select Barangay"
-            onChange={(barangay) => {
-              setBarangay(barangay.name)
-            }}
-            searchText={'Search'}
-            cancelText={'Cancel'}
-            style={ city ? styles.fullWidthInput : styles.disabledFullWidthInput } 
-            initValueTextStyle={styles.initValueTextStyle}
-            searchStyle={styles.searchStyle}
-            selectStyle={ city ? styles.selectStyle1 : styles.disabledSelectStyle }
-            selectTextStyle={styles.selectTextStyle}
-            sectionTextStyle={styles.sectionTextStyle}
-            cancelStyle={styles.cancelStyle}
-            cancelTextStyle={styles.cancelTextStyle}
-            overlayStyle={styles.overlayStyle}
-            touchableActiveOpacity={styles.touchableActiveOpacity}
-          />
-        </View>
-        <TouchableOpacity
-          disabled={!checkChequeInputs()}
-          style={[styles.confirmBtn, checkChequeInputs() && { backgroundColor: UMColors.primaryOrange }]}
-          onPress={() => onChequePayment()}
-        >
-          <Text style={styles.confirmBtnTxt}>
-            Continue
-          </Text>
-        </TouchableOpacity>
-      </View>
-    )
+      )
   }
 
   const renderOnlinePayment = () => {
@@ -551,6 +768,87 @@ export default ToPayScreen = () => {
     }
   }
 
+  const bottomSheet = () => {
+    return(
+      <RBSheet
+        ref={setRef}
+        height={deviceHeight / 4.5}
+        openDuration={250}
+        customStyles={{
+          container: {
+            justifyContent: "center",
+            alignItems: "center",
+            borderTopLeftRadius: 15,
+            borderTopRightRadius: 15,
+          }
+        }}
+      >
+        <TouchableOpacity
+          style={styles.rbSheetBtn}
+          onPress={() => onPressImage()}
+        >
+          <Text style={styles.rbSheetText}>Take a photo</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.rbSheetBtn}
+          onPress={() => onChooseGallery()}
+        >
+          <Text style={styles.rbSheetText}>Choose from gallery</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.rbSheetBtn}
+          onPress={() => RBSheetRef.current.close()}
+        >
+          <Text style={[styles.rbSheetText, { color: UMColors.red }]}>Cancel</Text>
+        </TouchableOpacity>
+      </RBSheet>
+    )
+  }
+
+  const dateModal = () => {
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={dateModalVisible}
+        onRequestClose={() => setDateModalVisible(false) }
+      >
+        <View style={styles.centeredView}>
+          <DateTimePicker
+            display="default" 
+            mode="date"
+            minimumDate={new Date().setDate(new Date().getDate())}
+            themeVariant="light"
+            value={date}
+            onChange={onChangeDate}
+          />
+        </View>
+      </Modal>
+    )
+  }
+
+  const timeModal = () => {
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={timeModalVisible}
+        onRequestClose={() => setTimeModalVisible(false) }
+      >
+        <View style={styles.centeredView}>
+          <DateTimePicker 
+            display="default" 
+            mode="time"
+            themeVariant="light"
+            is24Hour={false}
+            value={time}
+            onChange={onChangeTime}
+          />
+        </View>
+      </Modal>
+    )
+  }
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView style={styles.mainContainer}>
@@ -576,11 +874,15 @@ export default ToPayScreen = () => {
               setPaymentMehodOpen(!paymentMehodOpen)}}
             setValue={setPaymentMethodValue}
             setItems={setPaymentCategoryItems}
+            onChangeValue={() => paymentMethodChanged()}
           />
           { !paymentMethodValue && renderToPay()}
-          { paymentMethodValue == 1 && renderCheckPayment()}
+          { paymentMethodValue == 1 && renderChequePayment()}
           { paymentMethodValue == 2 && renderOnlinePayment()}
+          { paymentMethodValue == 3 && renderChequePayment()}
         </View>
+        {dateModal()}
+        {timeModal()}
         {bottomSheet()}
         <Loader/>
       </SafeAreaView>
@@ -896,5 +1198,51 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: UMColors.primaryGray,
     marginLeft: 10
+  },
+  dateInput: {
+    backgroundColor: UMColors.white,
+    width: '51%',
+    marginRight: 7,
+    height: 50,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: UMColors.primaryOrange,
+    paddingLeft: '5%',
+    paddingRight: '5%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row'
+  },
+  timeInput: {
+    backgroundColor: UMColors.white,
+    width: '42%',
+    height: 50,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: UMColors.primaryOrange,
+    paddingLeft: '5%',
+    paddingRight: '5%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row'
+  },
+  blurContainer: {
+    flex: 1,
+    padding: 20,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)'
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalView: {
+    width: '90%',
+    backgroundColor: "white",
+    borderRadius: 20,
+    borderColor: 'rgb(223,131,68)',
+    borderWidth: 1,
+    elevation: 5
   },
 })

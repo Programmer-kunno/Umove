@@ -232,33 +232,6 @@ export default BookingPickUpScreen = (props) => {
                     value={date}
                     onChange={onChangeDate}
                   />
-                  {
-                  //IOS
-                  /* <View style={styles.alignItemCenter}>
-                    <TouchableOpacity
-                      style={styles.modalButton}
-                      onPress={() => this.setState({dateModalVisible: false}, () => {
-                        let booking = this.state.booking
-                        if(booking.pickupDate != '') {
-                          let unformattedDate = booking.pickupDate
-                          let rawDate = unformattedDate.replaceAll('/', '-') 
-                          let date = new Date(unformattedDate)
-
-                          this.setState({ newDate: date })
-                        } else {
-                          let date = new Date()
-                          this.setState({ newDate: date })
-                          
-                          const selectedDate = date.toLocaleDateString('zh-Hans-CN');
-                          let booking = this.state.booking
-                          booking.pickupDate = selectedDate
-                          this.setState({ booking }); 
-                        }
-                      })}
-                    >
-                      <Text style={styles.textStyle}> Done </Text>
-                    </TouchableOpacity>
-                  </View> */}
                 </View>
               </View>
             </TouchableWithoutFeedback>
@@ -284,30 +257,6 @@ export default BookingPickUpScreen = (props) => {
                   value={time}
                   onChange={onChangeTime}
                 />
-                {/* <View style={styles.alignItemCenter}>
-                  <TouchableOpacity
-                    style={styles.modalButton}
-                    onPress={() => this.setState({timeModalVisible: false}, () => {
-                      let booking = this.state.booking
-                      if(booking.pickupTime != '') {
-                        let unformattedTime = booking.pickupTime
-                        let time = new Date( 'March, 28 2001 ' + unformattedTime )
-
-                        this.setState({ newTime: time })
-                      } else {
-                        let time = new Date()
-                        this.setState({ newTime: time })
-                        
-                        const selectedTime = time.toLocaleTimeString('en-GB');
-                        let booking = this.state.booking
-                        booking.pickupTime = selectedTime
-                        this.setState({ booking });
-                      }
-                    })}
-                  >
-                    <Text style={styles.textStyle}> Done </Text>
-                  </TouchableOpacity>
-                </View> */}
               </View>
             </View>
           </TouchableWithoutFeedback>
@@ -876,14 +825,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     elevation: 5
   },
-  modalButton: {
-    borderRadius: 20,
-    width: '40%',
-    margin: 10,
-    padding: 10,
-    elevation: 2,
-    backgroundColor: "rgb(223,131,68)",
-  },
   textStyle: {
     color: "white",
     fontWeight: "bold",
@@ -895,10 +836,6 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.6)'
-  },
-  dateTimeSpinner: {
-    color: 'black',
-    borderRadius: 10,
   },
   btnContainer: {
     alignItems: 'center',

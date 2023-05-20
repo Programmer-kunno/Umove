@@ -32,6 +32,7 @@ const Chat = (props) => {
 
   useEffect(() => {
     if(lastMessage.data) {
+      console.log(lastMessage?.data)
       const newChats = [...chats];
       newChats.push(JSON.parse(lastMessage.data));
       setChats(newChats);

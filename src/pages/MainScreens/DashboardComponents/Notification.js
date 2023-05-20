@@ -86,7 +86,7 @@ export default Notification = () => {
               navigate('BookingAndDriverDescription', { booking: response?.data?.data })
               dispatch(setLoading(false))
             } else {
-              setListLoading(false);
+              dispatch(setLoading(false))
               setError({ value: true, message: response.data.message || response.data })
             }
           }
@@ -207,6 +207,10 @@ export default Notification = () => {
           value: true,
           data: data.notification_event
         })
+      }
+      console.log(data)
+      if(data.notification_event.title.includes('delivered')){
+        navigate('DeliveredScreen', { data: data })
       }
     }
 

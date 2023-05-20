@@ -99,6 +99,7 @@ export default SelectPaymentScreen = (props) => {
           style={styles.selectPaymentBtn}
           onPress={() => {
             setSelectedPaymentMethod(defaultPaymentMethod)
+            setUseWallet(false)
           }}
         >
           <View style={styles.radioBtnSection}>

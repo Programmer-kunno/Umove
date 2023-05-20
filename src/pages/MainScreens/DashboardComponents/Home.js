@@ -1,4 +1,4 @@
-import React, { Component, useState }  from 'react';
+import React, { Component, useEffect, useState }  from 'react';
 import { 
   StyleSheet, 
   View,
@@ -22,6 +22,11 @@ import { navigate } from '../../../utils/navigationHelper';
 import SelectPaymentScreen from '../Payment/SelectPaymentScreen';
 import { moneyFormat } from '../../../utils/stringHelper';
 import { decode } from '@googlemaps/polyline-codec';
+import { saveUser } from '../../../redux/actions/User';
+import { dispatch } from '../../../utils/redux';
+import { showError } from '../../../redux/actions/ErrorModal';
+import { CustomerApi } from '../../../api/customer';
+import { refreshTokenHelper } from '../../../api/helper/userHelper';
 
 const bgImage = '../../../assets/bg-image.jpg';
 const deviceWidth = Dimensions.get('screen').width
@@ -45,6 +50,25 @@ export default Home = () => {
     } else {
       setError({ value: true, message: 'Account not Validated, Please validate your account first' })
     }
+  }
+
+  useEffect(() => {
+    updateRedux()
+  }, [])
+
+  const updateRedux = () => {
+    refreshTokenHelper(async() => {
+      const response = await CustomerApi.getCustomerData()
+      if(response == undefined){
+        dispatch(showError(true))
+      } else {
+        if(response?.data?.success) {
+          dispatch(saveUser(response?.data?.data))
+        } else {
+          setError({ value: true, message: response?.data?.message || response?.data })
+        }
+      }
+    })
   }
 
   return(
@@ -107,7 +131,10 @@ export default Home = () => {
 
           {/* Body */}
           <View style={styles.bodyContainer}>
-            <View style={styles.walletContainer}>
+            <TouchableOpacity 
+              style={styles.walletContainer}
+              onPress={() => navigate('WalletScreen')}
+            >
               <View style={styles.balanceContainer}>
                 <View style={styles.balanceTxtContainer}>
                   <Text style={styles.balanceTxt}>{moneyFormat(userDetailsData.remaining_credits)}</Text>
@@ -120,7 +147,7 @@ export default Home = () => {
                 <Text style={styles.pointsTxt}>Points</Text>
                 <Text style={styles.pointsTxt}>{wallet.points}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
             <View style={styles.paragraphContainer}>
               <Text style={styles.paragraphTitle}>Send{'\n'}anything{'\n'}fast</Text>
               <Text style= {styles.paragraph}>There is no transfer, {'\n'}leading to the destination, {'\n'}real-time monitoring, first compensation {'\n'}guarantee and peace of mind.</Text>

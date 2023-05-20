@@ -6,7 +6,9 @@ import {
   Dimensions, 
   Image,
   FlatList, 
-  TouchableOpacity 
+  TouchableOpacity,
+  Modal,
+  TextInput
 } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { UMColors } from '../../utils/ColorHelper'
@@ -24,44 +26,45 @@ import ErrorWithCloseButtonModal from '../Components/ErrorWithCloseButtonModal'
 import ErrorOkModal from '../Components/ErrorOkModal'
 import { Loader } from '../Components/Loader'
 import { useSelector } from 'react-redux'
+import { FetchApi } from '../../api/fetch'
+import { useIsFocused } from '@react-navigation/native'
+import { PayCreditApi } from '../../api/creditPayment'
 
 const deviceWidth = Dimensions.get('screen').width
+const deviceHeight = Dimensions.get('screen').height
 
 export default WalletScreen = () => {
   const userDetailsData = useSelector(state => state.userOperations.userDetailsData)
   const [error, setError] = useState({ value: false, message: ''})
-  const [transactionList, setTransactionList] = useState([
-    {
-      transaction_id: 'UMC890',
-      booking_type: 'Shared Booking',
-      price: 125
-    },
-    {
-      transaction_id: 'UMC109',
-      booking_type: 'Exclusive Booking',
-      price: 1250
-    },
-    {
-      transaction_id: 'UMC025',
-      booking_type: 'Exclusive Booking',
-      price: 2015
-    },
-    {
-      transaction_id: 'UMC023',
-      booking_type: 'Shared Booking',
-      price: 825
-    },
-    {
-      transaction_id: 'UMC003',
-      booking_type: 'Refund',
-      price: 525
-    },
-  ])
+  const [paymentHistoryData, setPaymentHistoryData] = useState(undefined)
+  const isFocused = useIsFocused()
+  const [renewModal, setRenewModal] = useState(false)
+  const [renewInputModal, setRenewInputModal] = useState(false)
+  const [amount, setAmount] = useState('')
 
   useEffect(() => {
     getCustomerData()
-    console.log(userDetailsData?.outstanding_balance)
+    getPaymentHistory()
   }, [])
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+  const getPaymentHistory = () => {
+    dispatch(setLoading(true))
+    refreshTokenHelper(async() => {
+      const response = await FetchApi.PaymentsHistory()
+      if(response == undefined){
+        dispatch(showError(true))
+        dispatch(setLoading(false))
+      } else {
+        if(response?.data?.success){
+          setPaymentHistoryData(response?.data?.data)
+          dispatch(setLoading(false))
+        } else {
+          setError({ value: true, message: response?.data?.message || response?.data })
+          dispatch(setLoading(false))
+        }
+      }
+    })
+  }
 
   const getCustomerData = () => {
     dispatch(setLoading(true))
@@ -82,22 +85,108 @@ export default WalletScreen = () => {
     })
   }
 
+  const requestCreditIncrease = () => {
+    setRenewInputModal(false)
+    dispatch(setLoading(true))
+    const data = {
+      amount: amount
+    }
+    refreshTokenHelper(async() => {
+      const response = await PayCreditApi.requestRenew(data)
+      if(response == undefined){
+        dispatch(showError(true))
+        dispatch(setLoading(false))
+      } else {
+        if(response?.data?.success) {
+          setRenewModal(true)
+          dispatch(setLoading(false))
+        } else {
+          setError({ value: true, message: response?.data?.message || response?.data })
+          dispatch(setLoading(false))
+        }
+      }
+    })
+  }
+
   const renderTransaction = ({ item, index }) => {
     return (
       <View style={styles.transactionDetailsContainer}>
         <View style={styles.transactionLeftDetails}>
           <Image
             style={{ width: 40, height: 50 }}
-            source={ item.booking_type == 'Refund' ? UMIcons.refundIcon : UMIcons.transactionSheetIcon}
+            source={UMIcons.transactionSheetIcon}
             resizeMode='contain'
           />
           <View style={{ marginLeft: 5 }}>
-            <Text style={{ fontSize: 15, fontWeight: 'bold' }}>{item.transaction_id}</Text>
-            <Text style={{ fontSize: 10 }}>{item.booking_type}</Text>
+            <Text style={{ fontSize: 15, fontWeight: 'bold' }}>{item.cheque == 'None' ? 'Online Payment' : 'Cheque'}</Text>
+            <Text style={{ fontSize: 10 }}>{item.status}</Text>
           </View>
         </View>
-        <Text style={{ fontSize: 13 }}>{'-₱ ' + moneyFormat(item.price)}</Text>
+        <Text style={{ fontSize: 13, marginRight: 10 }}>{'₱ ' + moneyFormat(parseInt(item.amount))}</Text>
       </View>
+    )
+  }
+  
+  const creditInputModal = () => {
+    return(
+      <Modal
+        visible={renewInputModal}
+        animationType='none'
+        statusBarTranslucent
+        transparent={true}
+      >
+        <View style={styles.mainMdlContainer}>
+          <View style={styles.mdlContainer}>
+            <View style={styles.mdlTxtContainer}>
+              <Text style={[styles.mdlTxt, { marginTop: 30 }]}>{'Input desired credit increase'}</Text>
+              <TextInput
+                keyboardType='numeric'
+                style={styles.mdlRequestInput}
+                onChangeText={(val) => {
+                  setAmount(val)
+                }}
+              />
+            </View>
+            <View style={[styles.mdlBtnContainer, { marginBottom: 30 }]}>
+              <TouchableOpacity
+                onPress={() => requestCreditIncrease()}
+              >
+                <Text style={styles.mdlBtnTxt}>Confirm</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setRenewInputModal(false)
+                }}
+              >
+                <Text style={[styles.mdlBtnTxt, { color: UMColors.red }]}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    )
+  }
+
+  const requestRenewModal = () => {
+    return(
+      <Modal
+        visible={renewModal}
+        animationType='none'
+        statusBarTranslucent
+        transparent={true}
+      >
+        <View style={styles.mainMdlContainer}>
+          <View style={[styles.mdlContainer, { width: '90%' }]}>
+            <View style={styles.mdlTxtContainer}>
+              <Text style={[styles.mdlTxt, { marginTop: 30 }]}>{'You have requested for the renewal of your Credit Limit.'}</Text>
+              <Text style={[styles.mdlTxt, { marginTop: 20 }]}>{'Your Credit limit will renew once approved'}</Text>
+            </View>
+              <TouchableOpacity onPress={() => setRenewModal(false)}>
+                <Text style={[styles.mdlBtnTxt, { marginVertical: 30, fontSize: 20 }]}>Okay</Text>
+              </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     )
   }
 
@@ -117,7 +206,10 @@ export default WalletScreen = () => {
           <Text style={styles.creditBalance}>{moneyFormat(userDetailsData?.remaining_credits)}</Text>
           <View style={styles.walletCreditBottomContainer}>
             <Text style={styles.bottomPartTxt}>Current Credit Limit</Text>
-            <TouchableOpacity style={styles.renewBtn}>
+            <TouchableOpacity 
+              style={styles.renewBtn}
+              onPress={() => setRenewInputModal(true)}
+            >
               <Text style={[styles.bottomPartTxt, { color: UMColors.primaryOrange, fontWeight: 'bold', marginRight: 8}]}>
                 Request Renew
               </Text>
@@ -146,13 +238,14 @@ export default WalletScreen = () => {
               <Text style={styles.transactionsTxt}>Transactions</Text>
             </View>
             <TouchableOpacity>
-              <Text style={[styles.transactionsTxt, { color: UMColors.primaryOrange, fontWeight: 'bold'}]}>
+              <Text style={[styles.transactionsTxt, { color: UMColors.BGOrange, fontWeight: 'bold',}]}>
                 View All
               </Text>
             </TouchableOpacity>
           </View>
           <FlatList
-            data={transactionList}
+            data={paymentHistoryData}
+            style={styles.historyList}
             renderItem={renderTransaction}
           />
         </View>
@@ -165,7 +258,9 @@ export default WalletScreen = () => {
             >
               <Text style={styles.payBtnTxt}>Pay</Text>
             </TouchableOpacity>
-        }  
+        }
+      {creditInputModal()}
+      {requestRenewModal()}
       <Loader/>
     </SafeAreaView>
   )
@@ -181,7 +276,8 @@ const styles = StyleSheet.create({
     backgroundColor: UMColors.darkerGray,
     width: deviceWidth,
     height: '7%',
-    alignItems: 'center'
+    alignItems: 'center',
+    zIndex: 1
   },
   walletCreditContainer: {
     width: deviceWidth / 1.05,
@@ -214,7 +310,7 @@ const styles = StyleSheet.create({
   },
   renewBtn: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   toPayContainer: {
     marginTop: 120,
@@ -259,5 +355,68 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: UMColors.white
+  },
+  historyList: {
+    maxWidth: '100%',
+    maxHeight: '65%'
+  },
+  mainMdlContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  mdlContainer: {
+    width: '80%',
+    backgroundColor: UMColors.white,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  mdlTxtContainer: {
+    width: '85%',
+    justifyContent: 'center',
+  },
+  mdlTxt: {
+    color: UMColors.black,
+    fontSize: 18,
+    fontWeight: '400',
+    alignSelf: 'center',
+    textAlign: 'center'
+  },
+  mdlBtnContainer: {
+    width: '50%',
+    marginTop: '5%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  mdlBtnTxt: {
+    fontSize: 17,
+    fontWeight: 'bold',
+    color: UMColors.primaryOrange
+  },
+  mdlRequestInput: {
+    backgroundColor: UMColors.white,
+    borderWidth: 1,
+    borderColor: UMColors.primaryOrange,
+    color: UMColors.black,
+    height: 40,
+    borderRadius: 5,
+    marginTop: 10,
+    fontSize: 14,
+    paddingLeft: 10,
+    elevation: 7
+  },
+  renewModalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  mdlSubContainer: {
+    width: '90%',
+    height: 200,
+    backgroundColor: UMColors.white
   }
 })

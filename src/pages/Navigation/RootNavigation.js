@@ -77,6 +77,7 @@ import ReviewPaymentScreen from '../E-Wallet/ReviewPaymentScreen';
 import ConfirmationPaymentScreen from '../E-Wallet/ConfirmationPaymentScreen';
 import CreditReceiptScreen from '../E-Wallet/CreditReceiptScreen';
 import OnlinePaymentSuccessScreen from '../E-Wallet/OnlinePaymentSuccessScreen';
+import DeliveredScreen from '../../Rate Booking/DeliveredScreen';
 
 export default RootNavigation = () => {
   const Stack = createStackNavigator();
@@ -190,6 +191,8 @@ export default RootNavigation = () => {
       <Stack.Screen name="ConfirmationPaymentScreen" component={ConfirmationPaymentScreen} />
       <Stack.Screen name="CreditReceiptScreen" component={CreditReceiptScreen} />
       <Stack.Screen name="OnlinePaymentSuccessScreen" component={OnlinePaymentSuccessScreen} />
+      {/* Rate */}
+      <Stack.Screen name="DeliveredScreen" component={DeliveredScreen} />
 
       {/* There are Pages in the Archive and Hidden Folder */}
 
