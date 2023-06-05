@@ -27,10 +27,8 @@ export class PayCreditApi {
     formdata.append('barangay', data.barangay)
     formdata.append('zip_code', data.zipCode)
 
-    console.log(formdata)
-
     try {
-      const response = await post('/api/credits/pay/cheque', formdata, { 'Content-Type': 'multipart/form-data '})
+      const response = await post('/api/credits/pay/cheque', formdata, { 'Content-Type': 'multipart/form-data '}, false)
       return response
     } catch(err) {
       return err
@@ -38,9 +36,8 @@ export class PayCreditApi {
   }
 
   static async creditOnlinePayment(data) {
-    console.log(data)
     try {
-      const response = await post('/api/credits/pay', data)
+      const response = await post('/api/credits/pay', data, {}, false)
       return response
     } catch(err) {
       return err
@@ -49,7 +46,7 @@ export class PayCreditApi {
 
   static async requestRenew(data) {
     try {
-      const response = await post('/api/credits/request', data)
+      const response = await post('/api/credits/request', data, {}, false)
       return response
     } catch(err) {
       return err

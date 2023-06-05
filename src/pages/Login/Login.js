@@ -23,6 +23,7 @@ export default Login = (props) => {
   const [username, setUsername] = useState( logInData ? logInData.username : '')
   const [password, setPassword] = useState( logInData ? logInData.password : '')
   const [remember, setRemember] = useState(false)
+  const [securePass, setSecurePass] = useState(true)
   const isFocused = useIsFocused()
   const [error, setError] = useState({
     value: false,
@@ -91,12 +92,24 @@ export default Login = (props) => {
                 <Text style={styles.text}>
                   Password
                 </Text>
-                <TextInput
-                  style={styles.input}
-                  secureTextEntry={true}
-                  value={password}
-                  onChangeText={(val) => {setPassword(val)}}  
-                />
+                <View style={styles.passwordInputContainer}>
+                  <TextInput
+                    style={[styles.input, { paddingRight: 50 }]}
+                    secureTextEntry={securePass}
+                    value={password}
+                    onChangeText={(val) => {setPassword(val)}}  
+                  />
+                  <TouchableOpacity
+                    style={styles.showPassBtn}
+                    onPress={() => setSecurePass(!securePass)}
+                  >
+                    <Image
+                      style={{ width: 20, height: 20 }}
+                      source={ securePass ? UMIcons.eyeClosedIcon : UMIcons.eyeICon }
+                      resizeMode='contain'
+                    />
+                  </TouchableOpacity>
+                </View>
               </View>
               
               {/* Remember Me and Forgot Password */}
@@ -110,23 +123,16 @@ export default Login = (props) => {
                   />
                   <Text style={styles.rememberMeTxt}>Remember Me</Text>
                 </View>
-                <TouchableOpacity onPress={() => navigate('ForgotPassword')}>
-                  <Text style={styles.forgotPassword}>Forgot Password?</Text>
-                </TouchableOpacity>
               </View>
               {error.value && <View style={styles.errorContainer}><Text style={styles.errorMessage}>{error.message}</Text></View>}
-
             </View>
 
             {/* Login Button */}
             <View style={styles.logInBtnContainer}>
               {/* Make button gray when not all inputs are filled out, orange when filled out */}
-              { username == '' || password == '' ?
-              <TouchableOpacity style={styles.loginButtonGray} disabled={true}>
-                <Text style={styles.loginButtonText}>LOG IN</Text>
-              </TouchableOpacity>
-              :
-              <TouchableOpacity style={styles.loginButtonOrange} 
+              <TouchableOpacity 
+                style={username == '' || password == '' ? styles.loginButtonGray : styles.loginButtonOrange} 
+                disabled={username == '' || password == '' ? true : false}
                 onPress={() => {
                   Keyboard.dismiss() 
                   logIn() 
@@ -134,7 +140,9 @@ export default Login = (props) => {
               >
                 <Text style={styles.loginButtonText}>LOG IN</Text>
               </TouchableOpacity>
-              }
+              <TouchableOpacity onPress={() => navigate('ForgotPassword')}>
+                <Text style={styles.forgotPassword}>Forgot Password?</Text>
+              </TouchableOpacity>
             </View>
 
             {/* Login with */}
@@ -236,7 +244,15 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     borderColor: UMColors.primaryOrange,
     borderWidth: 1,
-    backgroundColor: UMColors.white
+    backgroundColor: UMColors.white,
+  },
+  passwordInputContainer: {
+    width: '100%'
+  },
+  showPassBtn: {
+    position: 'absolute',
+    bottom: '30%',
+    right: '6%'
   },
   rememberForgotContainer: {
     width: '75%',
@@ -263,17 +279,16 @@ const styles = StyleSheet.create({
     color: UMColors.black,
   },
   forgotPassword: {
-    fontStyle: 'italic',
-    fontSize: 12,
+    marginTop: 10,
+    fontSize: 13,
     color: UMColors.black,
-    paddingLeft: 30
   }, 
   logInBtnContainer: {
     width: '100%',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   loginButtonGray: {
-    marginTop: '15%',
+    marginTop: '13%',
     height: 50,
     width: '70%',
     borderRadius: 25,
@@ -283,7 +298,7 @@ const styles = StyleSheet.create({
     elevation: 8
   },
   loginButtonOrange: {
-    marginTop: '15%',
+    marginTop: '13%',
     height: 50,
     width: '70%',
     borderRadius: 25,

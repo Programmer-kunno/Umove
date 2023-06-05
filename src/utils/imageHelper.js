@@ -25,6 +25,7 @@ export const UMIcons = {
   exitIcon: require('../assets/icons/exit.png'),
   userBlankProfile: require('../assets/user/user-blank.png'),
   profilePicIcon: require('../assets/icons/profile-pic.png'),
+  truckImg: require('../assets/truck/truckImg.png'),
   //Profile Drawer
   homeWalletIcon: require('../assets/drawer/UMoveWalletIcon.png'),
   historyIcon: require('../assets/drawer/history.png'),
@@ -76,6 +77,9 @@ export const UMIcons = {
   UMoveTruckIcon: require('../assets/vehicles/UMoveTruck.png'),
   UMoveCarIcon: require('../assets/vehicles/UMoveCar.png'),
   UMoveMotorcycleIcon: require('../assets/vehicles/UMoveMotorcycle.png'),
+  eyeICon: require('../assets/icons/eyeIcon.png'),
+  eyeClosedIcon: require('../assets/icons/eyeClosedIcon.png'),
+  magnefyingGlassIcon: require('../assets/icons/magnefyingGlassIcon.png'),
   //Help
   orangeCircleTarget: require('../assets/help/orange-circle-target.png'),
   orangeCircleHeadset: require('../assets/help/orange-circle-headset.png'),
@@ -110,5 +114,8 @@ export const UMIcons = {
   uploadIcon: require('../assets/wallet/uploadIcon.png'),
   timeInputIcon: require('../assets/wallet/timeInputIcon.png'),
   calendarInputIcon: require('../assets/wallet/calendarInputIcon.png'),
+  //Rate
+  boxCheckIcon: require('../assets/rate/boxCheckIcon.png'),
+  openedBoxIcon: require('../assets/rate/openedBoxIcon.png'),
 }
  

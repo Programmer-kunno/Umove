@@ -19,9 +19,9 @@ import SignUpScreen3 from '../SignUp/SignUpScreens/SignUpScreen3';
 import SignUpScreen4 from '../SignUp/SignUpScreens/SignUpScreen4';
 import SignUpScreen5 from '../SignUp/SignUpScreens/SignUpScreen5';
 import SignUpScreen6 from '../SignUp/SignUpScreens/SignUpScreen6';
-import QuickQuotationItemDesc from '../QuickQuotation/QuickQuotationItemDesc';
+import QuickQuotationItemScreen from '../QuickQuotation/QuickQuotationItemScreen';
 import QuickQuotationPickUp from '../QuickQuotation/QuickQuotationPickUp';
-import QuickQuotationDelivery from '../QuickQuotation/QuickQuotationDelivery';
+import QuickQuotationDropOff from '../QuickQuotation/QuickQuotationDropOff';
 import QuickQuotateScreen from '../QuickQuotation/QuickQuotateScreen';
 import QuickQuotatePriceScreen from '../QuickQuotation/QuickQuotatePriceScreen';
 import BookingSelectVehicle from '../MainScreens/Booking/BookingSelectVehicle';
@@ -77,7 +77,14 @@ import ReviewPaymentScreen from '../E-Wallet/ReviewPaymentScreen';
 import ConfirmationPaymentScreen from '../E-Wallet/ConfirmationPaymentScreen';
 import CreditReceiptScreen from '../E-Wallet/CreditReceiptScreen';
 import OnlinePaymentSuccessScreen from '../E-Wallet/OnlinePaymentSuccessScreen';
-import DeliveredScreen from '../../Rate Booking/DeliveredScreen';
+import DeliveredScreen from '../../RateBooking/DeliveredScreen';
+import RateScreen from '../../RateBooking/RateScreen';
+import RateLoadingScreen from '../../RateBooking/RateLoadingScreen';
+import BookingPickUpMap from '../MainScreens/Booking/BookingPickUpMap';
+import BookingDropOffMap from '../MainScreens/Booking/BookingDropOffMap';
+import QuickQuotationPickUpMap from '../QuickQuotation/QuickQuotationPickUpMap';
+import QuickQuotationDropOffMap from '../QuickQuotation/QuickQuotationDropOffMap';
+import QuickQuotationSelectVehicle from '../QuickQuotation/QuickQuotationSelectVehicle';
 
 export default RootNavigation = () => {
   const Stack = createStackNavigator();
@@ -128,15 +135,20 @@ export default RootNavigation = () => {
       <Stack.Screen name="SignUpScreen4" component={SignUpScreen4} />
       <Stack.Screen name="SignUpScreen5" component={SignUpScreen5} />
       <Stack.Screen name="SignUpScreen6" component={SignUpScreen6} />
-      <Stack.Screen name="QuickQuotationItemDesc" component={QuickQuotationItemDesc} options={{ cardStyleInterpolator: forFade, gestureEnabled: false }} />
+      <Stack.Screen name="QuickQuotationSelectVehicle" component={QuickQuotationSelectVehicle} />
+      <Stack.Screen name="QuickQuotationItemScreen" component={QuickQuotationItemScreen} options={{ cardStyleInterpolator: forFade, gestureEnabled: false }} />
       <Stack.Screen name="QuickQuotationPickUp" component={QuickQuotationPickUp} />
-      <Stack.Screen name="QuickQuotationDelivery" component={QuickQuotationDelivery} />
+      <Stack.Screen name="QuickQuotationPickUpMap" component={QuickQuotationPickUpMap} />
+      <Stack.Screen name="QuickQuotationDropOff" component={QuickQuotationDropOff} />
+      <Stack.Screen name="QuickQuotationDropOffMap" component={QuickQuotationDropOffMap} />
       <Stack.Screen name="QuickQuotateScreen" component={QuickQuotateScreen} />
       <Stack.Screen name="QuickQuotatePriceScreen" component={QuickQuotatePriceScreen} />
       <Stack.Screen name="BookingSelectVehicle" component={BookingSelectVehicle} />
       <Stack.Screen name="BookingItemScreen" component={BookingItemScreen} />
       <Stack.Screen name="BookingPickUpScreen" component={BookingPickUpScreen} />
+      <Stack.Screen name="BookingPickUpMap" component={BookingPickUpMap} />
       <Stack.Screen name="BookingDropOffScreen" component={BookingDropOffScreen} />
+      <Stack.Screen name="BookingDropOffMap" component={BookingDropOffMap} />
       <Stack.Screen name="BookingDescriptionScreen" component={BookingDescriptionScreen} />
       <Stack.Screen name="BookingProcessingScreen" component={BookingProcessingScreen} />
       <Stack.Screen name="BookingFindingDriverScreen" component={BookingFindingDriverScreen} options={{ gestureEnabled: false }} />
@@ -193,6 +205,8 @@ export default RootNavigation = () => {
       <Stack.Screen name="OnlinePaymentSuccessScreen" component={OnlinePaymentSuccessScreen} />
       {/* Rate */}
       <Stack.Screen name="DeliveredScreen" component={DeliveredScreen} />
+      <Stack.Screen name="RateScreen" component={RateScreen} />
+      <Stack.Screen name="RateLoadingScreen" component={RateLoadingScreen} />
 
       {/* There are Pages in the Archive and Hidden Folder */}
 

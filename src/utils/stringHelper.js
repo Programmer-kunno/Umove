@@ -48,8 +48,6 @@ export const make12HoursFormat = (time) => {
   let meridian
   let newHour
   if(hours >= 12){
-    console.log(hours);
-    console.log(hours === 2);
     newHour = hours === 12 ? hours : hours - 12
     meridian = 'PM'
   } else if(hours === 0) {

@@ -74,6 +74,15 @@ export default class SignUpScreen1 extends Component {
     }
   }
 
+  checkIsEmptyInputs() {
+    const register = this.state.register
+    if(register.firstName == '' || register.lastName == '' || register.username == '' || register.email == '' || register.mobileNumber == ''){
+      return true 
+    } else {
+      return false
+    }
+  }
+
   render() {
     let register = this.state.register;
     return(
@@ -88,12 +97,11 @@ export default class SignUpScreen1 extends Component {
                 style={styles.logo}
                 resizeMode={'contain'}
               />
+              <Text style={styles.signUpText}>Sign Up</Text>
               {this.state.error && <View style={styles.errorContainer}><Text style={styles.errorMessage}>{this.state.message}</Text></View>}
             </View>
-
             {/* Sign Up input */}
             <View style={styles.middleContainer}>
-              <Text style={styles.signUpText}>Sign Up</Text>
               <View style={styles.inputPart}> 
                 <Text style={styles.text}>First Name</Text>
                 <TextInput
@@ -171,15 +179,13 @@ export default class SignUpScreen1 extends Component {
             {/* Next Button */}
             <View style={styles.nextBtnContainer}>
               {/* Make button gray when not all inputs are filled out, orange when filled out */}
-              { register.firstName == '' || register.lastName == '' || register.username == '' || register.email == '' || register.mobileNumber == ''  ?
-              <TouchableOpacity style={styles.signUpButtonGray} disabled={true}>
+              <TouchableOpacity 
+                style={[styles.signUpButton, !this.checkIsEmptyInputs() && {backgroundColor: UMColors.primaryOrange}]} 
+                disabled={this.checkIsEmptyInputs()}
+                onPress={() => this.register()}
+              >
                 <Text style={styles.signUpButtonText}>NEXT</Text>
               </TouchableOpacity>
-              :
-              <TouchableOpacity style={styles.signUpButtonOrange} onPress={() => this.register() }>
-                <Text style={styles.signUpButtonText}>NEXT</Text>
-              </TouchableOpacity>
-              }
             </View>
 
             {/* Login with */}
@@ -243,18 +249,17 @@ const styles = StyleSheet.create({
     backgroundColor: UMColors.BGOrange, 
   },
   upperContainer: {
-    height: '18%',
-    width: '80%',
+    width: '100%',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginBottom: 20,
   },
   logo: {
-    height: '50%',
+    height: 60,
     width: '80%',
   },
   signUpText: {
     fontSize: 20,
-    fontWeight: 'bold',
     color: 'black',
   },
   middleContainer: {
@@ -321,24 +326,16 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    height: '10%'
+    height: 45,
+    marginBottom: 10
   },
-  signUpButtonGray: {
-    height: '55%',
+  signUpButton: {
+    height: '100%',
     width: '70%',
     borderRadius: 25,
     justifyContent:'center',
     alignItems: 'center',
     backgroundColor: UMColors.primaryGray,
-    elevation: 5
-  },
-  signUpButtonOrange: {
-    height: '55%',
-    width: '70%',
-    borderRadius: 25,
-    justifyContent:'center',
-    alignItems: 'center',
-    backgroundColor: UMColors.primaryOrange,
     elevation: 5
   },
   bottomContainer: {
@@ -375,14 +372,14 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   errorContainer:{
-    width: '90%',
-    height: '20%',
+    width: '70%',
+    height: 35,
     borderWidth: 2,
     borderRadius: 5,
     borderColor: UMColors.red,
     backgroundColor: '#ffcdd2',
     position: 'absolute',
-    bottom: 5,
+    bottom: -40,
     alignItems: 'center',
     justifyContent: 'center'
   },

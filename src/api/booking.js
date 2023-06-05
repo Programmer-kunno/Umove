@@ -4,10 +4,55 @@ import {
 } from './helper/http';
 
 export class BookingApi {
-  
-  static async quickQuotation(booking) {
+
+  static async RateBooking(data, bookingNumber) {
     try {
-      const response = await post('/api/bookings/quick-quotation', booking)
+      const response = await post(`/api/bookings/ratings/create/${bookingNumber}`, data, {}, false)
+      return response
+    } catch(err) {
+      return err
+    }
+  }
+  
+  static async quickQuotation(bookingData) {
+
+    const data = {
+      "vehicle_type": bookingData.vehicleType,
+      "booking_routes":  [
+        {
+          "origin_address": bookingData.pickupStreetAddress,
+          "origin_region": bookingData.pickupRegion,
+          "origin_province": bookingData.pickupProvince,
+          "origin_city": bookingData.pickupCity,
+          "origin_barangay": bookingData.pickupBarangay,
+          "origin_zip_code": bookingData.pickupZipcode,
+          "origin_latitude": bookingData.pickupLatitude,
+          "origin_longitude": bookingData.pickupLongitude,
+          "destination_address": bookingData.dropoffStreetAddress,
+          "destination_region": bookingData.dropoffRegion,
+          "destination_province": bookingData.dropoffProvince,
+          "destination_city": bookingData.dropoffCity,
+          "destination_barangay": bookingData.dropoffBarangay,
+          "destination_zip_code": bookingData.dropoffZipcode,
+          "destination_latitude": bookingData.dropoffLatitude,
+          "destination_longitude": bookingData.dropoffLongitude,
+        }
+      ],
+      "booking_items":  [
+        {
+          "subcategory": bookingData.productSubcategory,
+          "uom": bookingData.packagingType,
+          "length": bookingData.length,
+          "width": bookingData.width,
+          "height": bookingData.height,
+          "weight": bookingData.weight,
+          "quantity": bookingData.quantity
+        }
+      ]
+    }
+
+    try {
+      const response = await post('/api/bookings/quick-quotation', data, {}, true)
       return response
     } catch(err) {
       return err
@@ -23,9 +68,18 @@ export class BookingApi {
     }
   }
 
+  static async getAddressLocation(address) {
+    try {
+      const response = await post('/api/bookings/location', address, {}, true)
+      return response
+    } catch (err) {
+      return err
+    }
+  }
+
   static async payBooking(bookNumber, data) {
     try {
-      const response = await post(`/api/bookings/pay/${bookNumber}`, data)   
+      const response = await post(`/api/bookings/pay/${bookNumber}`, data, {}, false)   
       return response
     } catch(err) {
       return err
@@ -33,47 +87,60 @@ export class BookingApi {
   }
 
   static async book(data) {
-    const booking = data
-    const pickUpDateTime = booking.pickupDate + " " + booking.pickupTime
+
+    let pickUpTime = data.pickupDate + ' ' + data.pickupTime
 
     const bookingDetails = {
-      "booking_type": booking.bookingType,
-      "vehicle_type": booking.vehicleType,
-      "pickup_time": pickUpDateTime,
-      "signature_required": true,
+      "booking_type": data.bookingType,
+      "charge_type": data.chargeType,
+      "vehicle_type": data.vehicleType,
+      "pickup_time": pickUpTime,
+      "signature_required": data.isSignatureRequired,
       "booking_routes": [
         {
-          "shipper": booking.pickupName,
-          "origin_address": booking.pickupStreetAddress,
-          "origin_region": booking.pickupRegion,
-          "origin_province": booking.pickupProvince,
-          "origin_city": booking.pickupCity,
-          "origin_barangay": booking.pickupBarangay,
-          "origin_zip_code": booking.pickupZipcode,
-          "receiver": booking.dropoffName,
-          "destination_address": booking.dropoffStreetAddress,
-          "destination_region": booking.dropoffRegion,
-          "destination_province": booking.dropoffProvince,
-          "destination_city": booking.dropoffCity,
-          "destination_barangay": booking.dropoffBarangay,
-          "destination_zip_code": booking.dropoffZipcode,
+          "shipper": data.pickupName,
+          "origin_address": data.pickupStreetAddress,
+          "origin_region": data.pickupRegion,
+          "origin_province": data.pickupProvince,
+          "origin_city": data.pickupCity,
+          "origin_barangay": data.pickupBarangay,
+          "origin_zip_code": data.pickupZipcode,
+          "origin_landmark": data.pickupLandmark,
+          "origin_special_instructions": data.pickupSpecialInstructions,
+
+          "receiver": data.dropoffName,
+          "destination_address": data.dropoffStreetAddress,
+          "destination_region": data.dropoffRegion,
+          "destination_province": data.dropoffProvince,
+          "destination_city": data.dropoffCity,
+          "destination_barangay": data.dropoffBarangay,
+          "destination_zip_code": data.dropoffZipcode,
+          "destination_landmark": data.dropoffLandmark,
+          "destination_special_instructions": data.dropoffSpecialInstructions,
+
+          "origin_latitude": data.pickupLatitude.toString(),
+          "origin_longitude": data.pickupLongitude.toString(),
+          "destination_latitude": data.dropoffLatitude.toString(),
+          "destination_longitude": data.dropoffLongitude.toString(),
         }
       ],
       "booking_items": [
         {
-          "subcategory": booking.productSubcategory,
-          "uom": booking.packagingType,
-          "length": booking.length,
-          "width": booking.width,
-          "height": booking.height,
-          "weight": booking.weight,
-          "quantity": booking.quantity
+          "subcategory": data.productSubcategory,
+          "uom": data.packagingType,
+          "length": data.length,
+          "width": data.width,
+          "height": data.height,
+          "weight": data.weight,
+          "quantity": data.quantity
         }
       ]
     }
 
+    console.log(bookingDetails)
+    
     try {
-      const response = await post('/api/bookings/book-delivery', bookingDetails)
+      const response = await post('/api/bookings/book-delivery', bookingDetails, {}, false)
       return response
     } catch(err) {
       return err
@@ -95,7 +162,7 @@ export class BookingApi {
     formData.append('status', 'confirmed')
 
     try {
-      const response = await post(`/api/bookings/update-status/${bookNumber}`, formData, { "Content-Type": "multipart/form-data" })
+      const response = await post(`/api/bookings/update-status/${bookNumber}`, formData, { "Content-Type": "multipart/form-data" }, false)
       return response
     } catch(err) {
       return err
@@ -108,16 +175,7 @@ export class BookingApi {
     formData.append('status', 'cancelled')
 
     try {
-      const response = await post(`/api/bookings/update-status/${bookNumber}`, formData, { "Content-Type": "multipart/form-data" })
-      return response
-    } catch(err) {
-      return err
-    }
-  }
-
-  static async quickQuotate(data) {
-    try {
-      const response = await post('/api/bookings/quick-quotation', data)
+      const response = await post(`/api/bookings/update-status/${bookNumber}`, formData, { "Content-Type": "multipart/form-data" }, false)
       return response
     } catch(err) {
       return err

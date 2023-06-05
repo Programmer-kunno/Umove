@@ -22,8 +22,6 @@ import { setLoading } from '../../../redux/actions/Loader';
 import { Loader } from '../../Components/Loader';
 import ErrorOkModal from '../../Components/ErrorOkModal';
 import { useIsFocused } from '@react-navigation/native';
-import { refreshTokenHelper } from '../../../api/helper/userHelper';
-import { saveBookingDetails } from '../../../redux/actions/Booking';
 
 export default BookingDropOffScreen = (props) => { 
   const [bookingData, setBookingData] = useState({})
@@ -39,34 +37,36 @@ export default BookingDropOffScreen = (props) => {
 
   useEffect(() => {
     if(isFocused){
-      dispatch(setLoading(false))
       setBookingData(props.route.params.booking)
-      console.log(props.route.params.booking)
-      if(props.route.params?.booking?.fromSaveAddress){
-        updateDataFromSaveAddress()
-      }
+      dispatch(setLoading(false))
     }
   }, [isFocused])
 
+  useEffect(() => {
+    loadRegion()
+  }, [bookingData])
+
   const booking = () => {
-    dispatch(setLoading(true))
-    refreshTokenHelper(async() => {
-      const response = await BookingApi.book(bookingData)
-      if(response == undefined){
-        dispatch(setLoading(false))
-        dispatch(showError(true))
-      } else {
-        if(response?.data?.success) {
-          dispatch(saveBookingDetails(response?.data?.data))
-          navigate('BookingDescriptionScreen', { booking: bookingData })
-          dispatch(setLoading(false))
-        } else {
-          setError({ value: true, message: response?.data?.message || response?.data })
-          dispatch(setLoading(false))
-        }
-      }
-    })
+    navigate('BookingDropOffMap', { booking: { ...bookingData, fromSaveAddress: false } })
   }
+
+  // const booking = async() => {
+  //   dispatch(setLoading(true))
+  //   const response = await BookingApi.book(bookingData)
+  //   console.log(response?.data)
+  //   if(response == undefined){
+  //     dispatch(setLoading(false))
+  //     dispatch(showError(true))
+  //   } else {
+  //     if(response?.data?.success){
+  //       navigate('BookingDescriptionScreen', { booking: { ...bookingData, fromSaveAddress: false } })
+  //       dispatch(setLoading(false))
+  //     } else {
+  //       setError({ value: true, message: response?.data?.message || response?.data })
+  //       dispatch(setLoading(false))
+  //     }
+  //   }
+  // }
 
   const loadRegion = async() => {
     const response = await FetchApi.regions()
@@ -74,6 +74,14 @@ export default BookingDropOffScreen = (props) => {
       dispatch(showError(true))
     } else {
       if(response?.data?.success) {
+        let regionList = response?.data?.data
+        if(bookingData?.fromSaveAddress || bookingData?.isRebook){
+          regionList.map(async(data, index) => {
+            if(data.name == bookingData?.dropoffRegion){
+              await loadProvince(data.code)
+            }
+          })
+        }
         setRegionList(response?.data?.data)
       } else {
         console.log(response?.message)
@@ -87,6 +95,14 @@ export default BookingDropOffScreen = (props) => {
       dispatch(showError(true))
     } else {
       if(response?.data?.success) {
+        let provinceList = response?.data?.data
+        if(bookingData?.fromSaveAddress || bookingData?.isRebook){
+          provinceList.map(async(data, index) => {
+            if(data.name == bookingData?.dropoffProvince){
+              await loadCity(data.code)
+            }
+          })
+        }
         setProvinceList(response?.data?.data)
       } else {
         console.log(response?.message)
@@ -100,6 +116,14 @@ export default BookingDropOffScreen = (props) => {
       dispatch(showError(true))
     } else {
       if(response?.data?.success) {
+        let cityList = response?.data?.data
+        if(bookingData?.fromSaveAddress || bookingData?.isRebook){
+          cityList.map(async(data, index) => {
+            if(data.name == bookingData?.dropoffCity){
+              await loadBarangay(data.code)
+            }
+          })
+        }
         setCityList(response?.data?.data)
       } else {
         console.log(response?.message)
@@ -120,29 +144,15 @@ export default BookingDropOffScreen = (props) => {
     }
   }
 
-  const updateDataFromSaveAddress = async() => {
-    await loadRegion();
-    if(regionList){
-      regionList.map(async(item, index) => {
-        if(item.name === bookingData?.dropoffRegion){
-         await loadProvince(item.code)
-        }
-      })
-    }
-    if(provinceList){
-      provinceList.map(async(item, index) => {
-        if(item.name === bookingData?.dropoffProvince){
-          await loadCity(item.code)
-        }
-      })
-    }
-    if(cityList){
-      cityList.map(async(item, index) => {
-        if(item.name === bookingData?.dropoffCity){
-          await loadBarangay(item.code)
-        }
-      })
-    }
+  const checkInputs = () => {
+    if( bookingData?.dropoffStreetAddress == '' || bookingData?.dropoffBarangay == '' || 
+        bookingData?.dropoffCity == '' || bookingData?.dropoffProvince == '' || 
+        bookingData?.dropoffRegion == '' || bookingData?.dropoffZipcode == ''
+      ){
+        return true
+      } else {
+        return false
+      }
   }
   
     //For-IOS
@@ -168,305 +178,244 @@ export default BookingDropOffScreen = (props) => {
           setError({ value: false, message: '' })
         }}
       />
-        {/* Header for Delivery Address */}
-        <CustomNavbar
-          Title={'Drop Off Address'}
-          onBack={() => {
-            navigate('BookingItemScreen')
-          }}
-        />
-        <View style={{width: '100%', height: '71%', alignItems: 'center'}}>
-          <ScrollView style={{width: '100%'}}>
+      {/* Header for Delivery Address */}
+      <CustomNavbar
+        Title={'Delivery Address'}
+        onBack={() => {
+          navigate('BookingPickUpScreen')
+        }}
+      />
+      <View style={{width: '100%', height: '71%', alignItems: 'center'}}>
+        <ScrollView style={{width: '100%'}}>
 
-            <View style={styles.labelContainer}>
-              <Text style={styles.labelText}> Drop Off Details </Text>
-            </View>
+          <View style={styles.labelContainer}>
+            <Text style={styles.labelText}> Drop Off Details </Text>
+          </View>
 
-            <View style={styles.inputContainer}>
-              {/* Sender Name */}
-              <TextInput
-                value={bookingData?.dropoffName}
-                style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
-                onChangeText={(dropoffName) => {
-                  setBookingData({
-                    ...bookingData,
-                    dropoffName: dropoffName
-                  })
-                }}
-                placeholder="Sender's Name"
-                placeholderTextColor={'#808080'}
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              {/* Street Address */}
-              <TextInput
-                value={bookingData?.dropoffStreetAddress}
-                style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
-                onChangeText={(streetAddress) => {
-                  setBookingData({
-                    ...bookingData,
-                    dropoffStreetAddress: streetAddress
-                  })
-                }}
-                placeholder='House No., Lot, Street'
-                placeholderTextColor={'#808080'}
-              />
-            </View>
-            {/* Region and Zip Code */}
-            <View style={[styles.inputContainer, styles.marginTop, styles.row]}>
-              {/* Region */}
-              <ModalSelector
-                data={regionList}
-                onModalOpen={() => {
-                  loadRegion();
-                }}
-                keyExtractor= {region => region.code}
-                labelExtractor= {region => region.name}
-                initValue={bookingData?.isRebook || bookingData?.fromSaveAddress ? bookingData?.dropoffRegion : "Select Region"}
-                disabled={bookingData?.isRebook ? true : false}
-                onChange={async(region) => {
-                  setBookingData(
-                    bookingData?.dropoffRegion === region.name ?
-                      { ...bookingData, dropoffRegion: region.name }
-                    :
-                      {
-                        ...bookingData, 
-                        dropoffRegion: region.name,
-                        dropoffProvince: '',
-                        dropoffCity: '',
-                        dropoffBarangay: '',
-                      }
-                  ), 
-                  await loadProvince(region.code);
-                }}  
-                searchText={'Search'}
-                cancelText={'Cancel'}
-                style={styles.regionInput}
-                initValueTextStyle={[styles.initValueTextStyle, bookingData?.fromSaveAddress && { color: UMColors.black }]}
-                searchStyle={styles.searchStyle}
-                selectStyle={[styles.selectStyle2, { backgroundColor: bookingData?.isRebook ? UMColors.ligthGray : UMColors.white}]}
-                selectTextStyle={styles.selectTextStyle}
-                sectionTextStyle={styles.sectionTextStyle}
-                cancelStyle={styles.cancelStyle}
-                cancelTextStyle={styles.cancelTextStyle}
-                overlayStyle={styles.overlayStyle}
-                touchableActiveOpacity={styles.touchableActiveOpacity}
-              />
-              {/* ZIP Code */}
-              <TextInput
-                value={bookingData?.dropoffZipcode}
-                style={[styles.zipInput, { backgroundColor: bookingData?.isRebook ? UMColors.ligthGray : UMColors.white}]}
-                editable={bookingData?.isRebook ? false : true}
-                onChangeText={(val) => {
-                  setBookingData({
-                    ...bookingData,
-                    dropoffZipcode: val
-                  })
-                }}  
-                placeholder='ZIP Code'
-                placeholderTextColor={'#808080'}                        
-                keyboardType='number-pad'
-                returnKeyType='done'
-                maxLength={4}
-              />
-            </View>
-            {/* Province */}
-            <View style={[styles.inputContainer, styles.marginTop, styles.row]}>
-              { bookingData?.dropoffRegion != '' ? 
-              <ModalSelector
-                data={provinceList}
-                keyExtractor= {province => province.code}
-                labelExtractor= {province => province.name}
-                initValue={bookingData?.isRebook || bookingData?.fromSaveAddress ? bookingData?.dropoffProvince : "Select Province"}
-                disabled={bookingData?.isRebook ? true : false}
-                onChange={async(province) => {
-                  setBookingData(
-                    bookingData?.dropoffProvince === province.name ?
-                      { ...bookingData, dropoffProvince: province.name }
-                    :
-                      {
-                        ...bookingData, 
-                        dropoffProvince: province.name,
-                        dropoffCity: '',
-                        dropoffBarangay: '',
-                      }
-                  ), 
-                  await loadCity(province.code);
-                }}
-                searchText={'Search'}
-                cancelText={'Cancel'}
-                style={styles.fullWidthInput}
-                initValueTextStyle={[styles.initValueTextStyle, bookingData?.fromSaveAddress && { color: UMColors.black }]}
-                searchStyle={styles.searchStyle}
-                selectStyle={[styles.selectStyle1, { backgroundColor: bookingData?.isRebook ? UMColors.ligthGray : UMColors.white}]}
-                selectTextStyle={styles.selectTextStyle}
-                sectionTextStyle={styles.sectionTextStyle}
-                cancelStyle={styles.cancelStyle}
-                cancelTextStyle={styles.cancelTextStyle}
-                overlayStyle={styles.overlayStyle}
-                touchableActiveOpacity={styles.touchableActiveOpacity}
-              />
-              :
-              <ModalSelector
-                disabled={true}
-                data={provinceList}
-                initValue={"Select Province"}
-                searchText={'Search'}
-                cancelText={'Cancel'}
-                style={styles.disabledFullWidthInput}
-                initValueTextStyle={styles.initValueTextStyle}
-                searchStyle={styles.searchStyle}
-                selectStyle={styles.disabledSelectStyle}
-                selectTextStyle={styles.selectTextStyle}
-                sectionTextStyle={styles.sectionTextStyle}
-                cancelStyle={styles.cancelStyle}
-                cancelTextStyle={styles.cancelTextStyle}
-                overlayStyle={styles.overlayStyle}
-                touchableActiveOpacity={styles.touchableActiveOpacity}
-              />
+          <View style={styles.inputContainer}>
+            {/* Sender Name */}
+            <TextInput
+              value={bookingData?.dropoffName}
+              style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
+              onChangeText={(dropoffName) => {
+                setBookingData({
+                  ...bookingData,
+                  dropoffName: dropoffName
+                })
+              }}
+              placeholder="Sender's Name"
+              placeholderTextColor={UMColors.primaryGray}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            {/* Street Address */}
+            <TextInput
+              value={bookingData?.dropoffStreetAddress}
+              style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
+              onChangeText={(streetAddress) => {
+                setBookingData({
+                  ...bookingData,
+                  dropoffStreetAddress: streetAddress
+                })
+              }}
+              placeholder='House No., Lot, Street'
+              placeholderTextColor={UMColors.primaryGray}
+            />
+          </View>
+          {/* Region and Zip Code */}
+          <View style={[styles.inputContainer, styles.marginTop, styles.row]}>
+            {/* Region */}
+            <ModalSelector
+              data={regionList}
+              onModalOpen={() => {
+                loadRegion();
+              }}
+              keyExtractor= {region => region.code}
+              labelExtractor= {region => region.name}
+              initValue={
+                bookingData.dropoffRegion
+                ? 
+                bookingData?.dropoffRegion || !bookingData?.dropoffRegion && "Select Region" 
+                : 
+                "Select Region"
               }
-            </View>
-
-            {/* City */}
-            <View style={[styles.inputContainer, styles.marginTop]}>
-            { bookingData?.dropoffProvince != '' ?
-              <ModalSelector
-                data={cityList}
-                keyExtractor= {city => city.code}
-                labelExtractor= {city => city.name}
-                initValue={bookingData?.isRebook || bookingData?.fromSaveAddress ? bookingData?.dropoffCity : "Select City"}
-                disabled={bookingData?.isRebook ? true : false}
-                onChange={async(city) => {
-                  setBookingData(
-                    bookingData?.dropoffCity === city.name ?
-                      { ...bookingData, dropoffCity: city.name }
-                    :
-                      {
-                        ...bookingData, 
-                        dropoffCity: city.name,
-                        dropoffBarangay: '',
-                      }
-                  ), 
-                  await loadBarangay(city.code);
-                }}  
-                searchText={'Search'}
-                cancelText={'Cancel'}
-                style={styles.fullWidthInput}
-                initValueTextStyle={[styles.initValueTextStyle, bookingData?.fromSaveAddress && { color: UMColors.black }]}
-                searchStyle={styles.searchStyle}
-                selectStyle={[styles.selectStyle1, { backgroundColor: bookingData?.isRebook ? UMColors.ligthGray : UMColors.white}]}
-                selectTextStyle={styles.selectTextStyle}
-                sectionTextStyle={styles.sectionTextStyle}
-                cancelStyle={styles.cancelStyle}
-                cancelTextStyle={styles.cancelTextStyle}
-                overlayStyle={styles.overlayStyle}
-              />
-              :
-              <ModalSelector
-                disabled={true}
-                initValue={"Select City"}
-                searchText={'Search'}
-                cancelText={'Cancel'}
-                style={styles.disabledFullWidthInput}
-                initValueTextStyle={styles.initValueTextStyle}
-                searchStyle={styles.searchStyle}
-                selectStyle={styles.disabledSelectStyle}
-                selectTextStyle={styles.selectTextStyle}
-                sectionTextStyle={styles.sectionTextStyle}
-                cancelStyle={styles.cancelStyle}
-                cancelTextStyle={styles.cancelTextStyle}
-                overlayStyle={styles.overlayStyle}
-                touchableActiveOpacity={styles.touchableActiveOpacity}
-              />
-            }
-            </View>
-
-            {/* Barangay */}
-            <View style={[styles.inputContainer, styles.marginTop]}>
-            { bookingData?.dropoffCity != '' ? 
-              <ModalSelector
-                data={barangayList}
-                keyExtractor= {barangay => barangay.code}
-                labelExtractor= {barangay => barangay.name}
-                initValue={bookingData?.isRebook || bookingData?.fromSaveAddress ? bookingData?.dropoffBarangay : "Select Barangay"}
-                disabled={bookingData?.isRebook ? true : false}
-                onChange={(barangay) => {
+              onChange={async(region) => {
+                if(bookingData?.dropoffRegion === region.name){
+                  setBookingData({ ...bookingData, dropoffRegion: region.name })
+                } else {
                   setBookingData({
-                    ...bookingData,
-                    dropoffBarangay: barangay.name
+                    ...bookingData, 
+                    dropoffRegion: region.name,
+                    dropoffProvince: '',
+                    dropoffCity: '',
+                    dropoffBarangay: '',
                   })
-                }} 
-                searchText={'Search'}
-                cancelText={'Cancel'}
-                style={styles.fullWidthInput}
-                initValueTextStyle={[styles.initValueTextStyle, bookingData?.fromSaveAddress && { color: UMColors.black }]}
-                searchStyle={styles.searchStyle}
-                selectStyle={[styles.selectStyle1, { backgroundColor: bookingData?.isRebook ? UMColors.ligthGray : UMColors.white}]}
-                selectTextStyle={styles.selectTextStyle}
-                sectionTextStyle={styles.sectionTextStyle}
-                cancelStyle={styles.cancelStyle}
-                cancelTextStyle={styles.cancelTextStyle}
-                overlayStyle={styles.overlayStyle}
-              />
-              :
-              <ModalSelector
-                disabled={true}
-                initValue={"Select Barangay"}
-                searchText={'Search'}
-                cancelText={'Cancel'}
-                style={styles.disabledFullWidthInput}
-                initValueTextStyle={styles.initValueTextStyle}
-                searchStyle={styles.searchStyle}
-                selectStyle={styles.disabledSelectStyle}
-                selectTextStyle={styles.selectTextStyle}
-                sectionTextStyle={styles.sectionTextStyle}
-                cancelStyle={styles.cancelStyle}
-                cancelTextStyle={styles.cancelTextStyle}
-                overlayStyle={styles.overlayStyle}
-                touchableActiveOpacity={styles.touchableActiveOpacity}
-              />
-            }
-            </View>
+                }
+                await loadProvince(region.code)
+              }}  
+              searchText={'Search'}
+              cancelText={'Cancel'}
+              style={styles.regionInput}
+              initValueTextStyle={[styles.initValueTextStyle, bookingData.dropoffRegion && { color: UMColors.black }]}
+              searchStyle={styles.searchStyle}
+              selectStyle={styles.selectStyle2}
+              selectTextStyle={styles.selectTextStyle}
+              sectionTextStyle={styles.sectionTextStyle}
+              cancelStyle={styles.cancelStyle}
+              cancelTextStyle={styles.cancelTextStyle}
+              overlayStyle={styles.overlayStyle}
+              touchableActiveOpacity={styles.touchableActiveOpacity}
+            />
+            {/* ZIP Code */}
+            <TextInput
+              value={bookingData?.dropoffZipcode}
+              style={styles.zipInput}
+              onChangeText={(val) => {
+                setBookingData({
+                  ...bookingData,
+                  dropoffZipcode: val
+                })
+              }}  
+              placeholder='ZIP Code'
+              placeholderTextColor={UMColors.primaryGray}                        
+              keyboardType='number-pad'
+              returnKeyType='done'
+              maxLength={4}
+            />
+          </View>
+          {/* Province */}
+          <View style={[styles.inputContainer, styles.marginTop, styles.row]}>
+            <ModalSelector
+              disabled={!provinceList}
+              data={provinceList}
+              keyExtractor= {province => province.code}
+              labelExtractor= {province => province.name}
+              initValue={
+                bookingData?.isRebook || bookingData?.fromSaveAddress 
+                ? 
+                bookingData?.dropoffProvince || !bookingData?.dropoffProvince && "Select Province" 
+                : 
+                "Select Province"
+              }
+              onChange={async(province) => {
+                setBookingData(
+                  bookingData?.dropoffProvince === province.name ?
+                    { ...bookingData, dropoffProvince: province.name }
+                  :
+                    {
+                      ...bookingData, 
+                      dropoffProvince: province.name,
+                      dropoffCity: '',
+                      dropoffBarangay: '',
+                    }
+                ), 
+                await loadCity(province.code);
+              }}
+              searchText={'Search'}
+              cancelText={'Cancel'}
+              style={bookingData?.dropoffRegion ? styles.fullWidthInput : styles.disabledFullWidthInput}
+              initValueTextStyle={[styles.initValueTextStyle, bookingData?.dropoffRegion && bookingData?.dropoffProvince && { color: UMColors.black }]}
+              searchStyle={styles.searchStyle}
+              selectStyle={bookingData?.dropoffRegion ? styles.selectStyle1 : styles.disabledSelectStyle}
+              selectTextStyle={styles.selectTextStyle}
+              sectionTextStyle={styles.sectionTextStyle}
+              cancelStyle={styles.cancelStyle}
+              cancelTextStyle={styles.cancelTextStyle}
+              overlayStyle={styles.overlayStyle}
+              touchableActiveOpacity={styles.touchableActiveOpacity}
+            />
+          </View>
 
-            {/* Landmarks */}
-            <View style={styles.inputContainer}>
-              <TextInput
-                value={bookingData?.dropoffLandmark}
-                style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
-                onChangeText={(landmark) => {
-                  setBookingData({
-                    ...bookingData,
-                    dropoffLandmark: landmark
-                  })
-                }}
-                placeholder='Landmarks (Optional)'
-                placeholderTextColor={'#808080'}
-              />
-            </View>
-            {/* Special Instruction */}
-            <View style={styles.inputContainer}>
-              <TextInput
-                value={bookingData?.dropoffSpecialInstructions}
-                style={[styles.marginTop, styles.specialInstructions]}
-                onChangeText={(specialInstructions) => {
-                  setBookingData({
-                    ...bookingData,
-                    dropoffSpecialInstructions: specialInstructions
-                  })
-                }}
-                placeholder='Special Instruction (Optional)'
-                placeholderTextColor={'#808080'}
-                multiline={true}
-                returnKeyType='done'
-                blurOnSubmit={true}
-                onSubmitEditing={()=>{Keyboard.dismiss()}}
-              />
-            </View>
-          </ScrollView>
-        </View>
-        
+          {/* City */}
+          <View style={[styles.inputContainer, styles.marginTop]}>
+            <ModalSelector
+              disabled={!cityList}
+              data={cityList}
+              keyExtractor= {city => city.code}
+              labelExtractor= {city => city.name}
+              initValue={
+                bookingData?.isRebook || bookingData?.fromSaveAddress 
+                ? 
+                bookingData?.dropoffCity || !bookingData?.dropoffCity && "Select City" 
+                : 
+                "Select City"}
+              onChange={async(city) => {
+                setBookingData(
+                  bookingData?.dropoffCity === city.name ?
+                    { ...bookingData, dropoffCity: city.name }
+                  :
+                    {
+                      ...bookingData, 
+                      dropoffCity: city.name,
+                      dropoffBarangay: '',
+                    }
+                ), 
+                await loadBarangay(city.code)
+              }}  
+              searchText={'Search'}
+              cancelText={'Cancel'}
+              style={bookingData?.dropoffProvince ? styles.fullWidthInput : styles.disabledFullWidthInput}
+              initValueTextStyle={[styles.initValueTextStyle, bookingData?.dropoffProvince && bookingData?.dropoffCity &&  { color: UMColors.black }]}
+              searchStyle={styles.searchStyle}
+              selectStyle={bookingData?.dropoffProvince ? styles.selectStyle1 : styles.disabledSelectStyle}
+              selectTextStyle={styles.selectTextStyle}
+              sectionTextStyle={styles.sectionTextStyle}
+              cancelStyle={styles.cancelStyle}
+              cancelTextStyle={styles.cancelTextStyle}
+              overlayStyle={styles.overlayStyle}
+            />
+          </View>
+          {/* Barangay */}
+          <View style={[styles.inputContainer, styles.marginTop]}>
+            <ModalSelector
+              disabled={!barangayList}
+              data={barangayList}
+              keyExtractor= {barangay => barangay.code}
+              labelExtractor= {barangay => barangay.name}
+              initValue={
+                bookingData?.isRebook || bookingData?.fromSaveAddress 
+                ? 
+                bookingData?.dropoffBarangay || !bookingData?.dropoffBarangay && "Select Barangay" 
+                : 
+                "Select Barangay"}
+              onChange={(barangay) => {
+                setBookingData({
+                  ...bookingData,
+                  dropoffBarangay: barangay.name
+                })
+              }} 
+              searchText={'Search'}
+              cancelText={'Cancel'}
+              style={bookingData?.dropoffCity ? styles.fullWidthInput : styles.disabledFullWidthInput}
+              initValueTextStyle={[styles.initValueTextStyle, bookingData?.dropoffCity && bookingData?.dropoffBarangay && { color: UMColors.black }]}
+              searchStyle={styles.searchStyle}
+              selectStyle={bookingData?.dropoffCity ? styles.selectStyle1 : styles.disabledSelectStyle}
+              selectTextStyle={styles.selectTextStyle}
+              sectionTextStyle={styles.sectionTextStyle}
+              cancelStyle={styles.cancelStyle}
+              cancelTextStyle={styles.cancelTextStyle}
+              overlayStyle={styles.overlayStyle}
+            />
+          </View>
 
+          {/* Landmarks */}
+          <View style={styles.inputContainer}>
+            <TextInput
+              value={bookingData?.dropoffLandmark}
+              style={[styles.landmarkTxtInput, styles.marginTop, { paddingLeft: '5%', textAlignVertical: 'top'}]}
+              multiline={true}
+              onChangeText={(landmark) => {
+                setBookingData({
+                  ...bookingData,
+                  dropoffLandmark: landmark
+                })
+              }}
+              placeholder='Landmark (Optional)'
+              placeholderTextColor={UMColors.primaryGray}
+            />
+          </View>
+        </ScrollView>
+      </View>
       <View style={styles.btnContainer}>
         {/* Select from Saved Addresses */}
         <TouchableOpacity 
@@ -478,17 +427,13 @@ export default BookingDropOffScreen = (props) => {
         
         {/* Next Button */}
           {/* Make button gray when not all inputs are filled out, orange when filled out */}
-        { bookingData?.dropoffName == '' || bookingData?.dropoffStreetAddress == '' || bookingData?.dropoffBarangay == '' || bookingData?.dropoffCity == '' || bookingData?.dropoffProvince == '' || bookingData?.dropoffRegion == '' || bookingData?.dropoffZipcode == '' ?
-        <TouchableOpacity style={styles.nextButtonGray} disabled={true}>
-          <Text style={styles.buttonText}> NEXT </Text>
+        <TouchableOpacity 
+          style={checkInputs() ? styles.nextButtonGray : styles.nextButtonOrange} 
+          disabled={checkInputs()}
+          onPress={() => booking()}
+        >
+          <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>
-        :
-        <TouchableOpacity style={styles.nextButtonOrange} onPress={() => {
-          booking()
-        }}>
-          <Text style={styles.buttonText}> NEXT </Text>
-        </TouchableOpacity>
-        }
       </View>
       <Loader/>
     </View>
@@ -507,8 +452,8 @@ const styles = StyleSheet.create({
     marginLeft: '6%'
   },
   labelText: {
-    color: 'black',
-    fontSize: 15,
+    color: UMColors.primaryOrange,
+    fontSize: 14,
     fontWeight: '700',
     letterSpacing: 1
   },
@@ -533,27 +478,31 @@ const styles = StyleSheet.create({
     marginRight: '2%'
   },
   dateInput: {
-    backgroundColor: 'white',
-    width: '59%',
+    backgroundColor: UMColors.white,
+    width: '48%',
     marginRight: 7,
     height: 40,
-    borderTopLeftRadius: 25,
-    borderBottomLeftRadius: 25,
+    borderRadius: 25,
     borderWidth: 1,
-    borderColor: 'rgb(223,131,68)',
+    borderColor: UMColors.primaryOrange,
     paddingLeft: '5%',
-    justifyContent: 'center'
+    paddingRight: '5%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row'
   },
   timeInput: {
-    backgroundColor: 'white',
-    width: '29%',
+    backgroundColor: UMColors.white,
+    width: '40%',
     height: 40,
-    borderTopRightRadius: 25,
-    borderBottomRightRadius: 25,
+    borderRadius: 25,
     borderWidth: 1,
-    borderColor: 'rgb(223,131,68)',
-    justifyContent: 'center',
-    alignItems: 'center'
+    borderColor: UMColors.primaryOrange,
+    paddingLeft: '5%',
+    paddingRight: '5%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row'
   },
   fullWidthInput: {
     backgroundColor: 'white',
@@ -577,20 +526,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginLeft: '3%'
   },
-  specialInstructions: {
+  landmarkTxtInput: {
     backgroundColor: 'white',
     width: '90%',
     height: 100,
     borderRadius: 25,
     borderWidth: 1,
     borderColor: 'rgb(223,131,68)',
-    paddingRight: '5%',
-    paddingLeft: '5%',
-    paddingTop: '5%',
+    paddingHorizontal: 10
   },
   initValueTextStyle: {
     fontSize: 14,
-    color: "#808080"
+    color: UMColors.primaryGray
   },
   searchStyle: {
     borderColor: 'black',
@@ -649,16 +596,17 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     borderWidth: 1,
     borderColor: 'rgb(223,131,68)',
-    paddingLeft: '5%'
+    justifyContent: 'center',
   },
   disabledSelectStyle: {
     backgroundColor: 'rgb(222, 223, 228)',
     width: '100%',
-    height: 38,
+    height: '100%',
     borderRadius: 25,
     borderWidth: 0,
     justifyContent: 'center',
     alignItems: 'flex-start',
+    paddingLeft: '5%',
   },
   nextButtonGray: {
     marginTop: '2%',
@@ -701,14 +649,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     elevation: 5
   },
-  modalButton: {
-    borderRadius: 20,
-    width: '40%',
-    margin: 10,
-    padding: 10,
-    elevation: 2,
-    backgroundColor: "rgb(223,131,68)",
-  },
   textStyle: {
     color: "white",
     fontWeight: "bold",
@@ -720,10 +660,6 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.6)'
-  },
-  dateTimeSpinner: {
-    color: 'black',
-    borderRadius: 10,
   },
   btnContainer: {
     alignItems: 'center',

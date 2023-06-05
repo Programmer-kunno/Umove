@@ -7,6 +7,7 @@ import {
   TextInput, 
   TouchableOpacity, 
   ScrollView, 
+  Keyboard
 } from 'react-native';
 import ModalSelector from 'react-native-modal-selector-searchable';
 import { UMColors } from '../../utils/ColorHelper';
@@ -16,11 +17,12 @@ import { navigate } from '../../utils/navigationHelper';
 import { dispatch } from '../../utils/redux';
 import { showError } from '../../redux/actions/ErrorModal';
 import ErrorWithCloseButtonModal from '../Components/ErrorWithCloseButtonModal';
+import { setLoading } from '../../redux/actions/Loader';
+import { Loader } from '../Components/Loader';
 import ErrorOkModal from '../Components/ErrorOkModal';
 import { useIsFocused } from '@react-navigation/native';
-import { UMIcons } from '../../../utils/imageHelper';
 
-export default QuickQuotationPickUp = (props) => { 
+export default QuickQuotationDropOff = (props) => { 
   const [bookingData, setBookingData] = useState({})
   const [regionList, setRegionList] = useState()
   const [provinceList, setProvinceList] = useState()
@@ -32,10 +34,10 @@ export default QuickQuotationPickUp = (props) => {
     message: ''
   })
 
-
   useEffect(() => {
     if(isFocused){
       setBookingData(props.route.params.booking)
+      dispatch(setLoading(false))
     }
   }, [isFocused])
 
@@ -43,8 +45,8 @@ export default QuickQuotationPickUp = (props) => {
     loadRegion()
   }, [bookingData])
 
-  const booking = async() => {
-    navigate('QuickQuotationPickUpMap', { booking: bookingData })
+  const booking = () => {
+    navigate('QuickQuotationDropOffMap', { booking: bookingData })
   }
 
   const loadRegion = async() => {
@@ -56,14 +58,14 @@ export default QuickQuotationPickUp = (props) => {
         let regionList = response?.data?.data
         if(bookingData?.fromSaveAddress || bookingData?.isRebook){
           regionList.map(async(data, index) => {
-            if(data.name == bookingData?.pickupRegion){
+            if(data.name == bookingData?.dropoffRegion){
               await loadProvince(data.code)
             }
           })
         }
         setRegionList(response?.data?.data)
       } else {
-        setError({ value: true, message: response?.data?.message || response?.data })
+        console.log(response?.message)
       }
     }
   }
@@ -77,14 +79,14 @@ export default QuickQuotationPickUp = (props) => {
         let provinceList = response?.data?.data
         if(bookingData?.fromSaveAddress || bookingData?.isRebook){
           provinceList.map(async(data, index) => {
-            if(data.name == bookingData?.pickupProvince){
+            if(data.name == bookingData?.dropoffProvince){
               await loadCity(data.code)
             }
           })
         }
         setProvinceList(response?.data?.data)
       } else {
-        setError({ value: true, message: response?.data?.message || response?.data })
+        console.log(response?.message)
       }
     }
   }
@@ -98,14 +100,14 @@ export default QuickQuotationPickUp = (props) => {
         let cityList = response?.data?.data
         if(bookingData?.fromSaveAddress || bookingData?.isRebook){
           cityList.map(async(data, index) => {
-            if(data.name == bookingData?.pickupCity){
+            if(data.name == bookingData?.dropoffCity){
               await loadBarangay(data.code)
             }
           })
         }
         setCityList(response?.data?.data)
       } else {
-        setError({ value: true, message: response?.data?.message || response?.data })
+        console.log(response?.message)
       }
     }
   }
@@ -118,15 +120,15 @@ export default QuickQuotationPickUp = (props) => {
       if(response?.data?.success) {
         setBarangayList(response?.data?.data)
       } else {
-        setError({ value: true, message: response?.data?.message || response?.data })
+        console.log(response?.message)
       }
     }
   }
 
   const checkInputs = () => {
-    if( bookingData?.pickupStreetAddress == '' || bookingData?.pickupBarangay == '' || 
-        bookingData?.pickupCity == '' || bookingData?.pickupProvince == '' || 
-        bookingData?.pickupRegion == '' || bookingData?.pickupZipcode == ''
+    if( bookingData?.dropoffStreetAddress == '' || bookingData?.dropoffBarangay == '' || 
+        bookingData?.dropoffCity == '' || bookingData?.dropoffProvince == '' || 
+        bookingData?.dropoffRegion == '' || bookingData?.dropoffZipcode == ''
       ){
         return true
       } else {
@@ -145,30 +147,26 @@ export default QuickQuotationPickUp = (props) => {
           setError({ value: false, message: '' })
         }}
       />
-
       {/* Header for Delivery Address */}
       <CustomNavbar
         Title={'Delivery Address'}
-        onBack={() => {
-          navigate('BookingItemScreen')
-        }}
       />
       <View style={{width: '100%', height: '71%', alignItems: 'center'}}>
         <ScrollView style={{width: '100%'}}>
 
           <View style={styles.labelContainer}>
-            <Text style={styles.labelText}> Pick Up Details </Text>
+            <Text style={styles.labelText}> Drop Off Details </Text>
           </View>
 
           <View style={styles.inputContainer}>
             {/* Sender Name */}
             <TextInput
-              value={bookingData?.pickupName}
+              value={bookingData?.dropoffName}
               style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
-              onChangeText={(pickupName) => {
+              onChangeText={(dropoffName) => {
                 setBookingData({
                   ...bookingData,
-                  pickupName: pickupName
+                  dropoffName: dropoffName
                 })
               }}
               placeholder="Sender's Name"
@@ -178,12 +176,12 @@ export default QuickQuotationPickUp = (props) => {
           <View style={styles.inputContainer}>
             {/* Street Address */}
             <TextInput
-              value={bookingData?.pickupStreetAddress}
+              value={bookingData?.dropoffStreetAddress}
               style={[styles.fullWidthInput, styles.marginTop, { paddingLeft: '5%' }]}
               onChangeText={(streetAddress) => {
                 setBookingData({
                   ...bookingData,
-                  pickupStreetAddress: streetAddress
+                  dropoffStreetAddress: streetAddress
                 })
               }}
               placeholder='House No., Lot, Street'
@@ -201,22 +199,22 @@ export default QuickQuotationPickUp = (props) => {
               keyExtractor= {region => region.code}
               labelExtractor= {region => region.name}
               initValue={
-                bookingData.pickupRegion
+                bookingData.dropoffRegion
                 ? 
-                bookingData?.pickupRegion || !bookingData?.pickupRegion && "Select Region" 
+                bookingData?.dropoffRegion || !bookingData?.dropoffRegion && "Select Region" 
                 : 
                 "Select Region"
               }
               onChange={async(region) => {
-                if(bookingData?.pickupRegion === region.name){
-                  setBookingData({ ...bookingData, pickupRegion: region.name })
+                if(bookingData?.dropoffRegion === region.name){
+                  setBookingData({ ...bookingData, dropoffRegion: region.name })
                 } else {
                   setBookingData({
                     ...bookingData, 
-                    pickupRegion: region.name,
-                    pickupProvince: '',
-                    pickupCity: '',
-                    pickupBarangay: '',
+                    dropoffRegion: region.name,
+                    dropoffProvince: '',
+                    dropoffCity: '',
+                    dropoffBarangay: '',
                   })
                 }
                 await loadProvince(region.code)
@@ -224,7 +222,7 @@ export default QuickQuotationPickUp = (props) => {
               searchText={'Search'}
               cancelText={'Cancel'}
               style={styles.regionInput}
-              initValueTextStyle={[styles.initValueTextStyle, bookingData.pickupRegion && { color: UMColors.black }]}
+              initValueTextStyle={[styles.initValueTextStyle, bookingData.dropoffRegion && { color: UMColors.black }]}
               searchStyle={styles.searchStyle}
               selectStyle={styles.selectStyle2}
               selectTextStyle={styles.selectTextStyle}
@@ -236,12 +234,12 @@ export default QuickQuotationPickUp = (props) => {
             />
             {/* ZIP Code */}
             <TextInput
-              value={bookingData?.pickupZipcode}
+              value={bookingData?.dropoffZipcode}
               style={styles.zipInput}
               onChangeText={(val) => {
                 setBookingData({
                   ...bookingData,
-                  pickupZipcode: val
+                  dropoffZipcode: val
                 })
               }}  
               placeholder='ZIP Code'
@@ -261,30 +259,30 @@ export default QuickQuotationPickUp = (props) => {
               initValue={
                 bookingData?.isRebook || bookingData?.fromSaveAddress 
                 ? 
-                bookingData?.pickupProvince || !bookingData?.pickupProvince && "Select Province" 
+                bookingData?.dropoffProvince || !bookingData?.dropoffProvince && "Select Province" 
                 : 
                 "Select Province"
               }
               onChange={async(province) => {
                 setBookingData(
-                  bookingData?.pickupProvince === province.name ?
-                    { ...bookingData, pickupProvince: province.name }
+                  bookingData?.dropoffProvince === province.name ?
+                    { ...bookingData, dropoffProvince: province.name }
                   :
                     {
                       ...bookingData, 
-                      pickupProvince: province.name,
-                      pickupCity: '',
-                      pickupBarangay: '',
+                      dropoffProvince: province.name,
+                      dropoffCity: '',
+                      dropoffBarangay: '',
                     }
                 ), 
                 await loadCity(province.code);
               }}
               searchText={'Search'}
               cancelText={'Cancel'}
-              style={bookingData?.pickupRegion ? styles.fullWidthInput : styles.disabledFullWidthInput}
-              initValueTextStyle={[styles.initValueTextStyle, bookingData?.pickupRegion && bookingData?.pickupProvince && { color: UMColors.black }]}
+              style={bookingData?.dropoffRegion ? styles.fullWidthInput : styles.disabledFullWidthInput}
+              initValueTextStyle={[styles.initValueTextStyle, bookingData?.dropoffRegion && bookingData?.dropoffProvince && { color: UMColors.black }]}
               searchStyle={styles.searchStyle}
-              selectStyle={bookingData?.pickupRegion ? styles.selectStyle1 : styles.disabledSelectStyle}
+              selectStyle={bookingData?.dropoffRegion ? styles.selectStyle1 : styles.disabledSelectStyle}
               selectTextStyle={styles.selectTextStyle}
               sectionTextStyle={styles.sectionTextStyle}
               cancelStyle={styles.cancelStyle}
@@ -304,28 +302,28 @@ export default QuickQuotationPickUp = (props) => {
               initValue={
                 bookingData?.isRebook || bookingData?.fromSaveAddress 
                 ? 
-                bookingData?.pickupCity || !bookingData?.pickupCity && "Select City" 
+                bookingData?.dropoffCity || !bookingData?.dropoffCity && "Select City" 
                 : 
                 "Select City"}
               onChange={async(city) => {
                 setBookingData(
-                  bookingData?.pickupCity === city.name ?
-                    { ...bookingData, pickupCity: city.name }
+                  bookingData?.dropoffCity === city.name ?
+                    { ...bookingData, dropoffCity: city.name }
                   :
                     {
                       ...bookingData, 
-                      pickupCity: city.name,
-                      pickupBarangay: '',
+                      dropoffCity: city.name,
+                      dropoffBarangay: '',
                     }
                 ), 
                 await loadBarangay(city.code)
               }}  
               searchText={'Search'}
               cancelText={'Cancel'}
-              style={bookingData?.pickupProvince ? styles.fullWidthInput : styles.disabledFullWidthInput}
-              initValueTextStyle={[styles.initValueTextStyle, bookingData?.pickupProvince && bookingData?.pickupCity &&  { color: UMColors.black }]}
+              style={bookingData?.dropoffProvince ? styles.fullWidthInput : styles.disabledFullWidthInput}
+              initValueTextStyle={[styles.initValueTextStyle, bookingData?.dropoffProvince && bookingData?.dropoffCity &&  { color: UMColors.black }]}
               searchStyle={styles.searchStyle}
-              selectStyle={bookingData?.pickupProvince ? styles.selectStyle1 : styles.disabledSelectStyle}
+              selectStyle={bookingData?.dropoffProvince ? styles.selectStyle1 : styles.disabledSelectStyle}
               selectTextStyle={styles.selectTextStyle}
               sectionTextStyle={styles.sectionTextStyle}
               cancelStyle={styles.cancelStyle}
@@ -343,21 +341,21 @@ export default QuickQuotationPickUp = (props) => {
               initValue={
                 bookingData?.isRebook || bookingData?.fromSaveAddress 
                 ? 
-                bookingData?.pickupBarangay || !bookingData?.pickupBarangay && "Select Barangay" 
+                bookingData?.dropoffBarangay || !bookingData?.dropoffBarangay && "Select Barangay" 
                 : 
                 "Select Barangay"}
               onChange={(barangay) => {
                 setBookingData({
                   ...bookingData,
-                  pickupBarangay: barangay.name
+                  dropoffBarangay: barangay.name
                 })
               }} 
               searchText={'Search'}
               cancelText={'Cancel'}
-              style={bookingData?.pickupCity ? styles.fullWidthInput : styles.disabledFullWidthInput}
-              initValueTextStyle={[styles.initValueTextStyle, bookingData?.pickupCity && bookingData?.pickupBarangay && { color: UMColors.black }]}
+              style={bookingData?.dropoffCity ? styles.fullWidthInput : styles.disabledFullWidthInput}
+              initValueTextStyle={[styles.initValueTextStyle, bookingData?.dropoffCity && bookingData?.dropoffBarangay && { color: UMColors.black }]}
               searchStyle={styles.searchStyle}
-              selectStyle={bookingData?.pickupCity ? styles.selectStyle1 : styles.disabledSelectStyle}
+              selectStyle={bookingData?.dropoffCity ? styles.selectStyle1 : styles.disabledSelectStyle}
               selectTextStyle={styles.selectTextStyle}
               sectionTextStyle={styles.sectionTextStyle}
               cancelStyle={styles.cancelStyle}
@@ -369,13 +367,13 @@ export default QuickQuotationPickUp = (props) => {
           {/* Landmarks */}
           <View style={styles.inputContainer}>
             <TextInput
-              value={bookingData?.pickupLandmark}
+              value={bookingData?.dropoffLandmark}
               style={[styles.landmarkTxtInput, styles.marginTop, { paddingLeft: '5%', textAlignVertical: 'top'}]}
               multiline={true}
               onChangeText={(landmark) => {
                 setBookingData({
                   ...bookingData,
-                  pickupLandmark: landmark
+                  dropoffLandmark: landmark
                 })
               }}
               placeholder='Landmark (Optional)'
@@ -384,7 +382,6 @@ export default QuickQuotationPickUp = (props) => {
           </View>
         </ScrollView>
       </View>
-
       <View style={styles.btnContainer}>
         {/* Next Button */}
           {/* Make button gray when not all inputs are filled out, orange when filled out */}
@@ -396,6 +393,7 @@ export default QuickQuotationPickUp = (props) => {
           <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>
       </View>
+      <Loader/>
     </View>
   )
 }

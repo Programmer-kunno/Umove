@@ -33,9 +33,7 @@ export default class Start2 extends Component {
               <TouchableOpacity
                 style={styles.choiceBtn}
                 onPress={() => {
-                  this.props.navigation.navigate('QuickQuotationItemDesc', {
-                    vehicle_type: this.state.chooseMove
-                  })
+                  this.props.navigation.navigate('QuickQuotationSelectVehicle')
                 }}
               >
                 <Image

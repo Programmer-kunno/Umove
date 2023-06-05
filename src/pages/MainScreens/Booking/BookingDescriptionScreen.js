@@ -1,312 +1,224 @@
-import React, { Component }  from 'react';
-import { StyleSheet, StatusBar, View, Text, TouchableOpacity, Image, Dimensions } from 'react-native';
-import RadioButtonGroup, { RadioButtonItem } from "expo-radio-button";
+import React, { useEffect, useState } from 'react';
+import { 
+  StyleSheet, 
+  StatusBar, 
+  View, 
+  Text, 
+  TouchableOpacity, 
+  Image, 
+  Dimensions,
+  TextInput
+} from 'react-native';
 import CustomNavbar from '../../Components/CustomNavbar';
-import { connect } from 'react-redux';
 import { navigate } from '../../../utils/navigationHelper';
-import { goBack } from '../../../utils/navigationHelper';
 import { UMColors } from '../../../utils/ColorHelper';
 import { UMIcons } from '../../../utils/imageHelper';
+import { make12HoursFormat } from '../../../utils/stringHelper';
+import { getPreciseDistance } from 'geolib';
+import { RadioButton } from 'react-native-paper';
+import { refreshTokenHelper } from '../../../api/helper/userHelper';
+import { BookingApi } from '../../../api/booking';
+import { dispatch } from '../../../utils/redux';
+import { setLoading } from '../../../redux/actions/Loader';
+import { showError } from '../../../redux/actions/ErrorModal';
+import { Loader } from '../../Components/Loader';
+import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal';
+import ErrorOkModal from '../../Components/ErrorOkModal';
+import { saveBookingDetails } from '../../../redux/actions/Booking';
 
 const deviceWidth = Dimensions.get('screen').width
 
-export class BookingDescriptionScreen extends Component {  
-  constructor(props) {
-    super(props);
-    
-    this.state = { 
-      booking: this.props.route?.params?.booking,
-      computeRates: {},
-      distance: ''
-    };
-  }
+export default BookingDescriptionScreen = (props) => {  
+  const bookingData = props.route.params?.booking
+  const [distance, setDistance] = useState(0)
+  const [isSignatureRequired, setIsSignatureRequired] = useState(true)
+  const [speacialInstruction, setSpecialInstruction] = useState('')
+  const [error, setError] = useState({ value: false, message: '' })
 
-  async componentDidMount() {
-    this.init();
-    // this.computeRates();
-    }
+  useEffect(() => {
+    dispatch(setLoading(false))
+    getDistance()
+  }, [])
 
-  async init() {
-    let bookingOverall = this.props.bookingData
-    console.log(bookingOverall)
-    this.setState({ distance: bookingOverall?.booking_routes[0]?.distance / 1000 })
-  }
-
-  render() {
-    let booking = this.state.booking;
-    let pickupAddress = booking.pickupStreetAddress + ', ' + booking.pickupBarangay + ', ' + booking.pickupCity + ', ' + booking.pickupProvince;
-    let dropoffAddress = booking.dropoffStreetAddress + ', ' + booking.dropoffBarangay + ', ' + booking.dropoffCity + ', ' + booking.dropoffProvince;
-
-    return(
-      <View style={styles.container}>
-        <StatusBar translucent backgroundColor={'transparent'} barStyle={'light-content'} />
-
-        {/* Header for Booking Summary */}
-        <CustomNavbar
-          Title={'Booking Summary'}
-          onBack={() => {
-            goBack()
-          }}
-        />
-
-        {/* Booking Summary Content */}
-        <View style={styles.innerContent}>
-
-          {/* Payment */}
-          {/* <View style={styles.contentContainer1}>
-            <View style={[styles.alignItemCenter, styles.part1Padding]}>
-              <Text style={styles.priceText}> The fare for this booking: </Text>
-            </View>
-            <View style={[styles.alignItemCenter, styles.part1Padding]}>
-              <Text style={styles.priceText}> ₱ {" " + computeRates.total_price} </Text>
-            </View>
-          </View> */}
-
-          {/* Part 1 */}
-          <View style={styles.contentContainer2}>
-            <View style={[styles.row, styles.alignItemCenter, styles.justifyContentSpaceBetween, styles.part1Padding]}>
-              <View style={[styles.row, styles.alignItemCenter]}>
-                <Image
-                      source={UMIcons.truckNoBgIcon}
-                      style={styles.bookingVehicle}
-                />
-              </View>
-              <View>
-                <Text style={styles.contentText}> {booking.bookingType} </Text>
-              </View>
-            </View>
-            <View style={[styles.row, styles.alignItemCenter, styles.justifyContentSpaceBetween, styles.part1Padding]}>
-              <View style={[styles.row, styles.alignItemCenter]}>
-                <Text style={styles.contentText}>Pick Up:</Text>
-              </View>
-              <View>
-                <Text style={styles.contentText}>{booking.pickupTime} - {booking.pickupDate}</Text>
-              </View>
-            </View>
-            <View style={[styles.row, styles.alignItemCenter, styles.justifyContentSpaceBetween]}>
-              <View style={[styles.row, styles.alignItemCenter]}>
-                <Text style={styles.contentText}>Distance:</Text>
-              </View>
-              <View>
-                <Text style={styles.contentText}>{this.state.distance} km</Text>
-              </View>
-            </View>
-          </View>
-          
-          {/* Part 2 */}
-          <View style={styles.contentContainer2}>
-            <View style={[
-              styles.row, 
-              styles.alignItemCenter, 
-              styles.justifyContentSpaceBetween,
-              // styles.borderPart2
-            ]}>
-              <View>
-                <Text style={styles.contentText}> Require Signatures</Text>
-                <Text style={styles.contentSubText}> Applies to all locations</Text>
-              </View>
-              <RadioButtonGroup
-                selected={booking.signature}
-                onSelected={(value) => {
-                  booking.signature = value;
-                  this.setState({booking})
-                }}
-                radioBackground="green"
-              >
-                <RadioButtonItem value="true" label={""}/>
-              </RadioButtonGroup>
-            </View>
-            {/* <RadioButtonGroup
-              containerStyle={{ margin: 10 }}
-              selected={booking.paymentAddress}
-              onSelected={(value) => {
-                booking.paymentAddress = value;
-                this.setState({booking})
-              }}
-              radioBackground="green"
-            >
-              <Text style={styles.contextAddressText}> {pickupAddress} </Text>
-              <RadioButtonItem 
-                style={{marginBottom: 40, marginTop: 10}}
-                value="pickup" 
-                label={
-                  <Text style={styles.contextPaymentText1}>Responsible For Payment</Text>
-                }
-              />
-              <Text style={styles.contentText}> {dropoffAddress} </Text>
-              <RadioButtonItem
-                style={{marginTop: 10}}
-                value="dropoff"
-                label={
-                  <Text style={styles.contextPaymentText2}>Responsible For Payment</Text>
-                }
-              />
-            </RadioButtonGroup> */}
-          </View>
-        </View>
-
-        <View style={[styles.alignItemCenter, styles.bookBtnContainer]}>
-          {/* Book Button */}
-          <TouchableOpacity style={styles.bookButtonOrange} onPress={() => {
-            navigate('BookingProcessingScreen')
-          }}>
-            <Text style={styles.buttonText}> BOOK </Text>
-          </TouchableOpacity>
-        </View>
-            
-      </View>
+  const getDistance = () => {
+    var distance = getPreciseDistance(
+      { latitude: bookingData?.pickupLatitude, longitude: bookingData?.pickupLongitude },
+      { latitude: bookingData?.dropoffLatitude, longitude: bookingData?.dropoffLongitude },
     )
+    setDistance(distance) //Meter
   }
+
+  const bookNow = () => {
+    dispatch(setLoading(true))
+    refreshTokenHelper(async() => {
+      const response = await BookingApi.book({ ...bookingData, pickupSpecialInstructions: speacialInstruction, isSignatureRequired: isSignatureRequired })
+      if(response == undefined){
+        dispatch(setLoading(false))
+        dispatch(showError(true))
+      } else {
+        if(response?.data?.success){
+          dispatch(saveBookingDetails(response?.data?.data))
+          navigate('BookingProcessingScreen')
+          dispatch(setLoading(false))
+        } else {
+          if(response?.data?.message?.pickup_time){
+            setError({ value: true, message: 'Pick up time passed or too soon' })
+            dispatch(setLoading(false))
+          } else {
+            setError({ value: true, message: response?.data?.message || response?.data })
+            dispatch(setLoading(false))
+          }
+        }
+      }
+    })
+  }
+
+  return(
+    <View style={styles.mainContainer}>
+      <StatusBar translucent backgroundColor={'transparent'} barStyle={'light-content'} />
+      <ErrorWithCloseButtonModal/>
+      <ErrorOkModal
+        Visible={error.value}
+        ErrMsg={error.message}
+        OkButton={() => setError({ value: false, message: '' })}
+      />
+
+      {/* Header for Booking Summary */}
+      <CustomNavbar
+        Title={'Booking Summary'}
+      />
+
+      {/* Booking Summary Content */}
+      <View style={styles.bodyContainer}>
+        <View style={styles.bookingDetailsContainer}>
+          <Image
+            style={{ width: 120, height: 100 }}
+            source={UMIcons.truckImg}
+            resizeMode='contain'
+          />
+          <View style={styles.detailsTxtContainer}>
+            <Text style={styles.detailsTxt}>Quick/ASAP</Text>
+            <Text style={[styles.detailsTxt, { color: UMColors.primaryOrange, fontWeight: 'bold' }]}>
+              {bookingData?.bookingType}
+            </Text>
+          </View>
+          <View style={styles.detailsTxtContainer}>
+            <Text style={styles.detailsTxt}>Pickup:</Text>
+            <Text style={styles.detailsTxt}>
+              {make12HoursFormat(bookingData?.pickupTime) + ' - ' + bookingData?.pickupDate}
+            </Text>
+          </View>
+          <View style={[styles.detailsTxtContainer, { marginBottom: 10 }]}>
+            <Text style={styles.detailsTxt}>Distance:</Text>
+            <Text style={styles.detailsTxt}>{distance / 1000 + 'km' + ' ' + `(${distance}m)`}</Text>
+          </View>
+        </View>
+        <View style={styles.signatureContainer}>
+          <View style={styles.signatureSubContainer}>
+            <View style={{ alignItems: 'center' }}>
+              <Text style={{ fontSize: 14, color: UMColors.black }}>Require Signature</Text>
+              <Text style={{ fontSize: 11, color: UMColors.black }}>Applies to all locations</Text>
+            </View>
+            <RadioButton
+              value={isSignatureRequired}
+              status={isSignatureRequired ? 'checked' : 'unchecked'}
+              onPress={() => {
+                setIsSignatureRequired(!isSignatureRequired)
+              }}
+              color={UMColors.green}
+              uncheckedColor={UMColors.primaryOrange}
+            />
+          </View>
+        </View>
+        <View style={styles.specialInputContainer}>
+          <TextInput
+            style={styles.specialTxtInput}
+            placeholder='Special Instruction (Optional)'
+            multiline={true}
+            onChangeText={value => setSpecialInstruction(value)}
+          />
+        </View>
+      </View>
+      <TouchableOpacity
+        style={styles.bookBtn}
+        onPress={() => bookNow()}
+      >
+        <Text style={styles.btnTxt}>Book</Text>
+      </TouchableOpacity>
+      <Loader/>
+    </View>
+  )
 }
 
-export default connect(
-  state => {
-    return {
-      bookingData: state.bookingDetails.booking
-    };
-  },
-)(BookingDescriptionScreen);
-
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1, 
-    backgroundColor: 'rgb(238, 241, 217)',
+  mainContainer: {
+    flex: 1,
+    backgroundColor: UMColors.BGOrange,
+    alignItems: 'center'
   },
-  header: {
+  bodyContainer: {
+    marginTop: 15,
+    width: deviceWidth / 1.05,
+    alignItems: 'center'
+  },
+  bookingDetailsContainer: {
+    borderWidth: 1,
     width: '100%',
-    paddingTop: '10%',
-    backgroundColor: 'rgb(29, 32, 39)', 
-    shadowColor: '#171717',
-    shadowOffset: {height: 5},
-    shadowOpacity: 0.3,
-    alignItems: 'center',
-    zIndex: 1
+    borderColor: UMColors.primaryGray,
+    alignItems: 'center'
   },
-  headerText: {
-    color: 'white',
-    fontSize: 20,
-    marginTop: '5%',
-    marginBottom: '5%',
-  },
-  arrowContainer: {
-    marginLeft: '3%',
-    marginRight: '24%'
-  },
-  headerArrow: {
-    width: 12,
-    height: 20,
-  },
-  labelContainer: {
-    marginTop: '7%',
-    marginBottom: '3%',
-    marginLeft: '6%'
-  },
-  priceText: {
-    color: 'white',
-    fontSize: 20,
-    marginTop: '5%',
-  },
-  labelText: {
-    color: 'white',
-    fontSize: 15
-  },
-  innerContent: {
-    //
-  },
-  bookingVehicle: {
-    height: 60,
-    width: 60,
-    marginRight: 10
-  },
-  alignItemCenter: {
-    alignItems: 'center',
-    zIndex: 0
-  },
-  row: {
+  detailsTxtContainer: {
+    width: '93%',
     flexDirection: 'row',
-  },
-  justifyContentSpaceBetween: {
     justifyContent: 'space-between'
   },
-  contentContainer1: {
-    backgroundColor: 'rgb(28, 32, 38)',
-    marginTop: '6%',
-    marginRight: '3%',
-    marginBottom: '3%',
-    marginLeft: '3%',
-    padding: '5%',
-    shadowColor: '#171717',
-    shadowOffset: {width: -2, height: 6},
-    shadowOpacity: 0.7,
-    shadowRadius: 3,
+  detailsTxt: {
+    fontSize: 14,
+    marginVertical: 2,
+    color: UMColors.black,
   },
-  contentContainer2: {
-    backgroundColor: 'rgb(28, 32, 38)',
-    margin: '3%',
-    padding: '5%',
-    borderRadius: 5,
-    elevation: 7,
-    shadowColor: '#171717',
-    shadowOffset: {width: -2, height: 6},
-    shadowOpacity: 0.7,
-    shadowRadius: 3,
-  },
-  contentText: {
-    color: 'white'
-  },
-  contentSubText: {
-    color: 'white',
-    fontSize: 11
-  },
-  contextAddressText: {
-    color: 'white',
-    marginTop: 15,
-  },
-  contextPaymentText1: {
-    color: 'white',
+  signatureContainer: {
     marginTop: 10,
-    marginBottom: 40,
-    paddingLeft: 10
-  },
-  contextPaymentText2: {
-    color: 'white',
-    marginTop: 10,
-    paddingLeft: 10
-  },
-  part1Padding: {
-    marginBottom: '3%'
-  },
-  part2Padding: {
-    marginBottom: '3%'
-  },
-  borderPart2: {
-    paddingBottom: 15,
-    borderBottomWidth: 2,
-    borderBottomColor: 'rgb(38, 43, 52)'
-  },
-  bookButtonOrange: {
-    marginTop: '5%',
-    height: 50,
-    width: '70%',
-    borderRadius: 5,
-    justifyContent:'center',
+    borderWidth: 1,
+    width: '100%',
+    borderColor: UMColors.primaryGray,
     alignItems: 'center',
-    elevation: 7,
-    backgroundColor: 'rgb(223,131,68)',
-    shadowColor: '#171717',
-    shadowOffset: {width: -2, height: 6},
-    shadowOpacity: 0.9,
-    shadowRadius: 3,
+  }, 
+  signatureSubContainer: {
+    flexDirection: 'row',
+    width: '93%',
+    justifyContent: 'space-between',
+    padding: 15
   },
-  buttonText: {
-    color: 'white',
-    fontSize: 15,
-    fontWeight:'bold'
-  },
-  bookBtnContainer: {
-    position: 'absolute',
+  specialInputContainer: {
     width: deviceWidth,
-    bottom: 50
+    alignItems: 'center',
+    height: '25%',
+    marginTop: 20
+  },
+  specialTxtInput: {
+    width: '95%',
+    height: '100%',
+    borderWidth: 1,
+    borderColor: UMColors.primaryOrange,
+    borderRadius: 7,
+    textAlignVertical: 'top',
+    backgroundColor: UMColors.white,
+    paddingHorizontal: 15
+  },
+  bookBtn: {
+    position: 'absolute',
+    bottom: 40,
+    backgroundColor: UMColors.primaryOrange,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: deviceWidth / 1.2,
+    borderRadius: 50,
+    height: 50,
+  },
+  btnTxt: {
+    fontSize: 17,
+    fontWeight: 'bold',
+    color: UMColors.white
   }
 })

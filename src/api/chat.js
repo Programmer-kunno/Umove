@@ -6,7 +6,7 @@ import {
 export class ChatApi {
   static async createMessage(data) {
     try {
-      const response = await post(`/api/messages/create`, data)   
+      const response = await post(`/api/messages/create`, data, {}, false)   
       return response
     } catch(err) {
       return err

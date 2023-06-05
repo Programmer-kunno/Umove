@@ -7,11 +7,11 @@ const instance = axios.create({
   timeout: 20000,
 })
 
-export const post = (apiEndpoint, data, headers) => new Promise(async(resolve, reject) => {
+export const post = (apiEndpoint, data, headers, noAccess) => new Promise(async(resolve, reject) => {
   const addHeaders = {...headers}
   const accessToken = getAccessToken()
 
-  if(accessToken){
+  if(accessToken && !noAccess){
     addHeaders.Authorization = `Bearer ${accessToken}`
   }
 

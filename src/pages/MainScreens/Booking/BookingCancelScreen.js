@@ -100,7 +100,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   greenCheck: {
-    width: '20%',
+    width: 70,
+    height: 70
   },
   statusTxt: {
     fontSize: 19,

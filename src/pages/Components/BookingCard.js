@@ -43,7 +43,6 @@ const BookingCard = (props) => {
         dispatch(setLoading(false))
       } else {
         if(response?.data?.success) {
-          console.log(response.data.data)
           if(type === "ongoing"){
             navigate('BookingAndDriverDescription', { booking: response?.data?.data })
           } else {
@@ -84,9 +83,8 @@ const BookingCard = (props) => {
                   style={styles.saveIcon}
                 /> */}
               </View>
-{/*                 
+            {/*                 
               <TouchableOpacity style={styles.saveButton} onPress={() => {
-                console.log(data)
                 navigate('BookingItemScreen', { rebookData: rebookData, isRebook: true })}}>
                 <Text style={[styles.buttonText, {color: UMColors.primaryOrange}]}>Save</Text>
               </TouchableOpacity> */}

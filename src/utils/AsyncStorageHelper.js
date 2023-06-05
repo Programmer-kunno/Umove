@@ -6,6 +6,5 @@ export async function refreshAccessToken() {
       
     })
   } catch (err) {
-    console.log(err)
   }
 }

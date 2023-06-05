@@ -7,70 +7,61 @@ import { moneyFormat } from '../../utils/stringHelper';
 import { resetNavigation } from '../../utils/navigationHelper';
 import { navigate } from '../../utils/navigationHelper';
 
-export default class QuickQuotatePriceScreen extends Component {
-  constructor(props){
-    super(props);
+export default QuickQuotatePriceScreen = (props) => {
+  const price = props.route.params?.price
 
-    this.state = {
-      price: this.props.route.params.price
-    }
-
-  }
-
-  render() {
-    return (
-      <View style={styles.mainContainer}>
-        <View style={styles.logoContainer}>
-          <Image
-            style={styles.logo}
-            source={UMIcons.mainLogo}
-            resizeMode={'contain'}
-          />
-        </View>
-        <View style={styles.bodyContainer}>
-          <View style={styles.bodyPriceContainer}>
-            <View style={styles.priceContainer}>
-              <Text style={styles.priceTxt}>₱</Text>
-              <Text style={styles.priceTxt}>{moneyFormat(this.state.price)}</Text>
-              <Image
-                style={styles.tagIcon}
-                source={UMIcons.tagIcon}
-                resizeMode={'contain'}
-              />
-            </View>
-           
-          </View>
-          <Text style={styles.bodyTxt}>
-            This rate is exclusive quotation, a 
-            motorcycle vehicles has been selected 
-            to exclusively pick up and deliver 
-            without other customer's order co-
-            loaded, cheaper options maybe 
-            available time to time when you book 
-            your parcels.
-          </Text>
-        </View>
-        <View style={styles.btnContainer}>
-          <TouchableOpacity
-            style={styles.btn}
-            onPress={() => {
-              navigate('Login')
-            }}
-          >
-            <Text style={[styles.btnTxt, { color: UMColors.black }]}>Log In</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.btn}
-            onPress={() => {
-              resetNavigation('Start1')
-            }}
-          >
-            <Text style={[styles.btnTxt, { color: UMColors.primaryOrange }]}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
+  return (
+    <View style={styles.mainContainer}>
+      <View style={styles.logoContainer}>
+        <Image
+          style={styles.logo}
+          source={UMIcons.mainLogo}
+          resizeMode={'contain'}
+        />
       </View>
-    )
-  }
+      <View style={styles.bodyContainer}>
+        <View style={styles.bodyPriceContainer}>
+          <View style={styles.priceContainer}>
+            <Text style={styles.priceTxt}>₱</Text>
+            <Text style={styles.priceTxt}>{moneyFormat(price)}</Text>
+            <Image
+              style={styles.tagIcon}
+              source={UMIcons.tagIcon}
+              resizeMode={'contain'}
+            />
+          </View>
+          
+        </View>
+        <Text style={styles.bodyTxt}>
+          This rate is exclusive quotation, a 
+          motorcycle vehicles has been selected 
+          to exclusively pick up and deliver 
+          without other customer's order co-
+          loaded, cheaper options maybe 
+          available time to time when you book 
+          your parcels.
+        </Text>
+      </View>
+      <View style={styles.btnContainer}>
+        <TouchableOpacity
+          style={styles.btn}
+          onPress={() => {
+            navigate('Login')
+          }}
+        >
+          <Text style={[styles.btnTxt, { color: UMColors.black }]}>Log In</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.btn}
+          onPress={() => {
+            resetNavigation('Start1')
+          }}
+        >
+          <Text style={[styles.btnTxt, { color: UMColors.primaryOrange }]}>Cancel</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({

@@ -9,7 +9,7 @@ import {
 export class CustomerApi {
   static login = async(data) => {
     try {
-      const response = await post('/api/customers/login', data);
+      const response = await post('/api/customers/login', data, {}, false);
       return response
     } catch(err) {
       return err
@@ -18,7 +18,7 @@ export class CustomerApi {
 
   static async refreshAccess(data) {
     try {
-      const response = await post('/api/refresh-token', data)
+      const response = await post('/api/refresh-token', data, {}, true)
       return response
     } catch(err) {
       return err
@@ -45,7 +45,7 @@ export class CustomerApi {
 
   static async createSavedAddresses(data) {
     try {
-      const response = await post('/api/customers/addresses/create', data)
+      const response = await post('/api/customers/addresses/create', data, {}, false)
       return response
     } catch(err) {
       return err
@@ -169,7 +169,7 @@ export class CustomerApi {
 
   static async resetPassword(data) {
     try {
-      const response = await post('/api/reset-password/request', data)
+      const response = await post('/api/reset-password/request', data, {}, false)
       return response
     } catch(err) {
       return err
@@ -178,7 +178,7 @@ export class CustomerApi {
 
   static async validateUser(data) {
     try {
-      const response = await post('/api/users/validate', data)
+      const response = await post('/api/users/validate', data, {}, false)
       return response
     } catch(err) {
       return err
@@ -266,7 +266,7 @@ export class CustomerApi {
     }
 
     try {
-      const response = await post('/api/customers/register', formdata, { 'Content-Type': 'multipart/form-data '})
+      const response = await post('/api/customers/register', formdata, { 'Content-Type': 'multipart/form-data '}, false)
       return response
     } catch(err) {
       return err

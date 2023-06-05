@@ -27,7 +27,6 @@ export default Profile = () => {
   
   const user = useSelector((state) => state.userOperations.userData)
   const userDetailsData = useSelector((state) => state.userOperations.userDetailsData)
-  console.log(userDetailsData)
   const editUserData = {
     customerType: userDetailsData.customer_type?.includes('Corporate' || 'corporate') ? 'corporate' : 'individual',
     accountNumber: userDetailsData?.user?.user_profile?.account_number,

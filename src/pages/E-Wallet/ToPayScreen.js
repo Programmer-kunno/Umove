@@ -371,14 +371,6 @@ export default ToPayScreen = () => {
     }
   }
   
-  const showDatePicker = (visible) => {
-    setDateModalVisible(visible);
-  }
-  
-  const showTimePicker = (visible) => {
-    setTimeModalVisible(visible);
-  }
-
   const onChangeDate = (event, date) => {
     setDateModalVisible(false)
     const selectedDate = date?.toLocaleDateString('zh-Hans-CN');
@@ -449,7 +441,7 @@ export default ToPayScreen = () => {
               {
                 paymentMethodValue == 1 &&
                   <View style={[styles.mainWidthContainer, { flexDirection: 'row' }]}>
-                    <TouchableOpacity style={styles.dateInput} onPress={() => showDatePicker(true)}>
+                    <TouchableOpacity style={styles.dateInput} onPress={() => setDateModalVisible(true)}>
                       { newDate == '' ?
                         <Text style={{ color:'#808080' }}>
                           Select Date
@@ -466,7 +458,7 @@ export default ToPayScreen = () => {
                         resizeMode='contain'
                       />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.timeInput} onPress={() => showTimePicker(true)}>
+                    <TouchableOpacity style={styles.timeInput} onPress={() => setTimeModalVisible(true)}>
                       { newTime == '' ?
                         <Text style={{ color:'#808080' }}>
                           Select time
@@ -643,7 +635,7 @@ export default ToPayScreen = () => {
                   data={barangayList}
                   keyExtractor= {barangay => barangay.code}
                   labelExtractor= {barangay => barangay.name}
-                  initValue={paymentMethodValue == 1 ? barangayData || !barangayData && "Select Province" : "Select Barangay"}
+                  initValue={paymentMethodValue == 1 ? barangayData || !barangayData && "Select Barangay" : "Select Barangay"}
                   onChange={(barangay) => {
                     setBarangay(barangay.name)
                   }}
@@ -858,6 +850,8 @@ export default ToPayScreen = () => {
           ErrMsg={error.message}
           OkButton={() => setError({ value: false, message: '' })}
         />
+        {dateModal()}
+        {timeModal()}
         <CustomNavbar
           Title={'Payment Method'}
         />
@@ -881,8 +875,6 @@ export default ToPayScreen = () => {
           { paymentMethodValue == 2 && renderOnlinePayment()}
           { paymentMethodValue == 3 && renderChequePayment()}
         </View>
-        {dateModal()}
-        {timeModal()}
         {bottomSheet()}
         <Loader/>
       </SafeAreaView>
@@ -1226,23 +1218,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row'
   },
-  blurContainer: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.6)'
-  },
   centeredView: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  modalView: {
-    width: '90%',
-    backgroundColor: "white",
-    borderRadius: 20,
-    borderColor: 'rgb(223,131,68)',
-    borderWidth: 1,
-    elevation: 5
   },
 })

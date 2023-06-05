@@ -10,25 +10,20 @@ import {
   Dimensions
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { FetchApi } from '../../../api/fetch';
-import { UMColors } from '../../../utils/ColorHelper';
-import CustomNavbar from '../../Components/CustomNavbar';
-import { dispatch } from '../../../utils/redux';
-import { clearBookingDetails } from '../../../redux/actions/Booking';
-import { goBack, navigate } from '../../../utils/navigationHelper';
-import { showError } from '../../../redux/actions/ErrorModal';
+import { FetchApi } from '../../api/fetch';
+import { UMColors } from '../../utils/ColorHelper';
+import CustomNavbar from '../Components/CustomNavbar';
+import { dispatch } from '../../utils/redux';
+import { goBack, navigate } from '../../utils/navigationHelper';
+import { showError } from '../../redux/actions/ErrorModal';
 import { useSelector } from 'react-redux';
 
 const deviceWidth = Dimensions.get('screen').width
 
-export default BookingItemScreen = (props) => {  
-  const userDetailsData = useSelector(state => state.userOperations.userDetailsData)
+export default QuickQuotationItemScreen = (props) => {  
   const [bookingData, setBookingData] = useState({
-    bookingType: '',
-    chargeType: '',
     vehicleType: '',
     typeOfGoods: '',
-    isSignatureRequired: true,
     productCategory: '',
     productSubcategory: '',
     packagingType: '',
@@ -39,15 +34,12 @@ export default BookingItemScreen = (props) => {
     height: '',
     pickupName: '',
     pickupStreetAddress: '',
-    pickupDate: '',
-    pickupTime: '',
     pickupRegion: '',
     pickupProvince: '',
     pickupCity: '',
     pickupBarangay: '',
     pickupZipcode: '',
     pickupLandmark: '',
-    pickupSpecialInstructions: '',
     pickupLatitude: '',
     pickupLongitude: '',
     dropoffName: '',
@@ -58,12 +50,8 @@ export default BookingItemScreen = (props) => {
     dropoffBarangay: '',
     dropoffZipcode: '',
     dropoffLandmark: '',
-    dropoffSpecialInstructions: '',
     dropoffLatitude: '',
     dropoffLongitude: '',
-    paymentAddress: 'pickup',
-    signature: 'true',
-    isRebook: false
   })
   const [typeValue, setTypeValue] = useState('')
   const [typeOpen, setTypeOpen] = useState(false)
@@ -79,49 +67,16 @@ export default BookingItemScreen = (props) => {
   const [packagingItems, setPackagingItems] = useState([])
 
   useEffect(() => {
-    const propsRebookData = props.route.params?.rebookData
-    if(propsRebookData){
-      console.log(propsRebookData)
-      isRebook(propsRebookData)
-    } else {
-      setBookingData({
-        ...bookingData,
-        bookingType: props.route.params?.bookingType,
-        vehicleType: props.route.params?.vehicleType,
-        chargeType: userDetailsData.charge_type,
-      })
-    }
-    dispatch(clearBookingDetails())
+    setBookingData({
+      ...bookingData,
+      vehicleType: props.route.params?.vehicleType,
+    })
     loadType();
     loadPackaging();
   }, [])
 
-  const isRebook = (propsRebookData) => {
-    setBookingData({
-      ...bookingData,
-      bookingType: propsRebookData.bookingType,
-      vehicleType: propsRebookData.vehicleType,
-      pickupName: propsRebookData.pickupName,
-      pickupStreetAddress: propsRebookData.pickupStreetAddress,
-      pickupRegion: propsRebookData.pickupRegion,
-      pickupProvince: propsRebookData.pickupProvince ,
-      pickupCity: propsRebookData.pickupCity,
-      pickupBarangay: propsRebookData.pickupBarangay,
-      pickupZipcode: propsRebookData.pickupZipcode,
-      dropoffName: propsRebookData.dropoffName,
-      dropoffStreetAddress: propsRebookData.dropoffStreetAddress,
-      dropoffRegion: propsRebookData.dropoffRegion,
-      dropoffProvince: propsRebookData.dropoffProvince,
-      dropoffCity: propsRebookData.dropoffCity,
-      dropoffBarangay: propsRebookData.dropoffBarangay,
-      dropoffZipcode: propsRebookData.dropoffZipcode,
-      isRebook: props.route.params?.isRebook
-    })
-  }
-
   const booking = () => {
-    console.log(bookingData)
-    navigate('BookingPickUpScreen', { booking: bookingData })
+    navigate('QuickQuotationPickUp', { booking: bookingData })
   }
 
   const loadType = async() => {
@@ -244,7 +199,7 @@ export default BookingItemScreen = (props) => {
 
         {/* Header for Exclusive */}
         <CustomNavbar
-          Title={bookingData.bookingType + ' Booking'}
+          Title={'Quick Quotation'}
           onBack={() => {
             goBack()
           }}
@@ -427,13 +382,6 @@ export default BookingItemScreen = (props) => {
 
           </View>
         </View>
-        {/* <View style={styles.specialInputContainer}>
-          <TextInput
-            style={styles.specialTxtInput}
-            placeholder='Special Instruction (Optional)'
-            multiline={true}
-          />
-        </View> */}
         <View style={styles.btnContainer}>
         {/* Add Additional Items Button */}
           {/* Make button gray when not all inputs are filled out, orange when filled out */}

@@ -14,10 +14,10 @@ const Transactions = () => {
     <View style={styles.container}>
       <CustomNavbar
         Title={'Transactions'}
-        rightBtnImage={UMIcons.downloadIcon}
-        onRightPress={() => {
+        // rightBtnImage={UMIcons.downloadIcon}
+        // onRightPress={() => {
 
-        }}
+        // }}
       />
       <TransactionTabs />
 

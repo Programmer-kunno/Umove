@@ -15,7 +15,6 @@ import { navigate } from '../../utils/navigationHelper';
 export default TopDashboardNavbar = (props) => {  
 
   const user = useSelector((state) => state.userOperations.userData)
-  console.log(user)
 
   const navigation = useNavigation()
 

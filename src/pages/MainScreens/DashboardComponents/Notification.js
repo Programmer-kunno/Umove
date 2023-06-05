@@ -210,7 +210,8 @@ export default Notification = () => {
       }
       console.log(data)
       if(data.notification_event.title.includes('delivered')){
-        navigate('DeliveredScreen', { data: data })
+        const splittedTarget = data.notification_event.target.split(' ')
+        navigate('DeliveredScreen', { bookingNumber: splittedTarget[1], isDoneRating: false })
       }
     }
 

@@ -26,6 +26,7 @@
     "@twotalltotems/react-native-otp-input": "^1.3.11",
     "axios": "^1.3.4",
     "expo-radio-button": "^1.0.8",
+    "geolib": "^3.3.3",
     "jwt-decode": "^3.1.2",
     "moment": "^2.29.4",
     "radio-buttons-react-native": "^1.0.4",
@@ -36,6 +37,7 @@
     "react-native-dropdown-picker": "^5.4.4",
     "react-native-elements": "^3.4.3",
     "react-native-event-listeners": "^1.0.7",
+    "react-native-geocoding": "^0.5.0",
     "react-native-gesture-handler": "^2.9.0",
     "react-native-get-real-path": "github:Wraptime/react-native-get-real-path",
     "react-native-image-crop-picker": "^0.39.0",
@@ -62,7 +64,8 @@
     "react-redux": "^8.0.5",
     "redux": "^4.2.1",
     "redux-persist": "^6.0.0",
-    "redux-thunk": "^2.4.2"
+    "redux-thunk": "^2.4.2",
+    "yarn": "^1.22.19"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

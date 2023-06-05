@@ -16,7 +16,7 @@ export class CardPayment {
 
   static async addPaymentMethod(data) {
     try {
-      const response = await post(`/api/payments/methods/create`, data)
+      const response = await post(`/api/payments/methods/create`, data, {}, false)
       return response
     } catch(err) {
       return err
