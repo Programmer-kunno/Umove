@@ -5,7 +5,7 @@ import { UMIcons } from '../../../utils/imageHelper'
 import CustomNavbar from '../../Components/CustomNavbar'
 import ErrorOkModal from '../../Components/ErrorOkModal'
 import {resetNavigation } from '../../../utils/navigationHelper'
-import { capitalizeFirst, moneyFormat } from '../../../utils/stringHelper'
+import { TextSize, capitalizeFirst, moneyFormat, normalize } from '../../../utils/stringHelper'
 import ConfirmationModal from '../../Components/ConfirmationModal'
 import { useIsFocused } from '@react-navigation/native'
 
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     marginTop: '5%'
   },
   bookingRefTxt: {
-    fontSize: 20,
+    fontSize: normalize(TextSize('M')),
     color: UMColors.black
   },
   amountContainer: {
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     marginTop: '20%'
   },
   amountTxt: {
-    fontSize: 17,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.black
   },
   paidViaContainer: {
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     height: 22
   },
   cardName: {
-    fontSize: 14,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.black
   },
   dottedBottom: {
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     elevation: 10
   },
   confirmBtnTxt: {
-    fontSize: 17,
+    fontSize: normalize(TextSize('Normal')),
     fontWeight: 'bold',
     color: UMColors.white
   }

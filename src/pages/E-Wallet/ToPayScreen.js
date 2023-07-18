@@ -15,7 +15,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { UMColors } from '../../utils/ColorHelper'
 import CustomNavbar from '../Components/CustomNavbar'
 import DropDownPicker from 'react-native-dropdown-picker'
-import { capitalizeFirst, make12HoursFormat, mobileNumberRegex, moneyFormat } from '../../utils/stringHelper'
+import { TextSize, capitalizeFirst, make12HoursFormat, mobileNumberRegex, moneyFormat, normalize } from '../../utils/stringHelper'
 import { useSelector } from 'react-redux'
 import ModalSelector from 'react-native-modal-selector-searchable'
 import { FetchApi } from '../../api/fetch'
@@ -917,13 +917,13 @@ const styles = StyleSheet.create({
     elevation: 7
   },
   toPayTxt: {
-    fontSize: 15,
+    fontSize: normalize(TextSize('Normal')),
     marginLeft: 12,
     color: UMColors.black
   },
   balanceTxt: {
     color: UMColors.primaryOrange,
-    fontSize: 24,
+    fontSize: normalize(TextSize('L')),
     fontWeight: '500',
     marginRight: 12
   },
@@ -939,7 +939,7 @@ const styles = StyleSheet.create({
     elevation: 7
   },
   confirmBtnTxt: {
-    fontSize: 18,
+    fontSize: normalize(TextSize('M')),
     color: UMColors.white,
     fontWeight: 'bold'
   },
@@ -966,7 +966,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   uploadCheckBtnTxt: {
-    fontSize: 14,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.primaryGray
   },
   regionZipContainer: {
@@ -983,7 +983,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   text: {
-    fontSize: 18,
+    fontSize: normalize(TextSize('M')),
     color: 'black',
     marginBottom: '5%',
     fontWeight: 'bold'
@@ -1010,7 +1010,7 @@ const styles = StyleSheet.create({
     marginLeft: '3%'
   },
   initValueTextStyle: {
-    fontSize: 14,
+    fontSize: normalize(TextSize('Normal')),
     color: "#808080"
   },
   searchStyle: {
@@ -1038,11 +1038,11 @@ const styles = StyleSheet.create({
     paddingLeft: '8%'
   },
   selectTextStyle: {
-    fontSize: 14,
+    fontSize: normalize(TextSize('Normal')),
     color: 'black'
   },
   sectionTextStyle: {
-    fontSize: 18,
+    fontSize: normalize(TextSize('M')),
     fontWeight: '500'
   },
   cancelStyle: {
@@ -1051,7 +1051,7 @@ const styles = StyleSheet.create({
   },
   cancelTextStyle: {
     color: 'red',
-    fontSize: 16,
+    fontSize: normalize(TextSize('Normal')),
     fontWeight: '500'
   },
   overlayStyle: {
@@ -1086,7 +1086,7 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   rbSheetText: {
-    fontSize: 17,
+    fontSize: normalize(TextSize('M')),
     color: UMColors.primaryOrange
   },
   //Online Payment 
@@ -1105,12 +1105,12 @@ const styles = StyleSheet.create({
     width: '80%',
     height: '80%',
     textAlign: 'right',
-    fontSize: 30,
+    fontSize: normalize(TextSize('XL')),
     marginRight: 10,
   },
   phpTxt: {
     marginLeft: 15,
-    fontSize: 10,
+    fontSize: normalize(TextSize('S')),
     height: '70%',
     textAlignVertical: 'bottom'
   },
@@ -1120,7 +1120,7 @@ const styles = StyleSheet.create({
     width: deviceWidth / 1.1
   },
   onlineToPayTxt:{
-    fontSize: 14,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.black
   },
   selectPaymentContainer: {
@@ -1134,7 +1134,7 @@ const styles = StyleSheet.create({
   },
   selectPaymentTxt: {
     marginLeft: 6,
-    fontSize: 14,
+    fontSize: normalize(TextSize('Normal')),
     fontWeight: 'bold'
   },
   selectPaymentBtn: {
@@ -1152,7 +1152,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   paymentTitle: {
-    fontSize: 15,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.black,
   },
   paymentLogo: {
@@ -1176,18 +1176,18 @@ const styles = StyleSheet.create({
     bottom: 60
   },
   nextBtnTxt: {
-    fontSize: 16,
+    fontSize: normalize(TextSize('Normal')),
     fontWeight: 'bold',
     color: UMColors.white
   },
   noPayMethodTxt: {
     alignSelf: 'center', 
-    fontSize: 15, 
+    fontSize: normalize(TextSize('Normal')), 
     padding: 20, 
     color: UMColors.primaryGray
   },
   cardNumber: {
-    fontSize: 10,
+    fontSize: normalize(TextSize('S')),
     color: UMColors.primaryGray,
     marginLeft: 10
   },

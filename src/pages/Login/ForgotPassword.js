@@ -12,7 +12,7 @@ import {
 import { UMColors } from '../../utils/ColorHelper';
 import { UMIcons } from '../../utils/imageHelper';
 import { goBack } from '../../utils/navigationHelper';
-import { emailRegex } from '../../utils/stringHelper';
+import { TextSize, emailRegex, normalize } from '../../utils/stringHelper';
 import { navigate } from '../../utils/navigationHelper';
 import { CustomerApi } from '../../api/customer';
 import { dispatch } from '../../utils/redux';
@@ -186,12 +186,12 @@ const styles = StyleSheet.create({
   },
   forgotTxt: {
     color: UMColors.black,
-    fontSize: 20,
+    fontSize: normalize(TextSize('L')),
     fontWeight: '900',
     marginBottom: 15,
   },
   forgotBodyTxt: {
-    fontSize: 15,
+    fontSize: normalize(TextSize('M')),
     color: UMColors.black,
     textAlign: 'center',
     marginBottom: 30,
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
   },
   sendButtonText: {
     color: 'white',
-    fontSize: 15,
+    fontSize: normalize(TextSize('M')),
     fontWeight: 'bold'
   },
   headerContainer: {
@@ -256,13 +256,13 @@ const styles = StyleSheet.create({
   },
   emailSentTxt: {
     color: UMColors.black,
-    fontSize: 20,
+    fontSize: normalize(TextSize('L')),
     fontWeight: '900',
     marginBottom: 15,
     marginTop: 10
   },
   emailSentBodyTxt: {
-    fontSize: 16,
+    fontSize: normalize(TextSize('M')),
     color: UMColors.black,
     textAlign: 'center',
     marginBottom: 30,
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   errorMessage:{
-    fontSize: 15,
+    fontSize: normalize(TextSize('Normal')),
     textAlign: 'center',
     color: '#d32f2f'
   }

@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 
 import { UMColors } from '../../utils/ColorHelper'
 import { UMIcons } from '../../utils/imageHelper'
+import { TextSize, normalize } from '../../utils/stringHelper'
 
 export default class SuccessOkModal extends Component {
   render() {
@@ -55,13 +56,13 @@ const styles = StyleSheet.create({
   successText: {
     width: '80%',
     marginTop: '6%',
-    fontSize: 16,
+    fontSize: normalize(TextSize('M')),
     lineHeight: 25,
     textAlign: 'center'
   },
   okBtnTxt: {
     color: UMColors.primaryOrange,
-    fontSize: 18,
+    fontSize: normalize(TextSize('M')),
     fontWeight: 'bold'
   }
 })

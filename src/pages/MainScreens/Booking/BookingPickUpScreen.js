@@ -22,7 +22,7 @@ import { navigate } from '../../../utils/navigationHelper';
 import { dispatch } from '../../../utils/redux';
 import { showError } from '../../../redux/actions/ErrorModal';
 import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal';
-import { make12HoursFormat } from '../../../utils/stringHelper';
+import { TextSize, make12HoursFormat, normalize } from '../../../utils/stringHelper';
 import { BookingApi } from '../../../api/booking';
 import { setLoading } from '../../../redux/actions/Loader';
 import { Loader } from '../../Components/Loader';
@@ -56,6 +56,7 @@ export default BookingPickUpScreen = (props) => {
       setBookingData(props.route.params.booking)
       getMinTimeOfDelivery()
       dispatch(setLoading(false))
+      console.log(bookingData)
     } else {
       setNewDate('')
       setNewTime('')
@@ -354,11 +355,11 @@ export default BookingPickUpScreen = (props) => {
             <View style={[styles.inputContainer, styles.marginTop, { flexDirection: 'row' }]}>
               <TouchableOpacity style={styles.dateInput} onPress={() => showDatePicker(true)}>
                 { newDate == '' ?
-                  <Text style={{ color:'#808080' }}>
+                  <Text style={{ color:'#808080', fontSize: normalize(TextSize('Normal')) }}>
                     Select Date
                   </Text>
                 :
-                  <Text style={{ color:'black' }}>
+                  <Text style={{ color:'black', fontSize: normalize(TextSize('Normal')) }}>
                     {moment(newDate).format("YYYY-MM-DD")}
                     {/* { dateFormat.format(this.state.newDate) } */}
                   </Text>
@@ -371,11 +372,11 @@ export default BookingPickUpScreen = (props) => {
               </TouchableOpacity>
               <TouchableOpacity style={styles.timeInput} onPress={() => showTimePicker(true)}>
                 { newTime == '' ?
-                  <Text style={{ color:'#808080' }}>
+                  <Text style={{ color:'#808080', fontSize: normalize(TextSize('Normal')) }}>
                     Select Time
                   </Text>
                 :
-                  <Text style={{ color:'black' }}>
+                  <Text style={{ color:'black', fontSize: normalize(TextSize('Normal')) }}>
                     {make12HoursFormat(newTime)}
                   </Text>
                 }
@@ -636,8 +637,8 @@ const styles = StyleSheet.create({
   },
   labelText: {
     color: UMColors.primaryOrange,
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: normalize(TextSize('Normal')),
+    fontWeight: 'bold',
     letterSpacing: 1
   },
   inputContainer: {
@@ -695,6 +696,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgb(223,131,68)',
     justifyContent: 'center',
+    fontSize: normalize(TextSize('Normal')) 
   },
   regionInput: {
     width: '62%',
@@ -707,7 +709,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgb(223,131,68)',
     textAlign: 'center',
-    marginLeft: '3%'
+    marginLeft: '3%',
+    fontSize: normalize(TextSize('Normal')),
   },
   landmarkTxtInput: {
     backgroundColor: 'white',
@@ -716,10 +719,11 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     borderWidth: 1,
     borderColor: 'rgb(223,131,68)',
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
+    fontSize: normalize(TextSize('Normal')),
   },
   initValueTextStyle: {
-    fontSize: 14,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.primaryGray
   },
   searchStyle: {
@@ -749,11 +753,11 @@ const styles = StyleSheet.create({
     paddingLeft: '7%'
   },
   selectTextStyle: {
-    fontSize: 14,
+    fontSize: normalize(TextSize('Normal')),
     color: 'black'
   },
   sectionTextStyle: {
-    fontSize: 18,
+    fontSize: normalize(TextSize('M')),
     fontWeight: '500'
   },
   cancelStyle: {
@@ -762,7 +766,7 @@ const styles = StyleSheet.create({
   },
   cancelTextStyle: {
     color: 'red',
-    fontSize: 16,
+    fontSize: normalize(TextSize('Normal')),
     fontWeight: '500'
   },
   overlayStyle: {
@@ -816,7 +820,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
-    fontSize: 15,
+    fontSize: normalize(TextSize('M')),
     fontWeight:'bold'
   },
   centeredView: {
@@ -836,7 +840,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
-    fontSize: 15
+    fontSize: normalize(TextSize('Normal'))
   },
   blurContainer: {
     flex: 1,

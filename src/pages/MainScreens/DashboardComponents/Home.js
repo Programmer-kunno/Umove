@@ -20,19 +20,21 @@ import ErrorOkModal from '../../Components/ErrorOkModal';
 import { useSelector } from 'react-redux';
 import { navigate } from '../../../utils/navigationHelper';
 import SelectPaymentScreen from '../Payment/SelectPaymentScreen';
-import { moneyFormat } from '../../../utils/stringHelper';
+import { TextSize, moneyFormat } from '../../../utils/stringHelper';
 import { decode } from '@googlemaps/polyline-codec';
 import { saveUser } from '../../../redux/actions/User';
 import { dispatch } from '../../../utils/redux';
 import { showError } from '../../../redux/actions/ErrorModal';
 import { CustomerApi } from '../../../api/customer';
 import { refreshTokenHelper } from '../../../api/helper/userHelper';
+import { useIsFocused } from '@react-navigation/native';
 
 const bgImage = '../../../assets/bg-image.jpg';
 const deviceWidth = Dimensions.get('screen').width
 
 export default Home = () => {  
   const userDetailsData = useSelector(state => state.userOperations.userDetailsData)
+  const isFocused = useIsFocused()
   const [wallet, setWallet] = useState({
     balance: '1,000.00',
     points: '0.00'
@@ -42,19 +44,20 @@ export default Home = () => {
     value: false,
     message: ''
   })
-  const [isVerified, setIsVerified] = useState(true)
 
-  const chooseTypeBooking = () => {
-    if(isVerified){
-      setModalVisible(true) 
+  const isVerified = () => {
+    if(userDetailsData?.user?.user_profile?.is_email_verified && userDetailsData?.user?.user_profile?.is_mobile_verified){
+      return true
     } else {
-      setError({ value: true, message: 'Account not Validated, Please validate your account first' })
+      return false
     }
   }
 
   useEffect(() => {
-    updateRedux()
-  }, [])
+    if(isFocused){
+      updateRedux()
+    }
+  }, [isFocused])
 
   const updateRedux = () => {
     refreshTokenHelper(async() => {
@@ -69,6 +72,43 @@ export default Home = () => {
         }
       }
     })
+  }
+
+  const renderWallet = () => {
+    return (
+      <TouchableOpacity 
+        style={styles.walletContainer}
+        onPress={() => navigate('WalletScreen')}
+      >
+        <View style={styles.balanceContainer}>
+          <View style={styles.balanceTxtContainer}>
+            <Text style={styles.balanceTxt}>{moneyFormat(userDetailsData.remaining_credits)}</Text>
+          </View>
+          <Text style={[{ fontSize: TextSize('Normal'), marginTop: 5, color: UMColors.white, alignSelf: 'center' }]}>
+            Credit Limit Available Balance
+          </Text>
+        </View>
+        <View style={styles.pontsContainer}>
+          <Text style={styles.pointsTxt}>Points</Text>
+          <Text style={styles.pointsTxt}>{wallet.points}</Text>
+        </View>
+      </TouchableOpacity>
+    )
+  }
+
+  const renderPoints = () => {
+    return (
+      <View style={styles.walletContainer}>
+        <View style={styles.indivPointContainer}>
+          <View style={styles.indivPointTxtContainer}>
+            <Text style={styles.indivPointTxt}>{wallet.points}</Text>
+          </View>
+          <Text style={[{ fontSize: TextSize('Normal'), marginTop: '5%', color: UMColors.white, alignSelf: 'center' }]}>
+            Points
+          </Text>
+        </View>
+      </View>
+    )
   }
 
   return(
@@ -90,64 +130,13 @@ export default Home = () => {
             CustomerService={() => {}}
           />
 
-          {/* Modal */}
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={() => setModalVisible(false) }
-          >
-            <TouchableWithoutFeedback onPress={() => setModalVisible(false) }>
-              <View style={styles.centeredView}>
-                <View style={styles.modalView}>
-                  <View style={styles.modalRow}>
-                    <TouchableOpacity style={styles.alignItemCenter}
-                      onPress={() => {
-                        setModalVisible(false)
-                        navigate('BookingItemScreen', { bookingType: 'Exclusive' })
-                      }}
-                      >
-                      <Image source={require('../../../assets/truck/exclusive.png')} style={styles.exclusiveTruck}/>
-                      <View style={[styles.button, styles.modalButton]}>
-                        <Text style={styles.textStyle}>Exclusive</Text>
-                      </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.alignItemCenter}
-                      onPress={() => {
-                        setModalVisible(false)
-                        navigate('BookingItemScreen', { bookingType: 'Shared' })
-                      }}
-                    >
-                      <Image source={require('../../../assets/truck/shared.png')} style={styles.sharedTruck}/>
-                      <View style={[styles.button, styles.modalButton]}>
-                        <Text style={styles.textStyle}>Shared</Text>
-                      </View>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-            </TouchableWithoutFeedback>
-          </Modal>
+          {/* Wallet */}
+          
+          { userDetailsData.customer_type == 'Individual' ? renderPoints() : renderWallet() }
 
           {/* Body */}
           <View style={styles.bodyContainer}>
-            <TouchableOpacity 
-              style={styles.walletContainer}
-              onPress={() => navigate('WalletScreen')}
-            >
-              <View style={styles.balanceContainer}>
-                <View style={styles.balanceTxtContainer}>
-                  <Text style={styles.balanceTxt}>{moneyFormat(userDetailsData.remaining_credits)}</Text>
-                </View>
-                <Text style={[{ fontSize: 14, marginTop: 5, color: UMColors.white, alignSelf: 'center' }]}>
-                  Credit Limit Available Balance
-                </Text>
-              </View>
-              <View style={styles.pontsContainer}>
-                <Text style={styles.pointsTxt}>Points</Text>
-                <Text style={styles.pointsTxt}>{wallet.points}</Text>
-              </View>
-            </TouchableOpacity>
+
             <View style={styles.paragraphContainer}>
               <Text style={styles.paragraphTitle}>Send{'\n'}anything{'\n'}fast</Text>
               <Text style= {styles.paragraph}>There is no transfer, {'\n'}leading to the destination, {'\n'}real-time monitoring, first compensation {'\n'}guarantee and peace of mind.</Text>
@@ -158,7 +147,11 @@ export default Home = () => {
                 <TouchableOpacity
                   style={styles.chooseMoveBtn}
                   onPress={() => {
-                    navigate('BookingSelectVehicle', { bookingType: 'Exclusive' })
+                    if(isVerified()){
+                      navigate('BookingSelectVehicle', { bookingType: 'Exclusive' })
+                    } else {
+                      setError({ value: true, message: 'Account is not validated. Please validate your account first' })
+                    }
                   }}
                 >
                   <Image
@@ -171,7 +164,11 @@ export default Home = () => {
                 <TouchableOpacity
                   style={styles.chooseMoveBtn}
                   onPress={() => {
-                    navigate('BookingSelectVehicle', { bookingType: 'Shared' })
+                    if(isVerified()){
+                      navigate('BookingSelectVehicle', { bookingType: 'Shared' })
+                    } else {
+                      setError({ value: true, message: 'Account is not validated. Please validate your account first' })
+                    }
                   }}
                 >
                   <Image
@@ -183,15 +180,6 @@ export default Home = () => {
                 </TouchableOpacity>
               </View>
             </View>
-            {/* <TouchableOpacity
-              style={styles.bookBtn}
-              onPress={() => {
-                chooseTypeBooking()
-                // navigate('SelectPaymentScreen')
-              }}
-            >
-              <Text style={styles.bookBtnTxt}>Book</Text>
-            </TouchableOpacity> */}
           </View>
           
         </View>
@@ -212,11 +200,6 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     flex: 1,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 13,
-    fontWeight:'bold'
   },
   content: {
     flex: 1,
@@ -269,7 +252,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
-    fontSize: 15
+    fontSize: TextSize('Normal')
   },
   exclusiveTruck: {
     width: 100,
@@ -284,13 +267,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   bodyTitleTxt: {
-    fontSize: 30
+    fontSize: TextSize('XL')
   },
   walletContainer: {
     width: deviceWidth / 1.10,
     height: '25%',
     marginTop: '1%',
-    alignItems: 'center',
+    alignSelf: 'center',
     justifyContent: 'center'
   },
   balanceContainer: {
@@ -305,7 +288,21 @@ const styles = StyleSheet.create({
   },
   balanceTxt: {
     color: UMColors.white,
-    fontSize: 30,
+    fontSize: TextSize('XL'),
+    margin: 10
+  },
+  indivPointContainer: {
+    backgroundColor: 'rgba(67, 71, 77, 0.8)',
+    width: '100%',
+    height: '65%',
+    borderRadius: 7
+  },
+  indivPointTxtContainer: {
+    alignItems: 'center'
+  },
+  indivPointTxt: {
+    color: UMColors.white,
+    fontSize: TextSize('XL'),
     margin: 10
   },
   balancePlusBtn: {
@@ -334,7 +331,7 @@ const styles = StyleSheet.create({
   },
   pointsTxt: {
     color: UMColors.white,
-    fontSize: 15,
+    fontSize: TextSize('Normal'),
     marginHorizontal: 15,
   },
   paragraphContainer: {
@@ -343,12 +340,12 @@ const styles = StyleSheet.create({
   },
   paragraphTitle: {
     color: UMColors.white,
-    fontSize: 30
+    fontSize: TextSize('XL')
   },
   paragraph: {
     marginTop: 15,
     color: UMColors.white,
-    fontSize: 15,
+    fontSize: TextSize('Normal'),
     lineHeight: 23,
   },
   chooseMoveContainer: {
@@ -357,7 +354,7 @@ const styles = StyleSheet.create({
   },
   chooseMoveTitle: {
     color: UMColors.white,
-    fontSize: 16,
+    fontSize: TextSize('Normal'),
     fontWeight: 'bold',
     alignSelf: 'center',
     marginBottom: 11
@@ -377,19 +374,6 @@ const styles = StyleSheet.create({
   },
   chooseMoveTxt: {
     color: UMColors.primaryOrange,
-    fontSize: 16
+    fontSize: TextSize('Normal')
   },
-  // bookBtn: {
-  //   marginTop: '15%',
-  //   width: '80%',
-  //   height: '8%',
-  //   backgroundColor: UMColors.primaryOrange,
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  //   borderRadius: 100
-  // },
-  bookBtnTxt: {
-    color: UMColors.white,
-    fontSize: 20
-  }
 })

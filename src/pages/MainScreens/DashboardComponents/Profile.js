@@ -19,6 +19,7 @@ import DocumentPicker from 'react-native-document-picker'
 import getPath from '@flyerhq/react-native-android-uri-path';
 import { canAccessCamera, canReadMedia } from '../../../utils/mediaHelper';
 import ErrorOkModal from '../../Components/ErrorOkModal';
+import { TextSize, normalize } from '../../../utils/stringHelper';
 
 const deviceWidth = Dimensions.get('screen').width
 const deviceHeight = Dimensions.get('screen').height
@@ -62,7 +63,6 @@ export default Profile = () => {
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [cancelModalVisible, setCancelModalVisible] = useState(false)
-  const [profilePic, setProfilePic] = useState('')
   const [errorPass, setErrorPass] = useState({
     value: false,
     message: ''
@@ -85,7 +85,6 @@ export default Profile = () => {
         password: password
       }
       const response = await CustomerApi.deleteUser(data)
-      console.log(response)
       if(response == undefined){
         dispatch(setLoading(false))
         dispatch(showError(true))
@@ -188,6 +187,29 @@ export default Profile = () => {
     })
   }
 
+  const requestOTP = () => {
+    dispatch(setLoading(true))
+    const data = {
+      'method': 'sms'
+    }
+    refreshTokenHelper(async() => {
+      const otpResponse = await CustomerApi.requestOTP(data, user?.access)
+      console.log(otpResponse?.data)
+      if(otpResponse == undefined){
+        dispatch(showError(true))
+        dispatch(setLoading(false))
+      } else {
+        if(otpResponse?.data?.success){
+          dispatch(setLoading(false))
+          navigate('OTPScreen', { userData: { ...user, verify: 'sms' }})
+        } else {
+          setError({ value: true, message: otpResponse?.data?.message || otpResponse?.data })
+          dispatch(setLoading(false))
+        }
+      }
+    })
+  }
+
   const onPressImage = async () => {
     RBSheetRef.current.close()
     const granted = await canAccessCamera();
@@ -198,7 +220,6 @@ export default Profile = () => {
         height: 400,
         cropping: true
       }).then(image => {
-        console.log(image);
         let result = image
         let filename = result.path.substring(result.path.lastIndexOf('/') + 1, result.path.length);
         const imageData = {
@@ -225,7 +246,6 @@ export default Profile = () => {
         height: 400,
         cropping: true
       }).then(image => {
-        console.log(image);
         let result = image
         let filename = result.path.substring(result.path.lastIndexOf('/') + 1, result.path.length);
         const imageData = {
@@ -349,14 +369,16 @@ export default Profile = () => {
                 </TouchableOpacity>
             }
           </View>
-          {/* <View style={[styles.contactContainer, { marginTop: 12 }]}>
-            <Text style={[styles.contactTxt, { textAlign: 'left' }]}>Email Address:</Text>
-            <Text style={styles.contactTxt}>{userDetailsData?.user?.user_profile?.email}</Text>
-          </View>
-          <View style={styles.contactContainer}>
-            <Text style={[styles.contactTxt, { textAlign: 'left' }]}>Phone Number:</Text>
-            <Text style={styles.contactTxt}>{userDetailsData?.user?.user_profile?.mobile_number}</Text>
-          </View> */}
+          {/* Verify Mobile Number */}
+          {
+            !userDetailsData?.user?.user_profile?.is_mobile_verified &&  
+              <TouchableOpacity
+                style={{ marginTop: 10 }}
+                onPress={() => requestOTP()}
+              >
+                <Text style={styles.verifyMobileTxt}>Verify Mobile Number</Text>
+              </TouchableOpacity>
+          }
         </View>
         {/* Connected Accounts */}
         <View style={styles.connectedAcctContainer}>
@@ -434,7 +456,7 @@ const styles = StyleSheet.create({
   },
   headerTitleTxt: {
     color: UMColors.white,
-    fontSize: 22,
+    fontSize: normalize(TextSize('L')),
     marginBottom: 15,
     fontWeight: 'bold'
   },
@@ -456,13 +478,13 @@ const styles = StyleSheet.create({
     borderRadius: 100
   },
   profileName: {
-    fontSize: 25,
+    fontSize: normalize(TextSize('L')),
     color: UMColors.primaryOrange,
     marginTop: 5,
     fontWeight: 'bold',
   },
   companyName: {
-    fontSize: 15,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.primaryGray,
   },
   editButtonsContainer: {
@@ -483,7 +505,7 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   editProfileBtnTxt: {
-    fontSize: 14,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.black
   },
   profileCameraContainer: {
@@ -503,7 +525,7 @@ const styles = StyleSheet.create({
   contactTxt: {
     width: '50%',
     textAlign: 'right',
-    fontSize: 12,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.black
   },
   connectedAcctContainer: {
@@ -514,7 +536,7 @@ const styles = StyleSheet.create({
   },
   connectedAcctTxt: {
     color: UMColors.primaryOrange,
-    fontSize: 13,
+    fontSize: normalize(TextSize('Normal')),
     marginLeft: '5%',
     marginBottom: 10
   },
@@ -541,12 +563,12 @@ const styles = StyleSheet.create({
     marginLeft: 15
   },
   socialTxt: {
-    fontSize: 13,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.black,
     marginLeft: 10,
   },
   socialConnectTxt: {
-    fontSize: 13,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.primaryOrange,
     marginLeft: 10,
     fontWeight: 'bold',
@@ -563,7 +585,7 @@ const styles = StyleSheet.create({
     bottom: 40
   },
   deleteBtnTxt: {
-    fontSize: 15,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.red,
     fontWeight: 'bold'
   },
@@ -587,7 +609,7 @@ const styles = StyleSheet.create({
   },
   mdlTxt: {
     color: 'white',
-    fontSize: 18,
+    fontSize: normalize(TextSize('M')),
     fontWeight: '400',
     alignSelf: 'center',
     textAlign: 'center'
@@ -610,7 +632,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10
   },
   mdlBtnTxt: {
-    fontSize: 16,
+    fontSize: normalize(TextSize('Normal')),
     color: 'black'
   },
   mdlPasswordInput: {
@@ -619,7 +641,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 5,
     marginTop: 6,
-    fontSize: 14,
+    fontSize: normalize(TextSize('Normal')),
     paddingLeft: 10
   },
   rbSheetBtn: {
@@ -630,7 +652,12 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   rbSheetText: {
-    fontSize: 17,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.primaryOrange
+  },
+  verifyMobileTxt: {
+    fontSize: normalize(TextSize('Normal')),
+    color: UMColors.primaryOrange,
+    fontWeight: '700'
   }
 })

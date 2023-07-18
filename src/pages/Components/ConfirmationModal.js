@@ -1,5 +1,6 @@
 import { View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native'
 import React, { Component } from 'react'
+import { TextSize, normalize } from '../../utils/stringHelper'
 
 export default class ConfirmationModal extends Component {
   render() {
@@ -60,7 +61,7 @@ const styles = StyleSheet.create({
   },
   mdlTxt: {
     color: 'white',
-    fontSize: 18,
+    fontSize: normalize(TextSize('M')),
     fontWeight: '400',
     textAlign: 'center'
   },
@@ -78,7 +79,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10
   },
   mdlBtnTxt: {
-    fontSize: 16,
+    fontSize: normalize(TextSize('Normal')),
     color: 'black'
   }
 })

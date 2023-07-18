@@ -7,7 +7,7 @@ import { UMIcons } from '../../utils/imageHelper';
 
 let deviceWidth = Dimensions.get('window').width
 
-export default class Start1 extends Component {  
+export default class StartScreen extends Component {  
   constructor(props) {
     super(props);
     

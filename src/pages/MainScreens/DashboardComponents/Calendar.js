@@ -1,65 +1,39 @@
-import React, { Component }  from 'react';
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  ImageBackground, 
-  Image 
-} from 'react-native';
-import TopDashboardNavbar from '../../Components/TopDashboardNavbar';
+import React, { useState } from 'react'
+import {
+  View,
+  ImageBackground,
+  StatusBar,
+  StyleSheet
+} from 'react-native'
+import { CalendarView } from '../../Components/CalendarView'
+import { Bookings } from './CalendarBookings/Bookings'
+import { UMIcons } from '../../../utils/imageHelper'
 
-
-const bgImage = '../../../assets/bg-image.jpg';
-
-export default class Calendar extends Component {  
-  constructor() {
-    super();
-    
-    this.state = { 
-      balance: '00.00',
-      user: []
-    };
-  }
-
-  async componentDidMount() {
-    this.init();
-  }
+export default Calendar = () => {
+  const [selectedDate, setSelectedDate] = useState(undefined);
   
-  async init() {
-
+  const onChangeDate = (date) => {
+    setSelectedDate(date);
   }
 
-  render() {
-    return(
-      <View style={styles.container}>
-        <ImageBackground source={require(bgImage)} resizeMode='cover' style={styles.image}>
-          <View style={styles.innerContainer}>
-
-           {/* Header */}
-           <TopDashboardNavbar
-              CustomerService={() => {}}
-            />
-
-            <View style={styles.content}>
-
-              {/* Placeholder */}
-              <View style={styles.alignItemCenter}>
-                <View style={styles.placeholder}>
-                  <View style={styles.placeholderContainer}>
-                    <Text style={styles.placeholderText}>
-                      Calendar
-                    </Text>
-                  </View>
-                </View>
-              </View>
-
-            </View>
-          </View>
-        </ImageBackground>
-      </View>
-    )
-  }
+  return (
+    <View style={styles.container}>
+      <TopDashboardNavbar/>
+      <StatusBar translucent barStyle={'dark-content'}/>
+      <ImageBackground 
+        source={UMIcons.bgImage} 
+        resizeMode='cover' 
+        style={styles.image}
+      >
+        <CalendarView 
+          onPressCalendarDate={onChangeDate}
+        />
+        <Bookings 
+          selectedDate={selectedDate}
+        />
+      </ImageBackground>
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -71,31 +45,5 @@ const styles = StyleSheet.create({
   image: {
     flex: 1,
     justifyContent: 'center',
-  },
-  innerContainer: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center'
-  },
-  alignItemCenter: {
-    alignItems: 'center',
-  },
-  placeholder: {
-    width: '60%',
-    height: 100,
-    marginBottom: '20%',
-    justifyContent: 'space-evenly',
-    backgroundColor: 'rgba(255, 255, 255, 0.4)',
-    borderRadius: 15
-  },
-  placeholderContainer: {
-    alignItems: 'center'
-  },
-  placeholderText: {
-    color: 'white',
-    fontSize: 20,
-    fontWeight: '300'
   },
 })

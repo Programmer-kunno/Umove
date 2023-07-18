@@ -12,6 +12,7 @@ import React, { useEffect, useState } from 'react'
 import { UMIcons } from '../../../utils/imageHelper';
 import { UMColors } from '../../../utils/ColorHelper';
 import { resetNavigation } from '../../../utils/navigationHelper';
+import { TextSize, normalize } from '../../../utils/stringHelper';
 
 export default PaymentLoadingScreen = (props) => {
   const { selectedPaymentMethod, bookingNumber, data, booking } = props.route.params;
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
     height: 70
   },
   statusTxt: {
-    fontSize: 19,
+    fontSize: normalize(TextSize('Normal')),
     textAlign: 'center',
     marginTop: '10%',
     fontWeight: '400'
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
     borderRadius: 50
   },
   backBtnTxt: {
-    fontSize: 16,
+    fontSize: normalize(TextSize('Normal')),
     fontWeight: '600',
     color: 'white'
   }

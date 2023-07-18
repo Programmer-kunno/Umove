@@ -22,6 +22,7 @@ import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModa
 import ErrorOkModal from '../../Components/ErrorOkModal'
 import { Loader } from '../../Components/Loader'
 import { navigate } from '../../../utils/navigationHelper'
+import { TextSize, normalize } from '../../../utils/stringHelper'
 
 const deviceWidth = Dimensions.get('screen').width
 const deviceHeigth = Dimensions.get('screen').height
@@ -163,7 +164,7 @@ const styles = StyleSheet.create({
     width: 90,
   },
   markerTxt: {
-    fontSize: 9,
+    fontSize: normalize(TextSize('XS')),
     color: UMColors.white,
     backgroundColor: UMColors.darkerGray,
     borderRadius: 10,
@@ -183,13 +184,13 @@ const styles = StyleSheet.create({
     height: 50,
   },
   btnTxt: {
-    fontSize: 17,
+    fontSize: normalize(TextSize('M')),
     fontWeight: 'bold',
     color: UMColors.white
   },
   nextTipTxt: {
     marginTop: 5,
-    fontSize: 10,
+    fontSize: normalize(TextSize('S')),
     fontStyle: 'italic'
   }
 })

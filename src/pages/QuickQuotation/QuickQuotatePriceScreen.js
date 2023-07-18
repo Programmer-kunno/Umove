@@ -9,6 +9,7 @@ import { navigate } from '../../utils/navigationHelper';
 
 export default QuickQuotatePriceScreen = (props) => {
   const price = props.route.params?.price
+  const vehicleName = props.route.params?.vehicleName
 
   return (
     <View style={styles.mainContainer}>
@@ -33,13 +34,10 @@ export default QuickQuotatePriceScreen = (props) => {
           
         </View>
         <Text style={styles.bodyTxt}>
-          This rate is exclusive quotation, a 
-          motorcycle vehicles has been selected 
-          to exclusively pick up and deliver 
-          without other customer's order co-
-          loaded, cheaper options maybe 
-          available time to time when you book 
-          your parcels.
+          {          
+            `This rate is exclusive quotation, a ` + vehicleName.toLowerCase() +
+            ` vehicle has been selected to exclusively pick up and deliver without other customer's order co-loaded, cheaper options maybe available time to time when you book your parcels.`
+          }
         </Text>
       </View>
       <View style={styles.btnContainer}>
@@ -54,7 +52,7 @@ export default QuickQuotatePriceScreen = (props) => {
         <TouchableOpacity
           style={styles.btn}
           onPress={() => {
-            resetNavigation('Start1')
+            resetNavigation('StartScreen')
           }}
         >
           <Text style={[styles.btnTxt, { color: UMColors.primaryOrange }]}>Cancel</Text>
@@ -119,12 +117,13 @@ const styles = StyleSheet.create({
     textAlign: 'justify'
   },
   btnContainer: {
-    marginTop: '12%',
     height: '10%',
     width: '90%',
     justifyContent: 'space-around',
     alignItems: 'center',
     flexDirection: 'row',
+    position: 'absolute',
+    bottom: '10%'
   },
   btn: {
     width: '30%',

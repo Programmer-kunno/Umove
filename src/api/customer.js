@@ -25,9 +25,10 @@ export class CustomerApi {
     }
   }
 
-  static async getCustomerData() {
+  //the token is optional
+  static async getCustomerData(optionalToken) {
     try {
-      const response = await get('/api/customers/', {}, false)
+      const response = await get('/api/customers/', {}, false, optionalToken)
       return response
     } catch(err) {
       return err
@@ -64,6 +65,24 @@ export class CustomerApi {
   static async deleteSavedAddress(addressID) {
     try {
       const response = await del(`/api/customers/addresses/delete/${addressID}`)
+      return response
+    } catch(err) {
+      return err
+    }
+  }
+
+  static async requestOTP(data, tokenData) {
+    try {
+      const response = await post(`/api/customers/request-otp`, data, {}, true, tokenData)
+      return response
+    } catch(err) {
+      return err
+    }
+  }
+
+  static async verifyOTP(data, tokenData) {
+    try {
+      const response = await post(`/api/customers/verify-otp`, data, {}, true, tokenData)
       return response
     } catch(err) {
       return err
@@ -241,27 +260,22 @@ export class CustomerApi {
       formdata.append('company[office_zip_code]', register.officeZipcode)
       if(register.companyLogo) {
         const newData = register.companyLogo;
-        newData.type = newData.mime
-        
         formdata.append('company[company_logo]', {uri: newData?.path, name: newData?.name, type: newData?.type })
       }
       
       if(register.bir) {
         const newData = register.bir;
-        newData.mimeType = newData.type
-        formdata.append('company[company_requirement][bir]', {uri: newData?.uri, name: newData?.name, type: newData?.mimeType })
+        formdata.append('company[company_requirement][bir]', {uri: newData?.uri, name: newData?.name, type: newData?.type })
       }
       
       if(register.dti) {
         const newData = register.dti;
-        newData.mimeType = newData.type
-        formdata.append('company[company_requirement][dti]', {uri: newData?.uri, name: newData?.name, type: newData?.mimeType })
+        formdata.append('company[company_requirement][dti]', {uri: newData?.uri, name: newData?.name, type: newData?.type })
       }
   
       if(register.validId) {
         const newData = register.validId;
-        newData.mimeType = newData.type
-        formdata.append('valid_id', {uri: newData?.uri, name: newData?.name, type: newData?.mimeType })
+        formdata.append('valid_id', {uri: newData?.uri, name: newData?.name, type: newData?.type })
       }
     }
 

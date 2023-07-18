@@ -14,6 +14,7 @@ import { UMColors } from '../../utils/ColorHelper'
 import { useIsFocused } from '@react-navigation/native'
 import { UMIcons } from '../../utils/imageHelper'
 import { navigate, resetNavigation } from '../../utils/navigationHelper'
+import { TextSize, normalize } from '../../utils/stringHelper'
 
 const deviceWidth = Dimensions.get('screen').width
 const deviceHeight = Dimensions.get('screen').height
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
   text: {
     textAlign: 'center',
     color: 'black',
-    fontSize: 17
+    fontSize: normalize(TextSize('M'))
   },
   greenCheck: {
     height: 65,
@@ -135,7 +136,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
-    fontSize: 17,
+    fontSize: normalize(TextSize('M')),
     fontWeight:'bold',
   },
 })

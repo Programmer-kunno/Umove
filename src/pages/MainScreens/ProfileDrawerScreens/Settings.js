@@ -1,9 +1,18 @@
-import { SafeAreaView, Text, StyleSheet, TouchableOpacity, Image, Dimensions, FlatList } from 'react-native'
+import {
+  SafeAreaView, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  Image, 
+  Dimensions, 
+  FlatList 
+} from 'react-native'
 import React from 'react'
 import CustomNavbar from '../../Components/CustomNavbar'
 import { UMColors } from '../../../utils/ColorHelper'
 import { UMIcons } from '../../../utils/imageHelper'
 import { navigate } from '../../../utils/navigationHelper'
+import DeviceInfo from 'react-native-device-info'
 
 const deviceWidth = Dimensions.get('screen').width
 
@@ -12,10 +21,14 @@ export default Settings = () => {
   const settingsItems = [
     {
       id: 1,
-      label: 'Data Privacy'
+      label: 'Payment'
     },
     {
       id: 2,
+      label: 'Data Privacy'
+    },
+    {
+      id: 3,
       label: 'App Version'
     }
   ]
@@ -27,10 +40,16 @@ export default Settings = () => {
         onPress={() => {
           switch(item.id){
             case 1: {
-              navigate('DataPrivacy')
+              navigate('PaymentSettingsScreen')
+              break;
             }
             case 2: {
-              
+              navigate('DataPrivacy')
+              break;
+            }
+            case 3: {
+              navigate('AppVersion')
+              break;
             }
             default:
           }

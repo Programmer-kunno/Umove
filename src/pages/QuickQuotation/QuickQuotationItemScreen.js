@@ -23,6 +23,7 @@ const deviceWidth = Dimensions.get('screen').width
 export default QuickQuotationItemScreen = (props) => {  
   const [bookingData, setBookingData] = useState({
     vehicleType: '',
+    vehicleName: '',
     typeOfGoods: '',
     productCategory: '',
     productSubcategory: '',
@@ -70,6 +71,7 @@ export default QuickQuotationItemScreen = (props) => {
     setBookingData({
       ...bookingData,
       vehicleType: props.route.params?.vehicleType,
+      vehicleName: props.route.params?.vehicleName,
     })
     loadType();
     loadPackaging();
@@ -181,9 +183,10 @@ export default QuickQuotationItemScreen = (props) => {
   const checkInputs = () => {
     if( bookingData.typeOfGoods == '' || bookingData.productSubcategory == '' || bookingData.quantity == 0 || 
         bookingData.width == '' || bookingData.length == '' || bookingData.weight == '' || bookingData.height == '' || 
-        bookingData.width > 100 || bookingData.width < 0 || bookingData.length > 100 || bookingData.length < 0 || 
-        bookingData.weight > 1000 || bookingData.weight < 0 || bookingData.height > 100 || bookingData.height < 0 || 
-        bookingData.packagingType == '' 
+        bookingData.width > 100 || bookingData.width <= 0 || bookingData.length > 100 || bookingData.length <= 0 || 
+        bookingData.weight > 1000 || bookingData.weight <= 0 || bookingData.height > 100 || bookingData.height <= 0 || 
+        bookingData.packagingType == '' || !(bookingData.width % 1 >= 0) || !(bookingData.length % 1 >= 0) ||
+        !(bookingData.weight % 1 >= 0) || !(bookingData.height % 1 >= 0)  
       ){
         return true
        } else {
@@ -208,7 +211,7 @@ export default QuickQuotationItemScreen = (props) => {
           {/* Dropdown for Type of Goods */}
         <View style={styles.goodsDropDownContainer}>
           <DropDownPicker
-            placeholder="Select Type"
+            placeholder="Select Type of Good"
             placeholderStyle={styles.placeholderStyle}
             style={[styles.typeDropdownStyle, {position: 'relative', zIndex: 60}]}
             containerStyle={[styles.typeDropdownContainerStyle, {position: 'relative', zIndex: 100}]}
@@ -301,15 +304,19 @@ export default QuickQuotationItemScreen = (props) => {
                     placeholder={'00.00'}
                     keyboardType='decimal-pad'
                     returnKeyType='done'
-                    onChangeText={(data) => setBookingData({ ...bookingData, width: data })}
+                    onChangeText={(data) => {
+                      setBookingData({ ...bookingData, width: data })
+                    }}
                 />
                 <Text style={styles.unitTxt}>| cm</Text>
                 <Text style={styles.errorTxt}>
-                  { bookingData.width > 100 ?
-                      'Max value is 100'
-                    :
-                    bookingData.width < 0 &&
-                      'Value must be above 0'
+                  {
+                    bookingData.width &&
+                      (
+                        bookingData.width > 100 ? 'Max value is 100'
+                      :
+                        bookingData.width <= 0 ? 'Value must be above 0' : !(bookingData.width % 1 >= 0) && 'Invalid Input'
+                      )
                   }
                 </Text>
               </View>                    
@@ -326,11 +333,13 @@ export default QuickQuotationItemScreen = (props) => {
                 />
                 <Text style={styles.unitTxt}>| cm</Text>
                 <Text style={styles.errorTxt}>
-                  { bookingData.length > 100 ?
-                      'Max value is 100'
-                    :
-                    bookingData.length < 0 &&
-                      'Value must be above 0'
+                  {
+                    bookingData.length &&
+                      (
+                        bookingData.length > 100 ? 'Max value is 100'
+                      :
+                        bookingData.length <= 0 ? 'Value must be above 0' : !(bookingData.length % 1 >= 0) && 'Invalid Input'
+                      )
                   }
                 </Text>
               </View>
@@ -347,13 +356,15 @@ export default QuickQuotationItemScreen = (props) => {
                   returnKeyType='done'
                   onChangeText={(data) => setBookingData({ ...bookingData, weight: data })}
                 />
-                <Text style={styles.unitTxt}>| cm</Text>
+                <Text style={styles.unitTxt}>| kg</Text>
                 <Text style={styles.errorTxt}>
-                  { bookingData.weight > 1000 ?
-                      'Max value is 1000'
-                    :
-                    bookingData.weight < 0 &&
-                      'Value must be above 0'
+                  {
+                    bookingData.weight &&
+                      (
+                        bookingData.weight > 1000 ? 'Max value is 1000'
+                      :
+                        bookingData.weight <= 0 ? 'Value must be above 0' : !(bookingData.weight % 1 >= 0) && 'Invalid Input'
+                      )
                   }
                 </Text>
               </View>
@@ -370,11 +381,13 @@ export default QuickQuotationItemScreen = (props) => {
                 />
                 <Text style={styles.unitTxt}>| cm</Text>
                 <Text style={styles.errorTxt}>
-                  { bookingData.height > 100 ?
-                      'Max value is 100'
-                    :
-                    bookingData.height < 0 &&
-                      'Value must be above 0'
+                  {
+                    bookingData.height &&
+                      (
+                        bookingData.height > 100 ? 'Max value is 100'
+                      :
+                        bookingData.height <= 0 ? 'Value must be above 0' : !(bookingData.height % 1 >= 0) && 'Invalid Input'
+                      )
                   }
                 </Text>
               </View>

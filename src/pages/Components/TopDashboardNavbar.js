@@ -11,6 +11,7 @@ import { UMColors } from '../../utils/ColorHelper';
 import { UMIcons } from '../../utils/imageHelper';
 import { useSelector } from 'react-redux';
 import { navigate } from '../../utils/navigationHelper';
+import { TextSize, normalize } from '../../utils/stringHelper';
 
 export default TopDashboardNavbar = (props) => {  
 
@@ -94,7 +95,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     color: UMColors.black,
-    fontSize: 11,
+    fontSize: normalize(TextSize('S')),
     fontWeight: 'bold',
     top: -7
   },

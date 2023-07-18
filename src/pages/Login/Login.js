@@ -15,6 +15,9 @@ import { showError } from '../../redux/actions/ErrorModal';
 import { UMIcons } from '../../utils/imageHelper';
 import { useSelector } from 'react-redux';
 import { useIsFocused } from '@react-navigation/native';
+import DeviceInfo from 'react-native-device-info';
+import { TextSize, normalize } from '../../utils/stringHelper';
+import { UMFont } from '../../utils/fontHelper';
 
 const deviceWidth = Dimensions.get('screen').width
 
@@ -52,8 +55,28 @@ export default Login = (props) => {
         setError({ value: true, message: response?.data?.message || response?.data });
         dispatch(setLoading(false))
       } else {
-        dispatch(saveUserDetailsRedux({ ...response?.data?.data, rememberMe: remember }))
-        resetNavigation('Landing', { savedLogInData: data })
+        if(response?.data?.data?.is_email_verified){
+          dispatch(saveUserDetailsRedux({ ...response?.data?.data, rememberMe: remember }))
+          resetNavigation('Landing', { savedLogInData: data })
+        } else {
+          const data = {
+            'method': 'email'
+          }
+          const otpResponse = await CustomerApi.requestOTP(data, response?.data?.data?.access)
+          if(otpResponse == undefined){
+            dispatch(showError(true))
+            dispatch(setLoading(false))
+          } else {
+            if(otpResponse?.data?.success){
+              setError({ value: false, message: '' })
+              navigate('OTPScreen', { userData: { ...response?.data?.data, rememberMe: remember, verify: 'email' } })
+              dispatch(setLoading(false))
+            } else {
+              setError({ value: true, message: otpResponse?.data?.message || otpResponse?.data })
+              dispatch(setLoading(false))
+            }
+          }
+        }
         dispatch(setLoading(false))
       }
     }
@@ -193,6 +216,7 @@ export default Login = (props) => {
                 </View>
               </View>
             </View>
+            <Text style={styles.versionTxt}>{'v' + DeviceInfo.getVersion()}</Text>
         <Loader/>
       </View>
     </TouchableWithoutFeedback>
@@ -230,13 +254,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start'
   },
   text: {
-    fontSize: 15,
+    fontSize: normalize(TextSize('Normal')),
     paddingLeft: 8,
     paddingBottom: 3,
     color: 'black'
   }, 
   input: {
-    fontSize: 15,
+    fontSize: normalize(TextSize('Normal')),
     height: 45,
     width: '100%',
     paddingLeft: 20,
@@ -275,12 +299,12 @@ const styles = StyleSheet.create({
   },
   rememberMeTxt: {
     marginLeft: 10,
-    fontSize: 13,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.black,
   },
   forgotPassword: {
     marginTop: 10,
-    fontSize: 13,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.black,
   }, 
   logInBtnContainer: {
@@ -299,7 +323,7 @@ const styles = StyleSheet.create({
   },
   loginButtonOrange: {
     marginTop: '13%',
-    height: 50,
+    height: 45,
     width: '70%',
     borderRadius: 25,
     justifyContent:'center',
@@ -309,12 +333,12 @@ const styles = StyleSheet.create({
   },
   loginButtonText: {
     color: 'white',
-    fontSize: 15,
+    fontSize: normalize(TextSize('Normal')),
     fontWeight:'bold'
   },
   loginWithText: {
     color: 'black',
-    fontSize: 12,
+    fontSize: normalize(TextSize('Normal')),
     marginTop: '10%',
     marginBottom: '3%'
   },
@@ -334,11 +358,11 @@ const styles = StyleSheet.create({
   },
   signUpText: {
     color: 'black',
-    fontSize: 14,
+    fontSize: normalize(TextSize('Normal')),
   },
   underline: {
     color: 'black',
-    fontSize: 14,
+    fontSize: normalize(TextSize('Normal')),
     textDecorationLine: 'underline',
   },
   errorContainer:{
@@ -353,7 +377,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   errorMessage:{
-    fontSize: 14,
+    fontSize: normalize(TextSize('Normal')),
     textAlign: 'center',
     color: UMColors.red
   },
@@ -366,5 +390,11 @@ const styles = StyleSheet.create({
     height: 20,
     width: 20,
     marginRight: 5
+  },
+  versionTxt: {
+    position: 'absolute',
+    bottom: 10,
+    fontSize: normalize(TextSize('S')),
+    right: 10
   }
 })

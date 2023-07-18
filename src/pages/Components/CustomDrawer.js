@@ -15,7 +15,7 @@ import { userLogout } from '../../redux/actions/User'
 import { resetNavigation } from '../../utils/navigationHelper'
 import LinearGradient from 'react-native-linear-gradient'
 import { navigate } from '../../utils/navigationHelper'
-import { moneyFormat } from '../../utils/stringHelper'
+import { TextSize, moneyFormat, normalize } from '../../utils/stringHelper'
 
 export default CustomDrawer = () => {
   const deviceWidth = Dimensions.get('screen').width
@@ -32,6 +32,24 @@ export default CustomDrawer = () => {
   logOut = () => {
     dispatch(userLogout())
     resetNavigation('Landing')
+  }
+
+  const renderWallet = () => {
+    return (
+      <TouchableOpacity
+        style={[styles.drawerBtn, { justifyContent: 'space-between'}]}
+        onPress={() => {
+          navigate('WalletScreen')
+        }}
+      >
+        <Image
+          style={styles.drawerWalletImg}
+          source={UMIcons.homeWalletIcon}
+          resizeMode={'contain'}
+        />
+        <Text style={styles.homeWalletBalance}>₱ {moneyFormat(userDetailsData.remaining_credits)}</Text>
+      </TouchableOpacity>
+    )
   }
 
 
@@ -66,21 +84,21 @@ export default CustomDrawer = () => {
              />
            </TouchableOpacity>
           </View>
-          <Text style={styles.profileName}>{name}</Text>
+          <View style={styles.profileNameContainer}>
+            <Text style={styles.profileName}>{name}</Text>
+            {
+              (userDetailsData?.user?.user_profile?.is_mobile_verified && userDetailsData?.user?.user_profile?.is_email_verified) && 
+                <Image
+                  style={{ width: 20, height: 20, marginLeft: 5 }}
+                  source={UMIcons.fullyVerifiedCheck}
+                  resizeMode='contain'
+                /> 
+            }
+          </View>
         </View>
-        <TouchableOpacity
-          style={[styles.drawerBtn, { marginTop: '10%', justifyContent: 'space-between'}]}
-          onPress={() => {
-            navigate('WalletScreen')
-          }}
-        >
-          <Image
-            style={styles.drawerWalletImg}
-            source={UMIcons.homeWalletIcon}
-            resizeMode={'contain'}
-          />
-          <Text style={styles.homeWalletBalance}>₱ {moneyFormat(userDetailsData.remaining_credits)}</Text>
-        </TouchableOpacity>
+        
+        { userDetailsData.customer_type == 'Corporate / Enterprise' && renderWallet() }
+
         <TouchableOpacity
           style={styles.drawerBtn}
           onPress={() => {
@@ -185,6 +203,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '20%',
     marginTop: '15%',
+    marginBottom: '10%',
   },
   profilePicBtn: {
     width: 80,
@@ -218,10 +237,14 @@ const styles = StyleSheet.create({
     width: 75,
     height: 75,
   },
+  profileNameContainer: {
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginTop: 15
+  },
   profileName: {
-    marginTop: 15,
     color: UMColors.black,
-    fontSize: 15
+    fontSize: normalize(TextSize('Normal'))
   },
   drawerBtn: {
     width: '100%',
@@ -237,7 +260,7 @@ const styles = StyleSheet.create({
     marginLeft: 10
   },
   homeWalletBalance: {
-    fontSize: 13,
+    fontSize: normalize(TextSize('S')),
     fontWeight: 'bold',
     color: UMColors.black,
     marginRight: 10
@@ -247,7 +270,7 @@ const styles = StyleSheet.create({
     width: '20%'
   },
   drawerTxt: {
-    fontSize: 15,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.black
   }
 })

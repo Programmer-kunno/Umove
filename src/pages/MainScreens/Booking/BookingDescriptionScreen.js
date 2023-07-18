@@ -13,7 +13,7 @@ import CustomNavbar from '../../Components/CustomNavbar';
 import { navigate } from '../../../utils/navigationHelper';
 import { UMColors } from '../../../utils/ColorHelper';
 import { UMIcons } from '../../../utils/imageHelper';
-import { make12HoursFormat } from '../../../utils/stringHelper';
+import { TextSize, make12HoursFormat, normalize } from '../../../utils/stringHelper';
 import { getPreciseDistance } from 'geolib';
 import { RadioButton } from 'react-native-paper';
 import { refreshTokenHelper } from '../../../api/helper/userHelper';
@@ -34,11 +34,31 @@ export default BookingDescriptionScreen = (props) => {
   const [isSignatureRequired, setIsSignatureRequired] = useState(true)
   const [speacialInstruction, setSpecialInstruction] = useState('')
   const [error, setError] = useState({ value: false, message: '' })
+  const [sortedItems, setSortedItems] = useState([])
 
   useEffect(() => {
     dispatch(setLoading(false))
     getDistance()
+    sortBookingItems()
   }, [])
+
+  const sortBookingItems = () => {
+    const items = []
+    bookingData.bookingItems.map((data, index) => {
+      items.push({
+        id: index,
+        subcategory: data.productSubCategory,
+        uom: data.packagingType,
+        length: data.length,
+        width: data.width,
+        height: data.height,
+        weight: data.weight,
+        quantity: data.quantity
+      })
+      items.sort((a, b) => a.id - b.id)
+    })
+    setSortedItems(items)
+  }
 
   const getDistance = () => {
     var distance = getPreciseDistance(
@@ -51,7 +71,7 @@ export default BookingDescriptionScreen = (props) => {
   const bookNow = () => {
     dispatch(setLoading(true))
     refreshTokenHelper(async() => {
-      const response = await BookingApi.book({ ...bookingData, pickupSpecialInstructions: speacialInstruction, isSignatureRequired: isSignatureRequired })
+      const response = await BookingApi.book({ ...bookingData, bookingItems: sortedItems, pickupSpecialInstructions: speacialInstruction, isSignatureRequired: isSignatureRequired })
       if(response == undefined){
         dispatch(setLoading(false))
         dispatch(showError(true))
@@ -116,8 +136,8 @@ export default BookingDescriptionScreen = (props) => {
         <View style={styles.signatureContainer}>
           <View style={styles.signatureSubContainer}>
             <View style={{ alignItems: 'center' }}>
-              <Text style={{ fontSize: 14, color: UMColors.black }}>Require Signature</Text>
-              <Text style={{ fontSize: 11, color: UMColors.black }}>Applies to all locations</Text>
+              <Text style={{ fontSize: normalize(TextSize('Normal')), color: UMColors.black }}>Require Signature</Text>
+              <Text style={{ fontSize: normalize(TextSize('S')), color: UMColors.black }}>Applies to all locations</Text>
             </View>
             <RadioButton
               value={isSignatureRequired}
@@ -173,7 +193,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   },
   detailsTxt: {
-    fontSize: 14,
+    fontSize: normalize(TextSize('Normal')),
     marginVertical: 2,
     color: UMColors.black,
   },
@@ -217,7 +237,7 @@ const styles = StyleSheet.create({
     height: 50,
   },
   btnTxt: {
-    fontSize: 17,
+    fontSize: normalize(TextSize('M')),
     fontWeight: 'bold',
     color: UMColors.white
   }

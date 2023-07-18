@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import { UMColors } from '../../utils/ColorHelper';
 import { UMIcons } from '../../utils/imageHelper';
 import { goBack } from '../../utils/navigationHelper';
+import { TextSize, normalize } from '../../utils/stringHelper';
 
 export default class CustomNavbar extends Component {
   constructor(props){
@@ -72,7 +73,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     color: UMColors.white,
-    fontSize: 20,
+    fontSize: normalize(TextSize('L')),
   },
   headerBackBtn: {
     height: 30,

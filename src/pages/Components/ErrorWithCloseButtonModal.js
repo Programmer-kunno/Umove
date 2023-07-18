@@ -5,6 +5,7 @@ import { UMIcons } from '../../utils/imageHelper'
 import { useSelector } from 'react-redux'
 import { dispatch } from '../../utils/redux'
 import { showError } from '../../redux/actions/ErrorModal'
+import { TextSize, normalize } from '../../utils/stringHelper'
 
 export default ErrorWithCloseButtonModal = () => {
   const error = useSelector(state => state.showErrorReducer.showError)
@@ -69,13 +70,13 @@ const styles = StyleSheet.create({
   errorText: {
     width: '80%',
     marginTop: '2%',
-    fontSize: 16,
+    fontSize: normalize(TextSize('Normal')),
     lineHeight: 25,
     textAlign: 'center'
   },
   okBtnTxt: {
     color: UMColors.primaryOrange,
-    fontSize: 18,
+    fontSize: normalize(TextSize('M')),
     fontWeight: 'bold'
   }
 })

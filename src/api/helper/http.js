@@ -7,12 +7,16 @@ const instance = axios.create({
   timeout: 20000,
 })
 
-export const post = (apiEndpoint, data, headers, noAccess) => new Promise(async(resolve, reject) => {
+export const post = (apiEndpoint, data, headers, noAccess, tempAccess) => new Promise(async(resolve, reject) => {
   const addHeaders = {...headers}
   const accessToken = getAccessToken()
 
   if(accessToken && !noAccess){
     addHeaders.Authorization = `Bearer ${accessToken}`
+  }
+
+  if(tempAccess){
+    addHeaders.Authorization = `Bearer ${tempAccess}`
   }
 
   try {
@@ -23,12 +27,16 @@ export const post = (apiEndpoint, data, headers, noAccess) => new Promise(async(
   } 
 })
 
-export const get = (apiEndpoint, headers, noAccess) => new Promise(async(resolve, reject) => {
+export const get = (apiEndpoint, headers, noAccess, tempAccess) => new Promise(async(resolve, reject) => {
   const addHeaders = {...headers}
   const accessToken = getAccessToken()
 
   if(accessToken && !noAccess){
     addHeaders.Authorization = `Bearer ${accessToken}`
+  }
+
+  if(tempAccess){
+    addHeaders.Authorization = `Bearer ${tempAccess}`
   }
 
   try {

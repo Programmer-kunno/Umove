@@ -8,7 +8,7 @@ import { UMColors } from '../../utils/ColorHelper';
 import { UMIcons } from '../../utils/imageHelper';
 import { navigate } from '../../utils/navigationHelper';
 import { dispatch } from '../../utils/redux';
-import { moneyFormat } from '../../utils/stringHelper';
+import { TextSize, moneyFormat, normalize } from '../../utils/stringHelper';
 import { Loader } from './Loader';
 import BookingItemScreen from '../MainScreens/Booking/BookingItemScreen';
 
@@ -132,18 +132,18 @@ const styles = StyleSheet.create({
     flex: 1
   },
   typeText: {
-    fontSize: 15, 
+    fontSize: normalize(TextSize('Normal')), 
     fontWeight: 500
   },
   subTypeText: {
-    fontSize: 12, 
+    fontSize: normalize(TextSize('S')), 
     color: UMColors.primaryOrange,
     marginTop: 5, 
     marginBottom: 10, 
     fontWeight: 500
   },
   destinationText: {
-    fontSize: 12, 
+    fontSize: normalize(TextSize('S')), 
     fontWeight: 500
   },
   secondColumn: {
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     width: 18
   },
   buttonText: {
-    fontSize: 13, 
+    fontSize: normalize(TextSize('S')), 
     color: UMColors.white
   },
   trackIcon: {

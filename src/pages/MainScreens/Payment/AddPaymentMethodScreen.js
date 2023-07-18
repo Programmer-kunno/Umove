@@ -15,7 +15,7 @@ import CustomNavbar from '../../Components/CustomNavbar'
 import { UMColors } from '../../../utils/ColorHelper'
 import { UMIcons } from '../../../utils/imageHelper'
 import { CardPayment } from '../../../api/paymentCard'
-import { cardExpiryDateRegex, cardNumberRegex } from '../../../utils/stringHelper'
+import { TextSize, cardExpiryDateRegex, cardNumberRegex, normalize } from '../../../utils/stringHelper'
 import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal'
 import { refreshTokenHelper } from '../../../api/helper/userHelper'
 import { RadioButton } from 'react-native-paper'
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     elevation: 8
   },
   addBtnTxt: {
-    fontSize: 22,
+    fontSize: normalize(TextSize('M')),
     fontWeight: 'bold',
     color: UMColors.white
   },
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
   defaultTxt: {
-    fontSize: 15,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.black
   }
 })

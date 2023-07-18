@@ -12,6 +12,7 @@ import { navigate } from '../../../utils/navigationHelper'
 import { Loader } from '../../Components/Loader'
 import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal'
 import ErrorOkModal from '../../Components/ErrorOkModal'
+import { TextSize, normalize } from '../../../utils/stringHelper'
 
 const deviceWidth = Dimensions.get('screen').width
 
@@ -103,7 +104,7 @@ const styles = StyleSheet.create({
   }, 
   vehicleTypeTxt: {
     fontWeight: 'bold',
-    fontSize: 15,
+    fontSize: normalize(TextSize('Normal')),
     marginLeft: 10
   }
 })

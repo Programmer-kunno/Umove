@@ -1,489 +1,343 @@
-import React, { Component }  from 'react';
+import React, { Component, useEffect, useState }  from 'react';
 import { 
   StyleSheet, 
   View, 
+  ImageBackground, 
   Image, 
   Text, 
   TextInput, 
   TouchableOpacity, 
-  TouchableWithoutFeedback,
-  Keyboard
+  TouchableWithoutFeedback, 
+  Keyboard,
+  Dimensions
 } from 'react-native';
-import ModalSelector from 'react-native-modal-selector-searchable'
-import { FetchApi }  from '../../../api/fetch'
+import { CustomerApi } from '../../../api/customer'; 
+import { saveUserDetailsRedux, updateUserAccess } from '../../../redux/actions/User';
+import { dispatch } from '../../../utils/redux';
+import { setLoading } from '../../../redux/actions/Loader';
+import { Loader } from '../../Components/Loader';
 import { UMColors } from '../../../utils/ColorHelper';
+import { navigate, resetNavigation } from '../../../utils/navigationHelper';
 import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal';
+import { showError } from '../../../redux/actions/ErrorModal';
+import { TextSize, normalize } from '../../../utils/stringHelper';
+import { UMIcons } from '../../../utils/imageHelper';
+import ErrorOkModal from '../../Components/ErrorOkModal';
 
-export default class SignUpScreen4 extends Component {  
-  constructor(props) {
-    super(props);
-    
-    this.state = { 
-      register: this.props.route?.params?.register,
-      regionList: [],
-      provinceList: [],
-      cityList: [],
-      barangayList: [],
-    };
-  }
+const deviceWidth = Dimensions.get('screen').width
 
-  async componentDidMount() {
-    this.loadRegion();
-  }
+export default SignUpScreen4 = (props) => {  
 
-  async signUp() {
-      this.props.navigation.navigate('SignUpScreen5', {
-        register: this.state.register
-      })
-    }
+  const [registerData, setRegisterData] = useState({})
+  const [error, setError] = useState({ value: false, message: '' })
+  const [isLoading, setIsLoading] = useState(false)
+  const [securePass, setSecurePass] = useState(true)
+  const [secureConfirmPass, setSecureConfirmPass] = useState(true)
 
-  async loadRegion() {
-    let response = await FetchApi.regions()
-    if(response == undefined){
-      dispatch(showError(true))
-    } else {
-      if(response?.data?.success) {
-        let regionList = response?.data?.data
-        this.setState({regionList})
+  useEffect(() => {
+    dispatch(setLoading(false))
+    setRegisterData(props.route?.params?.register)
+  }, [])
+
+  const signUpNext = async() => {
+    dispatch(setLoading(true))
+    try {
+      if(registerData.password.length < 8) {
+        dispatch(setLoading(false))
+        setError({ value: true, message: "Password must be 8 characters long" })
+      } else if(registerData.password !== registerData.confirmPassword) {
+        dispatch(setLoading(false))
+        setError({ value: true, message: "Password do not match, try again" })
       } else {
-        console.log(response?.message)
+        const response = await CustomerApi.signUp(registerData)
+        if(response == undefined){
+          dispatch(setLoading(false))
+          dispatch(showError(true))
+        } else {
+          if(response?.data?.message?.password) {
+            dispatch(setLoading(false))
+            setError({ value: true, message: response?.data?.message?.password[0] })
+          } 
+          if(response?.data?.success) {
+            const data = {
+              'method': 'email'
+            }
+            const otpResponse = await CustomerApi.requestOTP(data, response?.data?.data?.access)
+            if(otpResponse == undefined){
+              dispatch(showError(true))
+              dispatch(setLoading(false))
+            } else {
+              if(otpResponse?.data?.success){
+                setError({ value: false, message: '' })
+                navigate('OTPScreen', { userData: { ...response?.data?.data, verify: 'email' }, registerData: registerData })
+                dispatch(setLoading(false))
+              } else {
+                setError({ value: true, message: otpResponse?.data?.message || otpResponse?.data })
+                dispatch(setLoading(false))
+              }
+            }
+            // const data = {
+            //   username: registerData.username,
+            //   password: registerData.password
+            // }
+            // let response = await CustomerApi.login(data);
+            // if(response == undefined){
+            //   dispatch(setLoading(false))
+            //   dispatch(showError(true))
+            // } else {
+            //   if(response?.data?.success) {
+            //     dispatch(saveUserDetailsRedux(response?.data?.data))
+            //     resetNavigation('DrawerNavigation')
+            //     this.setState({error: false})
+            //     dispatch(setLoading(false))
+            //   } else {
+            //     dispatch(setLoading(false))
+            //     this.setState({error: true, message: 'Something went wrong try again later'})
+            //   }
+            // }
+          }
+        }
       }
+    } catch (err) {
+      console.log(err)
     }
-  }
+  } 
 
-  async loadProvince(regionCode) {
-    let response = await FetchApi.provinces(regionCode)
-    if(response == undefined){
-      dispatch(showError(true))
+  const checkIsEmptyInputs = () => {
+    if( registerData.password == '' || registerData.confirmPassword == '' ){
+      return true 
     } else {
-      if(response?.data?.success) {
-        let provinceList = response?.data?.data
-        this.setState({provinceList})
-      } else {
-        console.log(response?.message)
-      }
+      return false
     }
   }
 
-  async loadCity(provinceCode) {
-    let response = await FetchApi.cities(provinceCode)
-    if(response == undefined){
-      dispatch(showError(true))
-    } else {
-      if(response?.data?.success) {
-        let cityList = response?.data?.data
-        this.setState({cityList})
-      } else {
-        console.log(response?.message)
-      }
-    }
-  }
-
-  async loadBarangay(cityCode) {
-    let response = await FetchApi.barangays(cityCode)
-    if(response == undefined){
-      dispatch(showError(true))
-    } else {
-      if(response?.data?.success) {
-        let barangayList = response?.data?.data
-        this.setState({barangayList})
-      } else {
-        console.log(response?.message)
-      }
-    }
-  }
-
-  render() {
-    let register = this.state.register;
-    return(
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <View style={styles.mainContainer}>
-        <ErrorWithCloseButtonModal/>
+  return(
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.mainContainer}>
+      <ErrorWithCloseButtonModal/>
+      <ErrorOkModal
+        Visible={error.value}
+        ErrMsg={error.message}
+        OkButton={() => setError({ value: false, message: '' })}
+      />
           {/* Logo */}
-          <View style={styles.upperContainer}>
+          <View style={styles.logoContainer}>
             <Image
               source={require('../../../assets/logo/logo-primary.png')}
               style={styles.logo}
               resizeMode={'contain'}
             />
           </View>
+
+          {/* Sign Up input */}
           <View style={styles.bodyContainer}>
-            <View style={[styles.inputContainer]}>
-              {/* Header */}
+            <Text style={styles.signUpHeader}>Sign Up</Text>
+            <View style={styles.inputPart}> 
               <Text style={styles.text}>
-                Office Address
+                Password
               </Text>
-              
-                {/* Street Address */}
-                <TextInput
-                  style={[styles.fullWidthInput]}
-                  onChangeText={(val) => {
-                    register.officeAddress = val;
-                    this.setState({register})
-                  }}
-                  placeholder='House No., Lot, Street'
-                  placeholderTextColor={'#808080'}
-                />
-            </View>
-            
-            {/* Region and Zip Code */}
-            <View style={[styles.inputContainer, styles.marginTop, styles.row]}>
-              {/* Region */}
-              <ModalSelector
-                data={this.state.regionList}
-                keyExtractor= {region => region.code}
-                labelExtractor= {region => region.name}
-                initValue="Select Region"
-                onChange={(region) => {
-                  register.officeRegion = region.name;
-                  this.setState({register}, async () => {
-                    await this.loadProvince(region.code);
-                  });
-                }}  
-                searchText={'Search'}
-                cancelText={'Cancel'}
-                style={styles.regionInput}
-                initValueTextStyle={styles.initValueTextStyle}
-                searchStyle={styles.searchStyle}
-                selectStyle={styles.selectStyle2}
-                selectTextStyle={styles.selectTextStyle}
-                sectionTextStyle={styles.sectionTextStyle}
-                cancelStyle={styles.cancelStyle}
-                cancelTextStyle={styles.cancelTextStyle}
-                overlayStyle={styles.overlayStyle}
-                touchableActiveOpacity={styles.touchableActiveOpacity}
-              />
-              {/* ZIP Code */}
               <TextInput
-                  style={[styles.zipInput]}
-                  onChangeText={(val) => {
-                    register.officeZipcode = val;
-                    this.setState({register})
-                  }}  
-                  placeholder='ZIP Code'
-                  placeholderTextColor={'#808080'}                        
-                  keyboardType='number-pad'
-                  returnKeyType='done'
-                  maxLength={4}
+                secureTextEntry={securePass}
+                style={styles.input}
+                onChangeText={(val) => {
+                  setRegisterData({ ...registerData, password: val })
+                }}  
+              />
+              <TouchableOpacity
+                style={styles.showPassBtn}
+                onPress={() => setSecurePass(!securePass)}
+              >
+                <Image
+                  style={{ width: 20, height: 20 }}
+                  source={ securePass ? UMIcons.eyeClosedIcon : UMIcons.eyeICon }
+                  resizeMode='contain'
                 />
+              </TouchableOpacity>
             </View>
-
-            {/* Province */}
-            <View style={[styles.inputContainer, styles.marginTop]}>
-              { register.region !== '' ? 
-                <ModalSelector
-                  data={this.state.provinceList}
-                  keyExtractor= {province => province.code}
-                  labelExtractor= {province => province.name}
-                  initValue="Select Province"
-                  onChange={(province) => {
-                    register.officeProvince = province.name;
-                    this.setState({register}, async () => {
-                      await this.loadCity(province.code);
-                    });
-                  }}  
-                  searchText={'Search'}
-                  cancelText={'Cancel'}
-                  style={styles.fullWidthInput}
-                  initValueTextStyle={styles.initValueTextStyle}
-                  searchStyle={styles.searchStyle}
-                  selectStyle={styles.selectStyle1}
-                  selectTextStyle={styles.selectTextStyle}
-                  sectionTextStyle={styles.sectionTextStyle}
-                  cancelStyle={styles.cancelStyle}
-                  cancelTextStyle={styles.cancelTextStyle}
-                  overlayStyle={styles.overlayStyle}
-                  touchableActiveOpacity={styles.touchableActiveOpacity}
+            <View style={styles.inputPart}> 
+              <Text style={styles.text}>
+                Confirm Password
+              </Text>
+              <TextInput
+                secureTextEntry={secureConfirmPass}
+                style={styles.input}
+                onChangeText={(val) => {
+                  setRegisterData({ ...registerData, confirmPassword: val })
+                }}   
+              />
+              <TouchableOpacity
+                style={styles.showPassBtn}
+                onPress={() => setSecureConfirmPass(!secureConfirmPass)}
+              >
+                <Image
+                  style={{ width: 20, height: 20 }}
+                  source={ secureConfirmPass ? UMIcons.eyeClosedIcon : UMIcons.eyeICon }
+                  resizeMode='contain'
                 />
-                :
-                <ModalSelector
-                  disabled={true}
-                  data={this.state.provinceList}
-                  initValue="Select Province"
-                  searchText={'Search'}
-                  cancelText={'Cancel'}
-                  style={styles.disabledFullWidthInput}
-                  initValueTextStyle={styles.initValueTextStyle}
-                  searchStyle={styles.searchStyle}
-                  selectStyle={styles.disabledSelectStyle}
-                  selectTextStyle={styles.selectTextStyle}
-                  sectionTextStyle={styles.sectionTextStyle}
-                  cancelStyle={styles.cancelStyle}
-                  cancelTextStyle={styles.cancelTextStyle}
-                  overlayStyle={styles.overlayStyle}
-                  touchableActiveOpacity={styles.touchableActiveOpacity}
-                />
-              }
+              </TouchableOpacity>
             </View>
-
-            {/* City */}
-            <View style={[styles.inputContainer, styles.marginTop]}>
-              { register.province !== '' ?
-                <ModalSelector
-                  data={this.state.cityList}
-                  keyExtractor= {city => city.code}
-                  labelExtractor= {city => city.name}
-                  initValue="Select City"
-                  onChange={(city) => {
-                    register.officeCity = city.name;
-                    this.setState({register}, async () => {
-                      await this.loadBarangay(city.code);
-                    });
-                  }}  
-                  searchText={'Search'}
-                  cancelText={'Cancel'}
-                  style={styles.fullWidthInput}
-                  initValueTextStyle={styles.initValueTextStyle}
-                  searchStyle={styles.searchStyle}
-                  selectStyle={styles.selectStyle1}
-                  selectTextStyle={styles.selectTextStyle}
-                  sectionTextStyle={styles.sectionTextStyle}
-                  cancelStyle={styles.cancelStyle}
-                  cancelTextStyle={styles.cancelTextStyle}
-                  overlayStyle={styles.overlayStyle}
-                />
-                :
-                <ModalSelector
-                  disabled={true}
-                  initValue="Select City"
-                  searchText={'Search'}
-                  cancelText={'Cancel'}
-                  style={styles.disabledFullWidthInput}
-                  initValueTextStyle={styles.initValueTextStyle}
-                  searchStyle={styles.searchStyle}
-                  selectStyle={styles.disabledSelectStyle}
-                  selectTextStyle={styles.selectTextStyle}
-                  sectionTextStyle={styles.sectionTextStyle}
-                  cancelStyle={styles.cancelStyle}
-                  cancelTextStyle={styles.cancelTextStyle}
-                  overlayStyle={styles.overlayStyle}
-                  touchableActiveOpacity={styles.touchableActiveOpacity}
-                />
-              }
-            </View>
-
-            {/* Barangay */}
-            <View style={[styles.inputContainer, styles.marginTop]}>
-              { register.city !== '' ? 
-                <ModalSelector
-                  data={this.state.barangayList}
-                  keyExtractor= {barangay => barangay.code}
-                  labelExtractor= {barangay => barangay.name}
-                  initValue="Select Barangay"
-                  onChange={(barangay) => {
-                    register.officeBarangay = barangay.name;
-                    this.setState({register});
-                  }} 
-                  searchText={'Search'}
-                  cancelText={'Cancel'}
-                  style={styles.fullWidthInput}
-                  initValueTextStyle={styles.initValueTextStyle}
-                  searchStyle={styles.searchStyle}
-                  selectStyle={styles.selectStyle1}
-                  selectTextStyle={styles.selectTextStyle}
-                  sectionTextStyle={styles.sectionTextStyle}
-                  cancelStyle={styles.cancelStyle}
-                  cancelTextStyle={styles.cancelTextStyle}
-                  overlayStyle={styles.overlayStyle}
-                />
-                :
-                <ModalSelector
-                  disabled={true}
-                  initValue="Select Barangay"
-                  searchText={'Search'}
-                  cancelText={'Cancel'}
-                  style={styles.disabledFullWidthInput}
-                  initValueTextStyle={styles.initValueTextStyle}
-                  searchStyle={styles.searchStyle}
-                  selectStyle={styles.disabledSelectStyle}
-                  selectTextStyle={styles.selectTextStyle}
-                  sectionTextStyle={styles.sectionTextStyle}
-                  cancelStyle={styles.cancelStyle}
-                  cancelTextStyle={styles.cancelTextStyle}
-                  overlayStyle={styles.overlayStyle}
-                  touchableActiveOpacity={styles.touchableActiveOpacity}
-                />
-              }
-            </View>
-          </View>         
-
-          <View style={styles.bottomBtnContainer}>
-          {/* Next Button */}
-            {/* Make button gray when not all inputs are filled out, orange when filled out */}
-            { register.officeAddress == '' || register.officeRegion == '' || register.officeProvince == '' || register.officeRegion == '' || register.officeBarangay == '' || register.officeZipcode == 0 ?
-            <TouchableOpacity style={styles.nextButtonGray} disabled={true}>
-              <Text style={styles.buttonText}> NEXT </Text>
-            </TouchableOpacity>
-            :
-            <TouchableOpacity style={styles.nextButtonOrange} onPress={() => this.signUp() }>
-              <Text style={styles.buttonText}> NEXT </Text>
-            </TouchableOpacity>
+            {
+              error.value && 
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorMessage}>{error.message}</Text>
+              </View>
             }
           </View>
-        </View>
-      </TouchableWithoutFeedback>
-    )
-  }
+
+          {/* Terms and Conditions & Privacy Policy */}
+          <View style={styles.conditionsContainer}>
+            <View style={styles.row}>
+              <Text style={styles.conditionsText}>
+                By clicking CONTINUE, you agree to our 
+              </Text>
+                <TouchableOpacity onPress={() => alert('Terms and Conditions')}>
+                  <Text style={styles.underline}>
+                    {" "} Terms and Conditions {" "}
+                  </Text>
+                </TouchableOpacity>
+                <Text style={styles.conditionsText}>
+                and that you have read our 
+                </Text>
+                <TouchableOpacity onPress={() => alert('Privacy Policy')}>
+                  <Text style={styles.underline}>
+                    {" "} Privacy Policy
+                  </Text>
+                </TouchableOpacity>
+              <Text style={styles.conditionsText}>
+                .
+              </Text>
+            </View>
+          </View>
+
+          {/* Continue Button */}
+          <View style={styles.nextButtonContainer}>
+            {/* Make button gray when not all inputs are filled out, orange when filled out */}
+            <TouchableOpacity 
+              style={[styles.nextButton, !checkIsEmptyInputs() && {backgroundColor: UMColors.primaryOrange}]} 
+              disabled={checkIsEmptyInputs()}
+              onPress={() => signUpNext()}
+            >
+              <Text style={styles.nextButtonText}>CONTINUE</Text>
+            </TouchableOpacity>
+          </View>
+        <Loader/>
+      </View>
+    </TouchableWithoutFeedback>
+  )
 }
 
 
 const styles = StyleSheet.create({
   mainContainer: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: UMColors.BGOrange,
-  },
-  upperContainer: {
-    alignItems: 'center',
+    flex: 1, 
     justifyContent: 'center',
-    height: "20%",
-    width: '90%',
-    marginTop: '10%'
+    alignItems: 'center',
+    backgroundColor: 'rgb(238, 241, 217)',
+  },
+  logoContainer: {
+    width: deviceWidth,
+    height: '9%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   logo: {
-    height: '50%',
+    height: '100%',
     width: '100%',
   },
   bodyContainer: {
     width: '90%',
-    height: '50%',
-    justifyContent: 'center'
+    height: '35%',
+    alignItems: 'center',
+  },
+  signUpHeader: {
+    fontSize: normalize(TextSize('L')),
+    letterSpacing: 1,
+    color: 'black',
+    marginBottom: '5%',
+  },
+  inputPart: {
+    margin: 5,
+    width: '80%',
+    justifyContent: 'center',
+    alignItems: 'flex-start'
+  },
+  text: {
+    fontSize: normalize(TextSize('Normal')),
+    paddingLeft: 8,
+    paddingBottom: 3,
+    color: 'black'
+  }, 
+  input: {
+    fontSize: normalize(TextSize('Normal')),
+    height: 45,
+    width: '100%',
+    paddingLeft: 20,
+    paddingRight: 20,
+    borderRadius: 25,
+    borderColor: 'rgb(223,131,68)',
+    borderWidth: 1,
+    backgroundColor: 'white'
+  },
+  conditionsContainer: {
+    width: '90%',
+    height: '8%',
+    marginTop: '10%',
+    justifyContent:'center',
+    marginBottom: '1%',
   },
   row: {
     flexDirection: 'row',
+    justifyContent:'center',
+    flexWrap: 'wrap',
   },
-  marginTop: {
-    marginTop: '6%'
-  },
-  inputContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 18,
+  conditionsText: {
     color: 'black',
-    marginBottom: '5%',
-    fontWeight: 'bold'
-  }, 
-  fullWidthInput: {
-    backgroundColor: 'white',
-    width: '90%',
-    height: 50,
-    borderRadius: 25,
-    borderColor: 'rgb(223,131,68)',
-    borderWidth: 1,
-    paddingLeft: '5%'
+    fontSize: normalize(TextSize('S')),
+    alignItems: 'center',
   },
-  regionInput: {
-    width: '62%',
+  underline: {
+    color: 'black',
+    fontSize: normalize(TextSize('S')),
+    textDecorationLine: 'underline',
   },
-  zipInput: {
-    backgroundColor: 'white',
-    width: '25%',
-    height: 50,
-    borderRadius: 25,
-    borderColor: 'rgb(223,131,68)',
-    borderWidth: 1,
-    textAlign: 'center',
-    marginLeft: '3%'
-  },
-  initValueTextStyle: {
-    fontSize: 14,
-    color: "#808080"
-  },
-  searchStyle: {
-    borderColor: 'black',
-    height: 40,
-    marginTop: '5%'
-  },
-  selectStyle1: {
-    backgroundColor: 'white',
-    width: '100%',
-    height: 48,
-    borderRadius: 25,
-    borderWidth: 0,    
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  selectStyle2: {
-    backgroundColor: 'white',
-    width: '100%',
-    height: 50,
-    borderRadius: 25,
-    borderColor: 'rgb(223,131,68)',
-    borderWidth: 1,    
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    paddingLeft: '10%'
-  },
-  selectTextStyle: {
-    fontSize: 14,
-    color: 'black'
-  },
-  sectionTextStyle: {
-    fontSize: 18,
-    fontWeight: '500'
-  },
-  cancelStyle: {
-    justifyContent: 'center',
-    height: 50,
-  },
-  cancelTextStyle: {
-    color: 'red',
-    fontSize: 16,
-    fontWeight: '500'
-  },
-  overlayStyle: {
-    flex: 1, 
-    padding: '5%', 
-    justifyContent: 'center', 
-    backgroundColor: 'rgba(0,0,0,0.7)' 
-  },
-  disabledFullWidthInput: {
-    backgroundColor: 'rgb(222, 223, 228)',
-    width: '90%',
-    height: 50,
-    borderRadius: 25,
-    borderColor: 'rgb(223,131,68)',
-    borderWidth: 1,
-    paddingLeft: '5%'
-  },
-  disabledSelectStyle: {
-    backgroundColor: 'rgb(222, 223, 228)',
-    width: '100%',
-    height: 48,
-    borderRadius: 25,
-    borderWidth: 0,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  bottomBtnContainer: {
-    width: '90%',
-    height: '15%',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  nextButtonGray: {
-    height: 50,
-    width: '90%',
+  nextButton: {
+    height: 45,
+    width: '80%',
     borderRadius: 25,
     justifyContent:'center',
     alignItems: 'center',
-    backgroundColor: 'gray',
+    backgroundColor: UMColors.primaryGray,
     elevation: 5
   },
-  nextButtonOrange: {
-    height: 50,
-    width: '90%',
-    borderRadius: 25,
-    justifyContent:'center',
-    alignItems: 'center',
-    backgroundColor: 'rgb(223,131,68)',
-    elevation: 5
-  },
-  buttonText: {
+  nextButtonText: {
     color: 'white',
-    fontSize: 15,
+    fontSize: normalize(TextSize('Normal')),
     fontWeight:'bold'
+  },
+  nextButtonContainer: {
+    width: '90%',
+    alignItems: 'center',
+  },
+  errorContainer:{
+    width: '80%',
+    height: 35,
+    borderWidth: 2,
+    borderRadius: 5,
+    borderColor: UMColors.red,
+    backgroundColor: '#ffcdd2',
+    position: 'absolute',
+    bottom: 25,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  errorMessage:{
+    fontSize: normalize(TextSize('Normal')),
+    textAlign: 'center',
+    color: '#d32f2f'
+  },
+  showPassBtn: {
+    position: 'absolute',
+    bottom: '20%',
+    right: '6%'
   },
 })

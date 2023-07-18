@@ -47,12 +47,12 @@ class Landing extends Component {
           })
         } else {
           dispatch(userLogout())
-          resetNavigation('Start1')
+          resetNavigation('StartScreen')
         }
       } else {
         if(!user.access){
           dispatch(userLogout())
-          resetNavigation('Start1')
+          resetNavigation('StartScreen')
         } else {
           refreshTokenHelper(async() => {
             const response = await CustomerApi.getCustomerData()

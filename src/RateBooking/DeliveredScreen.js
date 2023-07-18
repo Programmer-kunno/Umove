@@ -5,7 +5,8 @@ import {
   SafeAreaView,
   Image,
   Dimensions,
-  TouchableOpacity 
+  TouchableOpacity,
+  ScrollView
 } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { UMColors } from '../utils/ColorHelper'
@@ -35,6 +36,7 @@ export default DeliveredScreen = (props) => {
   const [showModal, setShowModal] = useState(false)
   const [error, setError] = useState({ value: false, message: '' })
   const [isConfirmed, setIsConfirmed] = useState(false)
+  const [selectedItemIndex, setSelectedItemIndex] = useState(0)
 
   useEffect(() => {
     getBookingData()
@@ -155,6 +157,23 @@ export default DeliveredScreen = (props) => {
         >
           <View style={styles.mdlDetailsContainer}>
             <Text style={styles.mdlTitle}>Booking Information</Text>
+            <ScrollView 
+              style={styles.mdlItemPagesContainer}
+              contentContainerStyle={{ alignItems: 'center' }}
+              horizontal={true}
+            >
+              {
+                bookingData?.booking_items.map((item, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={[styles.mdlItemPagesBtn, index === selectedItemIndex && { backgroundColor: UMColors.primaryOrange }]}
+                    onPress={() => setSelectedItemIndex(index)}
+                  >
+                    <Text style={styles.mdlItemPagesTxt}>{'Item ' + (index + 1)}</Text>
+                  </TouchableOpacity>
+                ))
+              }
+            </ScrollView>
             <View style={styles.mdlInfoContainer}>
               <View style={styles.mdlInfo}>
                 <Text style={styles.mdlInfoTxtLeft}>Type of Goods:</Text>
@@ -166,13 +185,13 @@ export default DeliveredScreen = (props) => {
                 <Text style={styles.mdlInfoTxtLeft}>Heigth:</Text>
               </View>
               <View style={[styles.mdlInfo, { alignItems: 'flex-end' }]}>
-                <Text style={styles.mdlInfoTxtRight}>{bookingData.booking_items[0]?.subcategory.value}</Text>
-                <Text style={styles.mdlInfoTxtRight}>{bookingData.booking_items[0]?.uom.value}</Text>
-                <Text style={styles.mdlInfoTxtRight}>{bookingData.booking_items[0]?.quantity}</Text>
-                <Text style={styles.mdlInfoTxtRight}>{bookingData.booking_items[0]?.weight}</Text>
-                <Text style={styles.mdlInfoTxtRight}>{bookingData.booking_items[0]?.length}</Text>
-                <Text style={styles.mdlInfoTxtRight}>{bookingData.booking_items[0]?.width}</Text>
-                <Text style={styles.mdlInfoTxtRight}>{bookingData.booking_items[0]?.height}</Text>
+                <Text style={styles.mdlInfoTxtRight}>{bookingData.booking_items[selectedItemIndex]?.subcategory.value}</Text>
+                <Text style={styles.mdlInfoTxtRight}>{bookingData.booking_items[selectedItemIndex]?.uom.value}</Text>
+                <Text style={styles.mdlInfoTxtRight}>{bookingData.booking_items[selectedItemIndex]?.quantity}</Text>
+                <Text style={styles.mdlInfoTxtRight}>{bookingData.booking_items[selectedItemIndex]?.weight}</Text>
+                <Text style={styles.mdlInfoTxtRight}>{bookingData.booking_items[selectedItemIndex]?.length}</Text>
+                <Text style={styles.mdlInfoTxtRight}>{bookingData.booking_items[selectedItemIndex]?.width}</Text>
+                <Text style={styles.mdlInfoTxtRight}>{bookingData.booking_items[selectedItemIndex]?.height}</Text>
               </View>
             </View>
           </View>
@@ -284,7 +303,6 @@ const styles = StyleSheet.create({
   mdlInfoContainer: {
     width: '95%',
     height: '75%',
-    marginTop: '3%',
     flexDirection: 'row'
   },
   mdlInfo: {
@@ -302,5 +320,21 @@ const styles = StyleSheet.create({
     marginRight: '12%',
     fontWeight: 'bold',
     color: UMColors.primaryOrange
+  },
+  mdlItemPagesContainer: {
+    height: 30,
+    width: '80%',
+    marginTop: 7,
+  },
+  mdlItemPagesBtn: {
+    backgroundColor: UMColors.primaryGray,
+    padding: 5,
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
+    marginRight: 5
+  },
+  mdlItemPagesTxt: {
+    fontSize: 13,
+    color: UMColors.white,
   }
 })

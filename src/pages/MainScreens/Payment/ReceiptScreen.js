@@ -8,7 +8,7 @@ import { refreshTokenHelper } from '../../../api/helper/userHelper'
 import { BookingApi } from '../../../api/booking'
 import CustomNavbar from '../../Components/CustomNavbar'
 import ErrorOkModal from '../../Components/ErrorOkModal'
-import { capitalizeFirst, moneyFormat } from '../../../utils/stringHelper'
+import { TextSize, capitalizeFirst, moneyFormat, normalize } from '../../../utils/stringHelper'
 import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal'
 import { Loader } from '../../Components/Loader'
 import { resetNavigation } from '../../../utils/navigationHelper'
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     marginTop: '5%'
   },
   bookingRefTxt: {
-    fontSize: 20,
+    fontSize: normalize(TextSize('M')),
     color: UMColors.black
   },
   amountContainer: {
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     marginTop: '20%'
   },
   amountTxt: {
-    fontSize: 17,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.black
   },
   paidViaContainer: {
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     height: 22
   },
   cardName: {
-    fontSize: 14,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.black
   },
   dottedBottom: {
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     elevation: 10
   },
   confirmBtnTxt: {
-    fontSize: 17,
+    fontSize: normalize(TextSize('Normal')),
     fontWeight: 'bold',
     color: UMColors.white
   }

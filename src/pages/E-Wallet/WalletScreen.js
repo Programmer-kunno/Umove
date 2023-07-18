@@ -14,7 +14,7 @@ import React, { useEffect, useState } from 'react'
 import { UMColors } from '../../utils/ColorHelper'
 import CustomNavbar from '../Components/CustomNavbar'
 import { UMIcons } from '../../utils/imageHelper'
-import { moneyFormat } from '../../utils/stringHelper'
+import { TextSize, moneyFormat, normalize } from '../../utils/stringHelper'
 import { refreshTokenHelper } from '../../api/helper/userHelper'
 import { CustomerApi } from '../../api/customer'
 import { dispatch } from '../../utils/redux'
@@ -36,7 +36,7 @@ const deviceHeight = Dimensions.get('screen').height
 export default WalletScreen = () => {
   const userDetailsData = useSelector(state => state.userOperations.userDetailsData)
   const [error, setError] = useState({ value: false, message: ''})
-  const [paymentHistoryData, setPaymentHistoryData] = useState(undefined)
+  const [paymentHistoryData, setPaymentHistoryData] = useState([])
   const isFocused = useIsFocused()
   const [renewModal, setRenewModal] = useState(false)
   const [renewInputModal, setRenewInputModal] = useState(false)
@@ -118,11 +118,11 @@ export default WalletScreen = () => {
             resizeMode='contain'
           />
           <View style={{ marginLeft: 5 }}>
-            <Text style={{ fontSize: 15, fontWeight: 'bold' }}>{item.cheque == 'None' ? 'Online Payment' : 'Cheque'}</Text>
-            <Text style={{ fontSize: 10 }}>{item.status}</Text>
+            <Text style={{ fontSize: normalize(TextSize('Normal')), fontWeight: 'bold' }}>{item.cheque == 'None' ? 'Online Payment' : 'Cheque'}</Text>
+            <Text style={{ fontSize: normalize(TextSize('S')) }}>{item.status}</Text>
           </View>
         </View>
-        <Text style={{ fontSize: 13, marginRight: 10 }}>{'₱ ' + moneyFormat(parseInt(item.amount))}</Text>
+        <Text style={{ fontSize: normalize(TextSize('Normal')), marginRight: 10 }}>{'₱ ' + moneyFormat(parseInt(item.amount))}</Text>
       </View>
     )
   }
@@ -182,7 +182,7 @@ export default WalletScreen = () => {
               <Text style={[styles.mdlTxt, { marginTop: 20 }]}>{'Your Credit limit will renew once approved'}</Text>
             </View>
               <TouchableOpacity onPress={() => setRenewModal(false)}>
-                <Text style={[styles.mdlBtnTxt, { marginVertical: 30, fontSize: 20 }]}>Okay</Text>
+                <Text style={[styles.mdlBtnTxt, { marginVertical: 30, fontSize: normalize(TextSize('M')) }]}>Okay</Text>
               </TouchableOpacity>
           </View>
         </View>
@@ -243,11 +243,16 @@ export default WalletScreen = () => {
               </Text>
             </TouchableOpacity>
           </View>
-          <FlatList
-            data={paymentHistoryData}
-            style={styles.historyList}
-            renderItem={renderTransaction}
-          />
+          {
+            paymentHistoryData.length == 0 ?
+              <Text style={[styles.noHistoryTxt, { marginTop: '20%' }]}>No Payment History</Text>
+            :
+            <FlatList
+              data={paymentHistoryData}
+              style={styles.historyList}
+              renderItem={renderTransaction}
+            />
+          }
         </View>
       </View>
         {
@@ -290,7 +295,7 @@ const styles = StyleSheet.create({
     elevation: 7
   },
   creditBalance: {
-    fontSize: 40,
+    fontSize: normalize(TextSize('XXL')),
     fontWeight: '400',
     width: '90%',
     textAlign: 'right',
@@ -305,7 +310,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   bottomPartTxt: {
-    fontSize: 13,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.black
   },
   renewBtn: {
@@ -321,7 +326,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   toPayTxt:{
-    fontSize: 11,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.black
   },
   transactionsTxt: {
@@ -352,7 +357,7 @@ const styles = StyleSheet.create({
     elevation: 7
   },
   payBtnTxt: {
-    fontSize: 18,
+    fontSize: normalize(TextSize('M')),
     fontWeight: 'bold',
     color: UMColors.white
   },
@@ -379,7 +384,7 @@ const styles = StyleSheet.create({
   },
   mdlTxt: {
     color: UMColors.black,
-    fontSize: 18,
+    fontSize: normalize(TextSize('M')),
     fontWeight: '400',
     alignSelf: 'center',
     textAlign: 'center'
@@ -392,7 +397,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   mdlBtnTxt: {
-    fontSize: 17,
+    fontSize: normalize(TextSize('M')),
     fontWeight: 'bold',
     color: UMColors.primaryOrange
   },
@@ -404,7 +409,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 5,
     marginTop: 10,
-    fontSize: 14,
+    fontSize: normalize(TextSize('Normal')),
     paddingLeft: 10,
     elevation: 7
   },
@@ -418,5 +423,11 @@ const styles = StyleSheet.create({
     width: '90%',
     height: 200,
     backgroundColor: UMColors.white
-  }
+  },
+  noHistoryTxt: {
+    fontSize: normalize(TextSize('Normal')),
+    color: UMColors.primaryGray,
+    width: '100%',
+    textAlign: 'center'
+  },
 })

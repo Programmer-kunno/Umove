@@ -3,6 +3,7 @@ import { View, Text, FlatList, ActivityIndicator, Image, StyleSheet, RefreshCont
 import BookingCard from './BookingCard';
 import { UMColors } from '../../utils/ColorHelper';
 import { UMIcons } from '../../utils/imageHelper';
+import { TextSize, normalize } from '../../utils/stringHelper';
 
 const ListComponent = (props) => {
   const { data, loading, type, refreshFunction } = props;
@@ -70,6 +71,6 @@ const styles = StyleSheet.create({
   noDataText: {
     textAlign: 'center', 
     color: '#8E8E8E', 
-    fontSize: 15
+    fontSize: normalize(TextSize('Normal'))
   }
 })

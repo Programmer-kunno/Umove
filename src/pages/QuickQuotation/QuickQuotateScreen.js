@@ -20,7 +20,7 @@ export default QuickQuotateScreen = (props) => {
       dispatch(showError(true))
     } else {
       if(response?.data?.success){
-        navigate('QuickQuotatePriceScreen', { price: response?.data?.data?.price })
+        navigate('QuickQuotatePriceScreen', { price: response?.data?.data?.price, vehicleName: bookingData?.vehicleName })
       } else {
         setError({ value: true, message: response?.data?.message || response?.data})
       }
@@ -66,6 +66,7 @@ export default QuickQuotateScreen = (props) => {
             source={UMIcons.quickQuotateIcon}
             resizeMode={'contain'}
           />
+          <Text style={styles.quickQuotateTxt}>Quick Quote</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -100,7 +101,6 @@ const styles = StyleSheet.create({
     textAlign: 'justify'
   },
   btnContainer: {
-    height: '25%',
     width: '90%',
     justifyContent: 'center',
     alignItems: 'center',
@@ -112,5 +112,13 @@ const styles = StyleSheet.create({
   },
   quickQuoteImg: {
     width: '100%',
+  },
+  quickQuotateTxt: {
+    fontSize: 21,
+    fontWeight: 'bold',
+    color: UMColors.white,
+    position: 'absolute',
+    top: '31%',
+    right: '21%'
   }
 })

@@ -4,16 +4,14 @@ import { Dimensions } from 'react-native'
 
 import { UMColors } from '../../utils/ColorHelper';
 import { UMIcons } from '../../utils/imageHelper';
+import { TextSize, normalize } from '../../utils/stringHelper';
 
 let deviceWidth = Dimensions.get('window').width
 
-export default class Start2 extends Component {  
+export default class StartScreen extends Component {  
   constructor(props) {
     super(props);
     
-    this.state = { 
-      chooseMove: this.props.route.params.vehicle_type,
-    };
   }
 
   render() {
@@ -97,7 +95,7 @@ const styles = StyleSheet.create({
   },
   signUpTxt: {
     color: UMColors.white,
-    fontSize: 18,
+    fontSize: normalize(TextSize('M')),
     fontWeight: 'bold'
   },
   signUpChoicesContainer: {
@@ -122,7 +120,7 @@ const styles = StyleSheet.create({
   },
   choiceTxt: {
     color: UMColors.white,
-    fontSize: 14,
+    fontSize: normalize(TextSize('Normal')),
     marginTop: '2%'
   },
   logInContainer: {
@@ -134,7 +132,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   logInTxt: {
-    fontSize: 15,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.white
   }
 })

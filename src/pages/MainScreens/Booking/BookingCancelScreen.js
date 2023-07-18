@@ -12,6 +12,7 @@ import React, { Component } from 'react'
 
 import { UMIcons } from '../../../utils/imageHelper';
 import { BookingApi } from '../../../api/booking';
+import { TextSize, normalize } from '../../../utils/stringHelper';
 
 export default class BookingCancelScreen extends Component {
   constructor(props) {
@@ -104,7 +105,7 @@ const styles = StyleSheet.create({
     height: 70
   },
   statusTxt: {
-    fontSize: 19,
+    fontSize: normalize(TextSize('L')),
     textAlign: 'center',
     marginTop: '10%',
     fontWeight: '400'
@@ -125,7 +126,7 @@ const styles = StyleSheet.create({
     borderRadius: 50
   },
   backBtnTxt: {
-    fontSize: 16,
+    fontSize: normalize(TextSize('M')),
     fontWeight: '600',
     color: 'white'
   }

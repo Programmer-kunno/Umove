@@ -22,6 +22,7 @@ import { setLoading } from '../../../redux/actions/Loader';
 import { Loader } from '../../Components/Loader';
 import ErrorOkModal from '../../Components/ErrorOkModal';
 import { useIsFocused } from '@react-navigation/native';
+import { TextSize, normalize } from '../../../utils/stringHelper';
 
 export default BookingDropOffScreen = (props) => { 
   const [bookingData, setBookingData] = useState({})
@@ -453,8 +454,8 @@ const styles = StyleSheet.create({
   },
   labelText: {
     color: UMColors.primaryOrange,
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: normalize(TextSize('Normal')),
+    fontWeight: 'bold',
     letterSpacing: 1
   },
   inputContainer: {
@@ -512,6 +513,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgb(223,131,68)',
     justifyContent: 'center',
+    fontSize: normalize(TextSize('Normal')) 
   },
   regionInput: {
     width: '62%',
@@ -524,7 +526,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgb(223,131,68)',
     textAlign: 'center',
-    marginLeft: '3%'
+    marginLeft: '3%',
+    fontSize: normalize(TextSize('Normal')),
   },
   landmarkTxtInput: {
     backgroundColor: 'white',
@@ -533,10 +536,11 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     borderWidth: 1,
     borderColor: 'rgb(223,131,68)',
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
+    fontSize: normalize(TextSize('Normal')),
   },
   initValueTextStyle: {
-    fontSize: 14,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.primaryGray
   },
   searchStyle: {
@@ -566,11 +570,11 @@ const styles = StyleSheet.create({
     paddingLeft: '7%'
   },
   selectTextStyle: {
-    fontSize: 14,
+    fontSize: normalize(TextSize('Normal')),
     color: 'black'
   },
   sectionTextStyle: {
-    fontSize: 18,
+    fontSize: normalize(TextSize('M')),
     fontWeight: '500'
   },
   cancelStyle: {
@@ -579,7 +583,7 @@ const styles = StyleSheet.create({
   },
   cancelTextStyle: {
     color: 'red',
-    fontSize: 16,
+    fontSize: normalize(TextSize('Normal')),
     fontWeight: '500'
   },
   overlayStyle: {
@@ -633,7 +637,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
-    fontSize: 15,
+    fontSize: normalize(TextSize('M')),
     fontWeight:'bold'
   },
   centeredView: {
@@ -653,7 +657,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
-    fontSize: 15
+    fontSize: normalize(TextSize('Normal')),
   },
   blurContainer: {
     flex: 1,

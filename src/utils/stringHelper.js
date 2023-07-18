@@ -4,6 +4,60 @@
  * @param {email} - The email we need to validate.
  * @returns {boolean}
  */
+
+import { Dimensions } from 'react-native';
+
+const {
+  width,
+  height
+} = Dimensions.get('window');
+
+const MONTH_NAMES = ["January", "Feburary", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+
+export const deviceWidth = width;
+export const deviceHeight = height;
+
+export const TextSize = (size) => {
+  switch(size){
+    case 'XS': {
+      return 11
+    }
+    case 'S': {
+      return 13
+    }
+    case 'Normal': {
+      return 17
+    }
+    case 'M': {
+      return 19
+    }
+    case 'L': {
+      return 23
+    }
+    case 'XL': {
+      return 32
+    }
+    case 'XXL': {
+      return 40
+    }
+    default:
+  }
+}
+
+export const normalize = (size) => {
+  if(width > 400){
+    return size;
+  } else if(width > 350) {
+    return size - 2
+  } else if(width > 300) {
+    return size - 3
+  } else if(width > 250){
+    return size - 4;
+  } else { 
+    return size - 5;
+  }
+}
+
 export const emailRegex = (email) => {
   const re = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
   return re.test(email);
@@ -59,4 +113,22 @@ export const make12HoursFormat = (time) => {
   }
 
   return `${newHour}` + ':' + minutes + (seconds ? `:${seconds}` : '') + ' ' + meridian
+}
+
+export const getDataFromTime = (date, type) => {
+  const splitterDate = date.split(" ");
+
+  if(type === "time") {
+    return splitterDate[1];
+  }
+
+  return splitterDate[0];
+}
+
+export const returnDate = (value) => {
+  const date = getDataFromTime(value, "date");
+  const splittedDate = date.split("-");
+  const month = MONTH_NAMES[parseInt(splittedDate[1]) - 1]
+ 
+  return `${month} ${splittedDate[2]}, ${splittedDate[0]}`;
 }

@@ -58,7 +58,7 @@ export default QuickQuotationSelectVehicle = (props) => {
       <TouchableOpacity 
         style={styles.vehicleBtn}
         onPress={() => {
-          navigate('QuickQuotationItemScreen', { vehicleType: item.id })
+          navigate('QuickQuotationItemScreen', { vehicleType: item.id, vehicleName: item.type_name })
         }}
       >
         <Image

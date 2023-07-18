@@ -17,7 +17,7 @@ import { dispatch } from '../../../utils/redux'
 import { showError } from '../../../redux/actions/ErrorModal'
 import ErrorWithCloseButtonModal from '../../Components/ErrorWithCloseButtonModal'
 import { refreshTokenHelper } from '../../../api/helper/userHelper'
-import { capitalizeFirst } from '../../../utils/stringHelper'
+import { TextSize, capitalizeFirst, normalize } from '../../../utils/stringHelper'
 import { RadioButton } from 'react-native-paper'
 import { useIsFocused } from '@react-navigation/native'
 import { setLoading } from '../../../redux/actions/Loader'
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     marginTop: '5%'
   },
   titleTxt: {
-    fontSize: 17,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.black,
     fontWeight: 'bold',
   },
@@ -210,15 +210,15 @@ const styles = StyleSheet.create({
   },
   addItemTxt: {
     color: UMColors.primaryOrange,
-    fontSize: 13
+    fontSize: normalize(TextSize('Normal'))
   },
   cardName:{
-    fontSize: 15,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.black,
     fontWeight: 'bold'
   },
   cardNumber: {
-    fontSize: 10,
+    fontSize: normalize(TextSize('S')),
     color: UMColors.primaryGray
   },
   cardContainer: {
@@ -235,13 +235,13 @@ const styles = StyleSheet.create({
   },
   noCardMethodTxt: {
     alignSelf: 'center', 
-    fontSize: 15, 
+    fontSize: normalize(TextSize('Normal')), 
     padding: 20, 
     color: UMColors.primaryGray
   },
   primaryTxt: {
     fontStyle: 'italic',
-    fontSize: 13,
+    fontSize: normalize(TextSize('Normal')),
     position: 'absolute',
     right: 40,
     top: 10

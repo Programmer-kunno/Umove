@@ -1,6 +1,7 @@
 import { View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native'
 import React from 'react'
 import { UMColors } from '../../utils/ColorHelper'
+import { TextSize, normalize } from '../../utils/stringHelper'
 
 export default OrangeConfirmationModal= (props) => {
   const { visible, message } = props
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
   },
   mdlTxt: {
     color: UMColors.black,
-    fontSize: 18,
+    fontSize: normalize(TextSize('M')),
     paddingHorizontal: 20,
     lineHeight: 30,
     fontWeight: '400',
@@ -72,7 +73,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   },
   mdlBtnTxt: {
-    fontSize: 16,
+    fontSize: normalize(TextSize('Normal')),
     fontWeight: 'bold'
   }
 })

@@ -8,8 +8,7 @@ import CustomDrawer from '../Components/CustomDrawer';
 import { setTopNavigationRef } from '../../utils/navigationHelper';
 
 import Landing from '../Landing';
-import Start1 from '../Start/Start1';
-import Start2 from '../Start/Start2';
+import StartScreen from '../Start/StartScreen';
 import Login from '../Login/Login';
 import ForgotPassword from '../Login/ForgotPassword';
 import SignUpScreen from '../SignUp/SignUpScreen';
@@ -17,8 +16,7 @@ import SignUpScreen1 from '../SignUp/SignUpScreens/SignUpScreen1';
 import SignUpScreen2 from '../SignUp/SignUpScreens/SignUpScreen2';
 import SignUpScreen3 from '../SignUp/SignUpScreens/SignUpScreen3';
 import SignUpScreen4 from '../SignUp/SignUpScreens/SignUpScreen4';
-import SignUpScreen5 from '../SignUp/SignUpScreens/SignUpScreen5';
-import SignUpScreen6 from '../SignUp/SignUpScreens/SignUpScreen6';
+import OTPScreen from '../MainScreens/OTPScreen';
 import QuickQuotationItemScreen from '../QuickQuotation/QuickQuotationItemScreen';
 import QuickQuotationPickUp from '../QuickQuotation/QuickQuotationPickUp';
 import QuickQuotationDropOff from '../QuickQuotation/QuickQuotationDropOff';
@@ -85,6 +83,8 @@ import BookingDropOffMap from '../MainScreens/Booking/BookingDropOffMap';
 import QuickQuotationPickUpMap from '../QuickQuotation/QuickQuotationPickUpMap';
 import QuickQuotationDropOffMap from '../QuickQuotation/QuickQuotationDropOffMap';
 import QuickQuotationSelectVehicle from '../QuickQuotation/QuickQuotationSelectVehicle';
+import AppVersion from '../MainScreens/ProfileDrawerScreens/AppVersion';
+import PaymentSettingsScreen from '../MainScreens/ProfileDrawerScreens/PaymentSettings/PaymentSettingsScreen';
 
 export default RootNavigation = () => {
   const Stack = createStackNavigator();
@@ -124,8 +124,7 @@ export default RootNavigation = () => {
     <StatusBar barStyle="dark-content" translucent backgroundColor={'transparent'} />
     <Stack.Navigator initialRouteName="Landing" screenOptions={{headerShown: false}} >
       <Stack.Screen name="Landing" component={Landing} />
-      <Stack.Screen name="Start1" component={Start1} options={{ cardStyleInterpolator: forFade, gestureEnabled: false }} />
-      <Stack.Screen name="Start2" component={Start2} options={{ cardStyleInterpolator: forFade}} />
+      <Stack.Screen name="StartScreen" component={StartScreen} options={{ cardStyleInterpolator: forFade, gestureEnabled: false }} />
       <Stack.Screen name="Login" component={Login} options={{ cardStyleInterpolator: forFade, gestureEnabled: false }} />
       <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ cardStyleInterpolator: forFade, gestureEnabled: false }} />
       <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
@@ -133,8 +132,7 @@ export default RootNavigation = () => {
       <Stack.Screen name="SignUpScreen2" component={SignUpScreen2} />
       <Stack.Screen name="SignUpScreen3" component={SignUpScreen3} />
       <Stack.Screen name="SignUpScreen4" component={SignUpScreen4} />
-      <Stack.Screen name="SignUpScreen5" component={SignUpScreen5} />
-      <Stack.Screen name="SignUpScreen6" component={SignUpScreen6} />
+      <Stack.Screen name="OTPScreen" component={OTPScreen} />
       <Stack.Screen name="QuickQuotationSelectVehicle" component={QuickQuotationSelectVehicle} />
       <Stack.Screen name="QuickQuotationItemScreen" component={QuickQuotationItemScreen} options={{ cardStyleInterpolator: forFade, gestureEnabled: false }} />
       <Stack.Screen name="QuickQuotationPickUp" component={QuickQuotationPickUp} />
@@ -172,6 +170,8 @@ export default RootNavigation = () => {
       <Stack.Screen name="CompanyProfileScreen" component={CompanyProfileScreen} />
       <Stack.Screen name="ChatScreen" component={Chat} />
       <Stack.Screen name="Settings" component={Settings} />
+      <Stack.Screen name="AppVersion" component={AppVersion} />
+      <Stack.Screen name="PaymentSettingsScreen" component={PaymentSettingsScreen} />
       {/* Edit Profile Screens */}
       <Stack.Screen name="EditName" component={EditName} />
       <Stack.Screen name="EditUsername" component={EditUsername} />
@@ -179,7 +179,7 @@ export default RootNavigation = () => {
       <Stack.Screen name="EditMobileNumber" component={EditMobileNumber} />
       <Stack.Screen name="EditAddress" component={EditAddress} />
       <Stack.Screen name="EditValidID" component={EditValidID} />
-      {/* Edit Profile Screens */}
+      {/* Edit Company Screens */}
       <Stack.Screen name="EditCompanyName" component={EditCompanyName} />
       <Stack.Screen name="EditCompanyEmail" component={EditCompanyEmail} />
       <Stack.Screen name="EditCompanyMobileNumber" component={EditCompanyMobileNumber} />

@@ -26,6 +26,9 @@ export const UMIcons = {
   userBlankProfile: require('../assets/user/user-blank.png'),
   profilePicIcon: require('../assets/icons/profile-pic.png'),
   truckImg: require('../assets/truck/truckImg.png'),
+  bgImage: require('../assets/bg-image.jpg'),
+  uploadLogoImage: require('../assets/signup/uploadLogoPic.png'),
+  uploadWithText: require('../assets/signup/uploadWithText.png'),
   //Profile Drawer
   homeWalletIcon: require('../assets/drawer/UMoveWalletIcon.png'),
   historyIcon: require('../assets/drawer/history.png'),
@@ -80,6 +83,8 @@ export const UMIcons = {
   eyeICon: require('../assets/icons/eyeIcon.png'),
   eyeClosedIcon: require('../assets/icons/eyeClosedIcon.png'),
   magnefyingGlassIcon: require('../assets/icons/magnefyingGlassIcon.png'),
+  pickUpIcon: require('../assets/icons/pickUpIcon.png'),
+  fullyVerifiedCheck: require('../assets/icons/fullyVerifiedCheck.png'),
   //Help
   orangeCircleTarget: require('../assets/help/orange-circle-target.png'),
   orangeCircleHeadset: require('../assets/help/orange-circle-headset.png'),

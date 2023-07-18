@@ -7,6 +7,7 @@ import ErrorWithCloseButtonModal from '../Components/ErrorWithCloseButtonModal'
 import CustomNavbar from '../Components/CustomNavbar'
 import { Loader } from '../Components/Loader'
 import TransactionTabs from './TransactionTabs'
+import { TextSize } from '../../utils/stringHelper'
 
 const Transactions = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -34,7 +35,7 @@ const Transactions = () => {
                 <TouchableOpacity style={styles.alignItemCenter}
                   onPress={() => {
                     setModalVisible(false)
-                    navigate('BookingItemScreen', { bookingType: 'Exclusive' })
+                    navigate('BookingSelectVehicle', { bookingType: 'Exclusive' })
                   }}
                   >
                   <Image 
@@ -49,7 +50,7 @@ const Transactions = () => {
                 <TouchableOpacity style={styles.alignItemCenter}
                   onPress={() => {
                     setModalVisible(false)
-                    navigate('BookingItemScreen', { bookingType: 'Shared' })
+                    navigate('BookingSelectVehicle', { bookingType: 'Shared' })
                   }}
                 >
                   <Image 
@@ -137,7 +138,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
-    fontSize: 15
+    fontSize: TextSize('Normal')
   },
   bookButtonContainer: {
     paddingHorizontal: 20, 
@@ -152,7 +153,7 @@ const styles = StyleSheet.create({
     borderRadius: 20
   },
    bookButtonText: {
-    fontSize: 20, 
+    fontSize: TextSize('M'), 
     color: UMColors.white
   }
 })

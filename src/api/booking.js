@@ -124,21 +124,9 @@ export class BookingApi {
           "destination_longitude": data.dropoffLongitude.toString(),
         }
       ],
-      "booking_items": [
-        {
-          "subcategory": data.productSubcategory,
-          "uom": data.packagingType,
-          "length": data.length,
-          "width": data.width,
-          "height": data.height,
-          "weight": data.weight,
-          "quantity": data.quantity
-        }
-      ]
+      "booking_items": data.bookingItems
     }
 
-    console.log(bookingDetails)
-    
     try {
       const response = await post('/api/bookings/book-delivery', bookingDetails, {}, false)
       return response

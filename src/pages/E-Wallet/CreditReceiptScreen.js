@@ -10,7 +10,7 @@ import {
 import React, { useEffect, useState } from 'react'
 import { UMColors } from '../../utils/ColorHelper'
 import CustomNavbar from '../Components/CustomNavbar'
-import { capitalizeFirst, moneyFormat } from '../../utils/stringHelper'
+import { TextSize, capitalizeFirst, moneyFormat, normalize } from '../../utils/stringHelper'
 import { UMIcons } from '../../utils/imageHelper'
 import { navigate, resetNavigation } from '../../utils/navigationHelper'
 import { useIsFocused } from '@react-navigation/native'
@@ -107,10 +107,10 @@ const styles = StyleSheet.create({
   referenceNoTxt: {
     color: UMColors.primaryOrange,
     fontWeight: 'bold',
-    fontSize: 18
+    fontSize: normalize(TextSize('M'))
   },
   referenceNoTitle: { 
-    fontSize: 15,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.black,
     marginTop: 5
   },
@@ -125,17 +125,17 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
   computationTxt: {
-    fontSize: 17,
+    fontSize: normalize(TextSize('M')),
     marginHorizontal: 6,
     color: UMColors.black
   },
   standardFont: {
-    fontSize: 15,
+    fontSize: normalize(TextSize('Normal')),
     color: UMColors.black,
   },
   priceTxt: {
     color: UMColors.primaryOrange,
-    fontSize: 35,
+    fontSize: normalize(TextSize('XL')),
     fontWeight: 'bold'
   },
   cardContainer: {
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     height: 32
   },
   cardName: {
-    fontSize: 18,
+    fontSize: normalize(TextSize('M')),
     color: UMColors.black,
     fontWeight: 'bold',
     marginLeft: 5
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     elevation: 7
   },
   confirmBtnTxt: {
-    fontSize: 18,
+    fontSize: normalize(TextSize('M')),
     fontWeight: 'bold',
     color: UMColors.white
   }

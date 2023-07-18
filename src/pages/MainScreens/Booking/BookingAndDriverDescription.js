@@ -4,63 +4,60 @@ import {
   StyleSheet, 
   Image,
   TouchableOpacity,
+  Dimensions,
+  ScrollView
 } from 'react-native'
-import React, { Component } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { UMColors } from '../../../utils/ColorHelper'
 import RBSheet from 'react-native-raw-bottom-sheet'
 import { navigate, resetNavigation } from '../../../utils/navigationHelper';
-import { dispatch } from '../../../utils/redux';
-import { setLoading } from '../../../redux/actions/Loader';
-import { BookingApi } from '../../../api/booking';
-import { showError } from '../../../redux/actions/ErrorModal';
 import { UMIcons } from '../../../utils/imageHelper';
 import { openNumber } from '../../../utils/phone';
+import { TextSize, normalize } from '../../../utils/stringHelper';
 
-export default class BookingAndDriverDescription extends Component {
-  constructor(props){
-    super(props);
+const deviceWidth = Dimensions.get('screen').width
 
-    this.state = {
-      booking: this.props.route?.params?.booking,
-      appointment: null,
-      userProfile: null,
-      userVehicle: null,
-      driverLocation: null,
-      visibleDetailsModal: false,
-    }
+export default BookingAndDriverDescription = (props) => {
 
-    this.RBSheet = null
+  const [bookingData, setBookingData] = useState(null)
+  const [appointmentData, setAppointmentData] = useState(null)
+  const [userProfileData, setUserProfileData] = useState(null)
+  const [userVehicleData, setUserVehicleData] = useState(null)
+  const [driverLocation, setDriverLocation] = useState(null)
+  const [visibleDetailsModal, setVisibleDetailsModal] = useState(false)
+  const [selectedItemIndex, setSelectedItemIndex] = useState(0)
+  const RBSheetRef = useRef(null)
+
+  const setRef = (ref) => {
+    RBSheetRef.current = ref;
   }
 
-  async componentDidMount () {
-    console.log(this.state.booking?.status)
-    this.init()
+  useEffect(() => {
+    init()
+  }, [])
+
+  const init = () => {
+    setBookingData(props.route.params?.booking)
+    setAppointmentData(props.route.params?.booking?.booking_routes[0]?.booking_appointments[0])
+    setUserVehicleData(props.route.params?.booking?.booking_routes[0]?.booking_appointments[0]?.vehicle)
+    setUserProfileData(props.route.params?.booking?.booking_routes[0]?.booking_appointments[0]?.driver?.user?.user_profile)
   }
 
-  async init() {
-    const bookRes = this.state.booking
-    this.setState({ 
-      appointment: bookRes?.booking_routes[0]?.booking_appointments[0],
-      userProfile: bookRes?.booking_routes[0]?.booking_appointments[0]?.driver?.user?.user_profile,
-      userVehicle: bookRes?.booking_routes[0]?.booking_appointments[0]?.vehicle,
-    })
+  const onPressCall = () => {
+    openNumber(userProfileData.mobile_number)
   }
 
-  onPressCall() {
-    openNumber(this.state.userProfile.mobile_number)
+  const onPressChat = () => {
+    navigate('ChatScreen', { data: userProfileData.account_number })
   }
 
-  onPressChat() {
-    navigate('ChatScreen', { data: this.state.userProfile.account_number })
-  }
-
-  bookDetailsModal() {
-    if(!this.state.booking?.booking_items) {
+  const bookDetailsModal = () => {
+    if(!bookingData?.booking_items) {
       return null
     } else {
       return(
         <RBSheet
-          ref={ref => this.RBSheet = ref}
+          ref={setRef}
           height={320}
           openDuration={250}
           customStyles={{
@@ -74,6 +71,23 @@ export default class BookingAndDriverDescription extends Component {
         >
           <View style={styles.mdlDetailsContainer}>
             <Text style={styles.mdlTitle}>Booking Information</Text>
+            <ScrollView 
+              style={styles.mdlItemPagesContainer}
+              contentContainerStyle={{ alignItems: 'center' }}
+              horizontal={true}
+            >
+              {
+                bookingData?.booking_items.map((item, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={[styles.mdlItemPagesBtn, index === selectedItemIndex && { backgroundColor: UMColors.primaryOrange }]}
+                    onPress={() => setSelectedItemIndex(index)}
+                  >
+                    <Text style={styles.mdlItemPagesTxt}>{'Item ' + (index + 1)}</Text>
+                  </TouchableOpacity>
+                ))
+              }
+            </ScrollView>
             <View style={styles.mdlInfoContainer}>
               <View style={styles.mdlInfo}>
                 <Text style={styles.mdlInfoTxtLeft}>Type of Goods:</Text>
@@ -85,13 +99,13 @@ export default class BookingAndDriverDescription extends Component {
                 <Text style={styles.mdlInfoTxtLeft}>Heigth:</Text>
               </View>
               <View style={[styles.mdlInfo, { alignItems: 'flex-end' }]}>
-                <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.subcategory.value}</Text>
-                <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.uom.value}</Text>
-                <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.quantity}</Text>
-                <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.weight}</Text>
-                <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.length}</Text>
-                <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.width}</Text>
-                <Text style={styles.mdlInfoTxtRight}>{this.state.booking?.booking_items[0]?.height}</Text>
+                <Text style={styles.mdlInfoTxtRight}>{bookingData?.booking_items[selectedItemIndex]?.subcategory.value}</Text>
+                <Text style={styles.mdlInfoTxtRight}>{bookingData?.booking_items[selectedItemIndex]?.uom.value}</Text>
+                <Text style={styles.mdlInfoTxtRight}>{bookingData?.booking_items[selectedItemIndex]?.quantity}</Text>
+                <Text style={styles.mdlInfoTxtRight}>{bookingData?.booking_items[selectedItemIndex]?.weight}</Text>
+                <Text style={styles.mdlInfoTxtRight}>{bookingData?.booking_items[selectedItemIndex]?.length}</Text>
+                <Text style={styles.mdlInfoTxtRight}>{bookingData?.booking_items[selectedItemIndex]?.width}</Text>
+                <Text style={styles.mdlInfoTxtRight}>{bookingData?.booking_items[selectedItemIndex]?.height}</Text>
               </View>
             </View>
           </View>
@@ -100,126 +114,124 @@ export default class BookingAndDriverDescription extends Component {
     }
   }
 
-  render() {
-    return (
-      <View style={styles.mainContainer}>
-        {
-          this.state.appointment !== null &&
-          <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-            <View style={styles.mainLogoContainer}>
+  return (
+    <View style={styles.mainContainer}>
+      {
+        appointmentData !== null &&
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <View style={styles.mainLogoContainer}>
+            <Image
+              style={styles.headerLogo}
+              source={UMIcons.mainLogo}
+              resizeMode={'contain'}
+            />  
+          </View>
+          <View style={styles.courierDetailsContainer}>
+            <View style={styles.courierDetails}>
+              <View style={styles.driverDetails}>
+                <Text style={{ fontSize: normalize(TextSize('Normal')), fontWeight: 'bold'}}>{userProfileData?.first_name + ' ' + userProfileData?.last_name}</Text>
+                <Text style={{ fontSize: normalize(TextSize('S')), marginBottom: '10%' }}>{userProfileData?.mobile_number}</Text>
+                <Image
+                  style={{ width: '80%', height: '60%', borderRadius: 15 }}
+                  source={{ uri: userProfileData?.profile_image }}
+                  resizeMode={'contain'}
+                />
+              </View>
+              <View style={styles.rideDetails}>
+                <Image 
+                  style={{ width: '80%', height: '60%', borderRadius: 15 }}
+                  source={{ uri: userVehicleData?.vehicle_image[0]?.image }}
+                  resizeMode={'contain'}
+                />
+                <Text style={{fontSize: normalize(TextSize('Normal')), marginTop: '10%'}}>{userVehicleData?.plate_number}</Text>
+                <Text style={{fontSize: normalize(TextSize('S'))}}>{userVehicleData?.vehicle_name}</Text>
+              </View>
+            </View>
+            <View style={styles.vacStatusContainer}>
+                <Image
+                  style={{ height: '80%', marginRight: 10 }}
+                  source={UMIcons.fullVaccinatedIcon}
+                  resizeMode={'contain'}
+                />
+                <Text style={{ fontSize: normalize(TextSize('M')), fontWeight: 'bold'}}>Fully Vaccinated</Text>
+            </View>
+          </View>
+          <View style={styles.contactDriverContainter}>
+            <TouchableOpacity
+              style={styles.contactBtn}
+              onPress={() => onPressCall()}
+            >
               <Image
-                style={styles.headerLogo}
-                source={UMIcons.mainLogo}
+                style={{ width: '90%' }}
+                source={UMIcons.callIcon}
                 resizeMode={'contain'}
-              />  
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.contactBtn}
+              onPress={() => onPressChat()}
+            >
+              <Image
+                style={{ width: '90%' }}
+                source={UMIcons.messageIcon}
+                resizeMode={'contain'}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.contactBtn}
+              onPress={() => {
+                navigate('BookingDriverLocation', {
+                  bookingNumber: bookingData?.booking_number,
+                  destination: {
+                    latitude: bookingData?.booking_routes[0]?.destination_latitude,
+                    longitude: bookingData?.booking_routes[0]?.destination_longitude
+                  },
+                  origin: {
+                    latitude: bookingData?.booking_routes[0]?.origin_latitude,
+                    longitude: bookingData?.booking_routes[0]?.origin_longitude
+                  },
+                  driverLocation: driverLocation
+                })
+              }}
+            >
+              <Image
+                style={{ width: '90%' }}
+                source={UMIcons.locationIcon}
+                resizeMode={'contain'}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.bookingDetailsContainer}>
+            <Text style={{ fontSize: normalize(TextSize('L')), color: 'rgb(223,131,68)', fontWeight: '400' }}>{bookingData?.status}</Text>
+            <View style={styles.bookigRefContainer}>
+              <Text style={styles.bookingRefTxt}>Booking No.</Text>
+              <Text style={[styles.bookingRefTxt, { textAlign: 'right' }]}>{bookingData?.booking_number}</Text>
             </View>
-            <View style={styles.courierDetailsContainer}>
-              <View style={styles.courierDetails}>
-                <View style={styles.driverDetails}>
-                  <Text style={{ fontSize: 15, fontWeight: 'bold'}}>{this.state.userProfile?.first_name + ' ' + this.state.userProfile?.last_name}</Text>
-                  <Text style={{ fontSize: 12, marginBottom: '10%' }}>{this.state.userProfile?.mobile_number}</Text>
-                  <Image
-                    style={{ width: '80%', height: '60%', borderRadius: 15 }}
-                    source={{ uri: this.state.userProfile?.profile_image }}
-                    resizeMode={'contain'}
-                  />
-                </View>
-                <View style={styles.rideDetails}>
-                  <Image 
-                    style={{ width: '80%', height: '60%', borderRadius: 15 }}
-                    source={{ uri: this.state.userVehicle?.vehicle_image[0]?.image }}
-                    resizeMode={'contain'}
-                  />
-                  <Text style={{fontSize: 17, marginTop: '10%'}}>{this.state.userVehicle?.plate_number}</Text>
-                  <Text style={{fontSize: 12}}>{this.state.userVehicle?.vehicle_name}</Text>
-                </View>
-              </View>
-              <View style={styles.vacStatusContainer}>
-                  <Image
-                    style={{ height: '80%', marginRight: 10 }}
-                    source={UMIcons.fullVaccinatedIcon}
-                    resizeMode={'contain'}
-                  />
-                  <Text style={{ fontSize: 17, fontWeight: 'bold'}}>Fully Vaccinated</Text>
-              </View>
-            </View>
-            <View style={styles.contactDriverContainter}>
-              <TouchableOpacity
-                style={styles.contactBtn}
-                onPress={() => this.onPressCall()}
-              >
-                <Image
-                  style={{ width: '90%' }}
-                  source={UMIcons.callIcon}
-                  resizeMode={'contain'}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.contactBtn}
-                onPress={() => this.onPressChat()}
-              >
-                <Image
-                  style={{ width: '90%' }}
-                  source={UMIcons.messageIcon}
-                  resizeMode={'contain'}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.contactBtn}
-                onPress={() => {
-                  navigate('BookingDriverLocation', {
-                    bookingNumber: this.state.booking?.booking_number,
-                    destination: {
-                      latitude: this.state.booking?.booking_routes[0]?.destination_latitude,
-                      longitude: this.state.booking?.booking_routes[0]?.destination_longitude
-                    },
-                    origin: {
-                      latitude: this.state.booking?.booking_routes[0]?.origin_latitude,
-                      longitude: this.state.booking?.booking_routes[0]?.origin_longitude
-                    },
-                    driverLocation: this.state.driverLocation
-                  })
-                }}
-              >
-                <Image
-                  style={{ width: '90%' }}
-                  source={UMIcons.locationIcon}
-                  resizeMode={'contain'}
-                />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.bookingDetailsContainer}>
-              <Text style={{ fontSize: 25, color: 'rgb(223,131,68)', fontWeight: '400' }}>{this.state.booking?.status}</Text>
-              <View style={styles.bookigRefContainer}>
-                <Text style={styles.bookingRefTxt}>Booking No.</Text>
-                <Text style={[styles.bookingRefTxt, { textAlign: 'right' }]}>{this.state.booking?.booking_number}</Text>
-              </View>
-            </View>
-            <View style={styles.bottomBtnContainer}>
-              <TouchableOpacity
-                style={styles.bottomBtn}
-                onPress={() => {
-                  this.RBSheet.open()
-                  this.setState({ visibleDetailsModal: true })
-                }}
-              >
-                <Text style={styles.btmBtnTxt}>View Details</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.bottomBtn}
-                onPress={() => {
-                  resetNavigation('DrawerNavigation')
-                }}
-              >
-                <Text style={styles.btmBtnTxt}>Okay</Text>
-              </TouchableOpacity>
-            </View>
-         </View>
-        }
-        {this.bookDetailsModal()}
-      </View>
-    )
-  }
+          </View>
+          <View style={styles.bottomBtnContainer}>
+            <TouchableOpacity
+              style={styles.bottomBtn}
+              onPress={() => {
+                RBSheetRef.current.open()
+                setVisibleDetailsModal(true)
+              }}
+            >
+              <Text style={styles.btmBtnTxt}>View Details</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.bottomBtn}
+              onPress={() => {
+                resetNavigation('DrawerNavigation')
+              }}
+            >
+              <Text style={styles.btmBtnTxt}>Okay</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      }
+      {bookDetailsModal()}
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -298,7 +310,7 @@ const styles = StyleSheet.create({
   },
   bookingRefTxt: {
     width: '45%',
-    fontSize: 17,
+    fontSize: normalize(TextSize('M')),
     marginTop: '5%'
   },
   bottomBtnContainer: {
@@ -319,7 +331,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgb(223,131,68)',
   },
   btmBtnTxt: {
-    fontSize: 16,
+    fontSize: normalize(TextSize('M')),
     color: 'white',
     fontWeight: '500'
   },
@@ -337,13 +349,12 @@ const styles = StyleSheet.create({
   },
   mdlTitle: {
     marginTop: '7%',
-    fontSize: 18,
+    fontSize: normalize(TextSize('M')),
     fontWeight: 'bold',
   },
   mdlInfoContainer: {
     width: '95%',
     height: '75%',
-    marginTop: '3%',
     flexDirection: 'row'
   },
   mdlInfo: {
@@ -351,15 +362,31 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   mdlInfoTxtLeft: {
-    fontSize: 16,
+    fontSize: normalize(TextSize('Normal')),
     marginTop: '6%',
     marginLeft: '12%',
   },
   mdlInfoTxtRight: {
-    fontSize: 16,
+    fontSize: normalize(TextSize('Normal')),
     marginTop: '6%',
     marginRight: '12%',
     fontWeight: 'bold',
     color: UMColors.primaryOrange
+  },
+  mdlItemPagesContainer: {
+    height: 30,
+    width: '80%',
+    marginTop: 7,
+  },
+  mdlItemPagesBtn: {
+    backgroundColor: UMColors.primaryGray,
+    padding: 5,
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
+    marginRight: 5
+  },
+  mdlItemPagesTxt: {
+    fontSize: normalize(TextSize('Normal')),
+    color: UMColors.white,
   }
 })
